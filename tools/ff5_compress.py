@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import numpy as np
 
 
 def encode_rle16(src):
@@ -240,31 +241,38 @@ def encode_lzss(src):
 
     while s < len(src):
         # find the longest sequence that matches the decompression buffer
-        max_run = 0
-        max_offset = 0
-        for offset in range(1, 0x0801):
-            run = 0
+        best_run = 0
+        best_offset = 0
 
-            while src[s + run - offset] == src[s + run]:
-                run += 1
-                if run == 34 or (s + run) == len(src):
-                    break
+        for run in range(34, 2, -1):
+            if s + run > len(src):
+                continue
 
-            if run > max_run:
-                # this is the longest sequence so far
-                max_run = run
-                max_offset = (b - offset) & 0x07FF
+            offset = src[s - 0x0800:s + run - 1].rfind(src[s:s + run])
+
+            '''
+            Due to a bug in the vanilla decompression subroutine, an offset
+            of zero will cause the decompressed data to be corrupted. To fix
+            this, set the BUGFIX_DECOMP config variable in include/const.inc
+            to 1 and comment out the next two lines.
+            '''
+            if offset == 0:
+                continue
+
+            if offset != -1:
+                best_run = run
+                best_offset = (b + offset) & 0x07FF
+                break
 
         # check if the longest sequence is compressible
-        if max_run >= 3:
+        if best_run != 0:
             # sequence is compressible
             # add compressed data to line buffer
-            line[l] = max_offset & 0xFF
-            l += 1
-            line[l] = ((max_offset >> 3) & 0xE0) | (max_run - 3)
-            l += 1
-            s += max_run
-            b += max_run
+            line[l] = best_offset & 0xFF
+            line[l + 1] = ((best_offset >> 3) & 0xE0) | (best_run - 3)
+            l += 2
+            s += best_run
+            b += best_run
         else:
             # sequence is not compressible
             # update header byte and add byte to line buffer
@@ -430,24 +438,291 @@ def decode_multi(src):
         raise ValueError('Invalid compression mode: 0x%02X' % mode)
 
 
+def encode_world(src):
+
+    # destination buffer
+    dest = bytearray(0x10000 * 5)
+    d = 0
+
+    row_bytes = []
+
+    for row in range(256 * 5):
+
+        s = 0  # source pointer
+        src_row = src[row * 256:row * 256 + 256]
+
+        dest = bytearray(256)
+        d = 0
+
+        while s < 256:
+            b = src_row[s]
+            if b in [0x0C, 0x1C, 0x2C]:
+                # mountain tiles
+                dest[d] = b
+                d += 1
+                s += 3
+                continue
+
+            # determine the repeated run length
+            run = 1
+            while (s + run) < 256 and b == src_row[s + run] and run < 64:
+                run += 1
+
+            if run > 1:
+                # run can be compressed with rle
+                dest[d] = 0xC0 + run - 1
+                dest[d + 1] = b
+                d += 2
+                s += run
+            else:
+                # raw byte can't be compressed
+                dest[d] = b
+                d += 1
+                s += 1
+
+        row_bytes.append(dest[:d])
+
+    return row_bytes
+
+def decode_world(src):
+
+    s = 0  # source pointer
+
+    # destination buffer
+    dest = bytearray(0x10000 * 5)
+    d = 0
+
+    while s < len(src):
+        b = src[s]
+        s += 1
+
+        if b >= 0xC0:
+            # rle encoded
+            run = b - 0xBF
+            b = src[s]
+            s += 1
+            dest[d:d + run] = [b] * run
+            d += run
+        elif b in [0x0C, 0x1C, 0x2C]:
+            # mountain tiles
+            dest[d] = b
+            dest[d + 1] = b + 1
+            dest[d + 2] = b + 2
+            d += 3
+        else:
+            # raw byte
+            dest[d] = b
+            d += 1
+
+    return dest
+
+
+def decode_battle_bg_tiles(src):
+
+    s = 0  # source pointer
+
+    # destination buffer
+    dest = bytearray(0x0280)
+    d = 0
+
+    while d < 0x0280:
+        b = src[s]
+        s += 1
+        if b != 0xFF:
+            dest[d] = b
+            d += 1
+            continue
+
+        control = src[s]
+        tile1 = src[s + 1]
+        tile2 = src[s + 2]
+        s += 3
+
+        if control & 0x80:
+            # alternating tiles
+            for i in range(control & 0x3F):
+                dest[d] = tile1
+                dest[d + 1] = tile2
+                d += 2
+        elif control & 0x40:
+            # tile run with constant decrement
+            for i in range(control & 0x3F):
+                dest[d] = tile1
+                d += 1
+                tile1 -= tile2
+        else:
+            # tile run with constant increment
+            for i in range(control & 0x3F):
+                dest[d] = tile1
+                d += 1
+                tile1 += tile2
+
+    # move the palette bit to the correct bit and set bit 7 of the tile index
+    dest16 = np.empty(0x0280, dtype=np.uint16)
+    for i in range(0x0280):
+        tile = dest[i]
+        pal = (tile & 0x80) << 3
+        tile &= 0x7F
+        dest16[i] = tile | pal | 0x80
+
+    return dest16.tobytes()
+
+
+def encode_battle_bg_tiles(src):
+    src16 = np.frombuffer(src, dtype=np.uint16)
+    src8 = bytearray(0x0280)
+    for i in range(0x0280):
+        tile = src16[i]
+        pal = (tile >> 3) & 0x80
+        tile &= 0x7F
+        src8[i] = tile | pal
+
+    s = 0
+
+    dest = bytearray(0x0280)
+    d = 0
+
+    while s < 0x0280:
+
+        if s == 0x027F:
+            dest[d] = t1
+            d += 1
+            break
+
+        t1 = src8[s]
+        t2 = src8[s + 1]
+
+        # check for alternating tiles
+        alt_run = 2
+        while s + alt_run < 0x027F and src8[s + alt_run] == t1 and src8[s + alt_run + 1] == t2:
+            alt_run += 2
+        alt_run = min(alt_run, 0x7E)
+
+        # check for repeating inc/dec
+        delta_run = 2
+        delta = t2 - t1
+        while s + delta_run < 0x0280 and src8[s + delta_run - 1] + delta == src8[s + delta_run]:
+            delta_run += 1
+        delta_run = min(delta_run, 0x3F)
+
+        if delta_run >= alt_run and delta_run > 4:
+            # repeating inc/dec
+            dest[d] = 0xFF
+            dest[d + 2] = t1
+            if delta >= 0:
+                dest[d + 1] = delta_run
+                dest[d + 3] = delta
+            else:
+                dest[d + 1] = delta_run | 0x40
+                dest[d + 3] = -delta
+            d += 4
+            s += delta_run
+
+        elif alt_run > 4:
+            # alternating tiles
+            dest[d] = 0xFF
+            dest[d + 1] = (alt_run // 2) | 0x80
+            dest[d + 2] = t1
+            dest[d + 3] = t2
+            d += 4
+            s += alt_run
+
+        else:
+            dest[d] = t1
+            d += 1
+            s += 1
+
+    return dest[:d]
+
+
+def decode_battle_bg_flip(src):
+
+    s = 0  # source pointer
+
+    # destination buffer
+    dest = bytearray(0x0280)
+    d = 0
+
+    while d < 0x0280:
+        b = src[s]
+        s += 1
+
+        if b == 0:
+            # repeat zero
+            d += src[s] * 8
+            s += 1
+            continue
+
+        # copy 8 bits
+        for _ in range(8):
+            if b & 0x80:
+                dest[d] = 1
+            b <<= 1
+            d += 1
+
+    return dest
+
+
+def encode_battle_bg_flip(src):
+
+    s = 0
+
+    dest = bytearray(0x50)
+    d = 0
+
+    run = 0
+    while s < 0x0280:
+        b = 0
+        # get the next 8 bits
+        for _ in range(8):
+            b <<= 1
+            if src[s] != 0:
+                b |= 1
+            s += 1
+
+        if b == 0:
+            run += 1
+            continue
+
+        if run != 0:
+            # encode sequential zeros
+            dest[d] = 0
+            dest[d + 1] = run
+            d += 2
+            run = 0
+        dest[d] = b
+        d += 1
+
+    if run != 0:
+        # fill in leftover run of zeros
+        dest[d] = 0
+        dest[d + 1] = run
+        d += 2
+
+    return dest[:d]
+
+
 if __name__ == '__main__':
     src_path = sys.argv[1]
-    dest_path = sys.argv[2]
 
     try:
-        mode = sys.argv[3]
+        mode = sys.argv[2]
     except IndexError:
         # use lzss by default
         mode = 'lzss'
 
     if mode == 'multi':
         encode_fn = encode_multi
+        dest_path = src_path + '.cmp'
     elif mode == 'rle8':
         encode_fn = encode_rle8
+        dest_path = src_path + '.rle8'
     elif mode == 'rle16':
         encode_fn = encode_rle16
+        dest_path = src_path + '.rle16'
     elif mode == 'lzss':
         encode_fn = encode_lzss
+        dest_path = src_path + '.lz'
     else:
         raise ValueError('Invalid compressions mode: ' + mode)
 

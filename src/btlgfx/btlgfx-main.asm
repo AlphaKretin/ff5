@@ -40,8 +40,6 @@
 .include "btlgfx/attack_anim_frames.inc"
 .include "btlgfx/unknown_d99ef2.inc"
 .include "btlgfx/unknown_d9a7b0.inc"
-.include "gfx/battle_bg_anim.inc"
-.include "gfx/battle_bg_pal_anim.inc"
 
 inc_lang "text/battle_dlg_%s.inc"
 inc_lang "text/battle_msg_%s.inc"
@@ -231,7 +229,7 @@ _c100f2:
 _c1010b:
         clr_ay
 @010d:  lda     $d0aa,y
-        jsr     $fc74
+        jsr     _c1fc74
         and     $de
         bne     @011d
         iny
@@ -244,7 +242,7 @@ _c1010b:
         stz     $70
         clr_ay
 @012a:  tya
-        jsr     $fc74
+        jsr     _c1fc74
         sta     $74
         and     $de
         beq     @0145
@@ -505,8 +503,8 @@ _c102ab:
         and     #$3fff
         tax
         shorta0
-        jsr     $ff2e
-        jsr     $ff12
+        jsr     _c1ff2e
+        jsr     _c1ff12
         pla
         sta     $ce
         plx
@@ -536,11 +534,11 @@ _c102df:
 ; [ battle graphics function $03: wait one frame ]
 
 _c102e0:
-        jsr     $fd1d       ; wait for vblank
+        jsr     _c1fd1d       ; wait for vblank
         jsr     _c13a6e
-        jsr     $aef6
-        jsr     $ad64
-        jsr     $ad2d
+        jsr     _c1aef6
+        jsr     _c1ad64
+        jsr     _c1ad2d
         jmp     _c137ef
 
 ; ---------------------------------------------------------------------------
@@ -548,9 +546,9 @@ _c102e0:
 ; [ wait one frame ]
 
 _c102f2:
-@02f2:  jsr     $fd1d       ; wait for vblank
-        jsr     $3a6e
-        jsr     $ad2d
+@02f2:  jsr     _c1fd1d       ; wait for vblank
+        jsr     _c13a6e
+        jsr     _c1ad2d
         jmp     _c137ef
 
 ; ---------------------------------------------------------------------------
@@ -616,20 +614,20 @@ _c10348:
         lda     $bc84
         ora     #$01
         sta     $bc84
-        jsr     $886b
+        jsr     _c1886b
         lda     #$bf
         sta     $bc86
 @0380:  ldx     #$0100
         stx     $bc77
         stx     $bc79
         lda     #$1f
-        sta     f:$00212c
-        sta     f:$00212e
-@0393:  lda     f:$004210
+        sta     f:hTM
+        sta     f:hTMW
+@0393:  lda     f:hRDNMI
         bpl     @0393
-        jsr     $fcdc
+        jsr     _c1fcdc
         lda     #$81
-        sta     f:$004200
+        sta     f:hNMITIMEN
         cli
         jmp     _c18736       ; do monster entry
 
@@ -814,7 +812,7 @@ _c104c9:
         lsr2
         ora     $0426
         sta     $0426
-        jsr     $fce9
+        jsr     _c1fce9
         lda     #$09        ; mode 1
         sta     $bc81
         lda     #$01
@@ -825,19 +823,19 @@ _c104c9:
         stz     $ff2b
         ldx     #$5800
         ldy     #$1000
-        jsr     $fdbb
+        jsr     _c1fdbb
         ldx     #$1000
         ldy     #$2000
-        jsr     $fdbb
+        jsr     _c1fdbb
         ldx     #$4800
         ldy     #$2000
-        jsr     $fdbb
+        jsr     _c1fdbb
         ldx     #$4000
         ldy     #$0200
-        jsr     $fdbb
+        jsr     _c1fdbb
         ldx     #$0000
         ldy     #$0020
-        jsr     $fdbb
+        jsr     _c1fdbb
         stz     $ee56
         stz     $ff33
         lda     #$13
@@ -882,7 +880,7 @@ _c104c9:
         cmp     #$1f
         bne     @05c1       ; branch if not neo exdeath
         inc     $b3bb
-@05c1:  jsr     $1482
+@05c1:  jsr     _c11482
         lda     $7c19
         beq     @05d8
         lda     #$ff
@@ -951,8 +949,8 @@ _c104c9:
         inx
         cpx     #$0020
         bne     @064f
-        jsr     $b117
-        jsr     $ae49
+        jsr     _c1b117
+        jsr     _c1ae49
         ldx     #$0000
 @0664:  lda     $4038,x
         sta     $7cf9,x
@@ -977,7 +975,7 @@ _c104c9:
         sta     $cd6e
         lda     #$ca
         sta     $cd72
-        jsr     $fd22       ; clear sprite data
+        jsr     _c1fd22       ; clear sprite data
         lda     $3ef2
         sta     $de
         ldx     #$0000
@@ -993,19 +991,19 @@ _c104c9:
         lda     $de
         and     $70         ; remove erased monsters
         sta     $de
-        jsr     $24e2       ; load character graphics
+        jsr     _c124e2       ; load character graphics
         ldx     #$2000
         stx     $70
         ldx     #$d000
         ldy     #$6000
         lda     #$7f
-        jsr     $fdca       ; copy data to vram
-        jsr     $242a
-        jsr     $2454
-        jsr     $335a       ; load battle bg
-        jsr     $3cff
-        jsr     $2689
-        jsr     $1a57
+        jsr     _c1fdca       ; copy data to vram
+        jsr     _c1242a
+        jsr     _c12454
+        jsr     _c1335a       ; load battle bg
+        jsr     _c13cff
+        jsr     _c12689
+        jsr     _c11a57
         lda     #$03
         ldy     #$0000
         jsr     _c1aa3e       ; load attack palette (16-colors)
@@ -1060,17 +1058,17 @@ _c104c9:
         lda     $3efc
         jsr     _c10885
         sta     $cfdd
-        jsr     $20c4       ; load monster graphics
-        jsr     $2202
+        jsr     _c120c4       ; load monster graphics
+        jsr     _c12202
         lda     $de
         sta     $70
-        jsr     $2068       ; load monster palettes
+        jsr     _c12068       ; load monster palettes
         ldx     #$0000
 @0796:  phx
         clr_a
         sta     $7e
         txa
-        jsr     $7b02
+        jsr     _c17b02
         plx
         inx
         cpx     #$0008
@@ -1086,14 +1084,14 @@ _c104c9:
         inx
         cpx     #$0008
         bne     @07a8
-        jsr     $1ceb
-        jsr     $1d48
+        jsr     _c11ceb
+        jsr     _c11d48
         stz     $dbbb
-        jsr     $2607       ; load character palettes
-        jsr     $1b65
-        jsr     $1b0d
-        jsr     $6d5c
-        jsr     $aef6
+        jsr     _c12607       ; load character palettes
+        jsr     _c11b65
+        jsr     _c11b0d
+        jsr     _c16d5c
+        jsr     _c1aef6
         jsr     _c102fe
         jsr     _c10401
         lda     $0426
@@ -1222,66 +1220,66 @@ _c10888:
 @0888:  lda     #$00
         pha
         plb
-        sta     $4200
+        sta     hNMITIMEN
         ldx     #$0000
         phx
         pld
         lda     #$80
-        sta     $2100
-        lda     $213f
+        sta     hINIDISP
+        lda     hSTAT78
         lda     #$02        ; mode 2
-        sta     $2105
+        sta     hBGMODE
         ldx     #$0300
-        stx     $2102
+        stx     hOAMADDL
         lda     #$03
-        sta     $2101
+        sta     hOBJSEL
         lda     #$00
-        sta     $210b
+        sta     hBG12NBA
         lda     #$44
-        sta     $210c
+        sta     hBG34NBA
         lda     #$13
-        sta     $2108
+        sta     hBG2SC
         lda     #$59
-        sta     $2107
+        sta     hBG1SC
         lda     #$4b
-        sta     $2109
+        sta     hBG3SC
         lda     #$4b
-        sta     $210a
+        sta     hBG4SC
         lda     #$80
-        sta     $2115
+        sta     hVMAINC
         lda     #$00
         tax
-        sta     $2106
-        sta     $210d
-        sta     $210d
-        sta     $210e
-        sta     $210e
-        sta     $210f
-        sta     $210f
-        sta     $2110
-        sta     $2110
-        sta     $2111
-        sta     $2111
-        sta     $2112
-        sta     $2112
-        sta     $2113
-        sta     $2113
-        sta     $2114
-        sta     $2114
-        stx     $212a
-        sta     $212e
-        sta     $212f
-        sta     $420b
-        sta     $420c
-        sta     $2131
-        sta     $2133
-        sta     $2130
+        sta     hMOSAIC
+        sta     hBG1HOFS
+        sta     hBG1HOFS
+        sta     hBG1VOFS
+        sta     hBG1VOFS
+        sta     hBG2HOFS
+        sta     hBG2HOFS
+        sta     hBG2VOFS
+        sta     hBG2VOFS
+        sta     hBG3HOFS
+        sta     hBG3HOFS
+        sta     hBG3VOFS
+        sta     hBG3VOFS
+        sta     hBG4HOFS
+        sta     hBG4HOFS
+        sta     hBG4VOFS
+        sta     hBG4VOFS
+        stx     hWBGLOG
+        sta     hTMW
+        sta     hTSW
+        sta     hMDMAEN
+        sta     hHDMAEN
+        sta     hCGADSUB
+        sta     hSETINI
+        sta     hCGSWSEL
         lda     #$08
-        sta     $2126
-        sta     $2128
+        sta     hWH0
+        sta     hWH2
         lda     #$f7
-        sta     $2127
-        sta     $2129
+        sta     hWH1
+        sta     hWH3
         lda     #^_c119ea
         sta     $1f03
         ldx     #near _c119ea      ; c1/19ea (battle nmi)
@@ -1294,12 +1292,12 @@ _c10888:
         ldx     #near _c119e9      ; c1/19e9 (battle irq)
         stx     $1f05
         lda     #$33
-        sta     $2123
-        sta     $2124
-        sta     $2125
+        sta     hW12SEL
+        sta     hW34SEL
+        sta     hWOBJSEL
         lda     #$1f
-        sta     $212c
-        sta     $212e
+        sta     hTM
+        sta     hTMW
         lda     #$7e
         pha
         plb
@@ -1329,6 +1327,7 @@ _c10888:
 
 ; ---------------------------------------------------------------------------
 
+_c10996:
         pha
         clc
         adc     $ce7b,x
@@ -1413,19 +1412,19 @@ _c10a00:
         lda     f:SineTbl8,x   ; sine table
         bpl     @0a1f
         eor     #$ff
-        sta     f:$004202
+        sta     f:hWRMPYA
         lda     $80
-        sta     f:$004203
+        sta     f:hWRMPYB
         nop4
-        lda     f:$004217
+        lda     f:hRDMPYH
         eor     #$ff
         inc
         rts
-@0a1f:  sta     f:$004202
+@0a1f:  sta     f:hWRMPYA
         lda     $80
-        sta     f:$004203
+        sta     f:hWRMPYB
         nop4
-        lda     f:$004217
+        lda     f:hRDMPYH
         rts
 
 ; ---------------------------------------------------------------------------
@@ -1437,13 +1436,13 @@ _c10a32:
         lda     $fa
         bne     @0a53
         lda     $9a
-        sta     f:$00211b
+        sta     f:hM7A
         clr_a
-        sta     f:$00211b
+        sta     f:hM7A
         lda     f:SineTbl8,x   ; sine table
-        sta     f:$00211c
-        sta     f:$00211c
-        lda     f:$002135
+        sta     f:hM7B
+        sta     f:hM7B
+        lda     f:hMPYM
         rts
 @0a53:  lda     f:SineTbl8,x   ; sine table
         bpl     @0a66
@@ -1567,22 +1566,22 @@ _c10aea:
 _c10b1b:
 @0b1b:  shorta
         lda     $80
-        sta     f:$004202
+        sta     f:hWRMPYA
         lda     $7e
-        sta     f:$004203
+        sta     f:hWRMPYB
         nop4
-        lda     f:$004216
+        lda     f:hRDMPYL
         sta     $82
-        lda     f:$004217
+        lda     f:hRDMPYH
         sta     $83
         lda     $80
-        sta     f:$004202
+        sta     f:hWRMPYA
         lda     $7f
-        sta     f:$004203
+        sta     f:hWRMPYB
         longa
         nop2
         stz     $84
-        lda     f:$004216
+        lda     f:hRDMPYL
         clc
         adc     $83
         sta     $83
@@ -1645,7 +1644,7 @@ _c10ba4:
         bne     @0bff
         lda     $ff2f
         beq     @0bbc
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$03
         sta     $bc77
 @0bbc:  lda     $04f2       ; battle background id
@@ -1659,7 +1658,7 @@ _c10ba4:
 @0bd1:  cmp     #$1d
         bne     @0be1       ; branch if not underwater tower of walse
         inc     $f8c5
-        jsr     $10f4
+        jsr     _c110f4
         inc     $f8c6
         jmp     _c10fc3
 @0be1:  cmp     #$1a
@@ -1724,11 +1723,11 @@ _c10c5f:
 
 ; $dbe9 = 0
         lda     #$1f
-        sta     f:$00212c
-        jsr     $fc96       ; generate random number
+        sta     f:hTM
+        jsr     _c1fc96       ; generate random number
         and     #$03
         sta     $88
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$03
         sta     $8a
         stz     $89
@@ -1756,22 +1755,22 @@ _c10c5f:
         stx     $8a
         lda     $dbeb
         beq     @0cd2
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     $dbec
         sta     $88
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     $dbec
         sta     $8a
 @0cd2:  lda     #$08
-        sta     f:$00211b
+        sta     f:hM7A
         lda     #$00
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $dbea
         tax
         lda     f:SineTbl8,x   ; sine table
-        sta     f:$00211c
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         clc
         adc     #$0008
         clc
@@ -1779,17 +1778,17 @@ _c10c5f:
         sta     $bc77       ; bg1 h-scroll
         shorta0
         lda     #$08
-        sta     f:$00211b
+        sta     f:hM7A
         lda     #$00
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $dbea
         clc
         adc     #$20
         tax
         lda     f:SineTbl8,x   ; sine table
-        sta     f:$00211c
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         clc
         adc     $8a
         sta     $bc79       ; bg1 v-scroll
@@ -1802,10 +1801,10 @@ _c10c5f:
         lda     $a2
         and     #$01
         beq     @0d45
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$07
         sta     $bc77       ; bg1 h-scroll
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$07
         sta     $bc79       ; bg1 v-scroll
 @0d45:  inc     $dba6
@@ -1833,7 +1832,7 @@ _c10c5f:
         jmp     @0da3
 @0d77:  lda     $dbc5
         bne     @0d96
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         ora     #$80
         sta     $dbc5
         and     #$01
@@ -1864,13 +1863,13 @@ _c10c5f:
 ;
         ldx     #$0000
 @0db8:  lda     $a009,y
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $a00a,y
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $8c
-        sta     f:$00211c
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         and     #$03ff
         sta     $acb7,x
         sta     $acc7,x
@@ -1890,13 +1889,13 @@ _c10c5f:
 ;
 @0df8:  ldx     #$0000
         lda     $a009,y
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $a00a,y
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $8c
-        sta     f:$00211c
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         and     #$03ff
         sta     $acb7,x     ; bg2 h-scroll hdma data
         lda     $88
@@ -1908,13 +1907,13 @@ _c10c5f:
         tax
         shorta0
 @0e2b:  lda     $a009,y
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $a00a,y
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $8c
-        sta     f:$00211c
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         and     #$03ff
         sta     $acb7,x
         sta     $acc7,x
@@ -1930,13 +1929,13 @@ _c10c5f:
         cpx     #$0270
         bne     @0e2b
         lda     $a009,y
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $a00a,y
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $8c
-        sta     f:$00211c
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         and     #$03ff
         sta     $acb7,x
         lda     $88
@@ -1951,7 +1950,7 @@ _c10c5f:
         bne     @0ecf
         lda     #$08
         sta     $dbc7
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$07
         sta     $dbc8
         sta     $88
@@ -2086,15 +2085,15 @@ _c10fd4:
         lda     #$03        ; amplitude 3 pixels
 
 _c10fe2:
-@0fe2:  sta     f:$00211b
+@0fe2:  sta     f:hM7A
         lda     #$00
-        sta     f:$00211b
+        sta     f:hM7A
 @0fec:  lda     f:SineTbl8,x   ; sine table
-        sta     f:$00211c
-        sta     f:$00211c
-        lda     f:$002135
+        sta     f:hM7B
+        sta     f:hM7B
+        lda     f:hMPYM
         sta     $acb9,y     ; bg2 vertical scroll hdma data
-        lda     f:$002136
+        lda     f:hMPYH
         sta     $acba,y
         txa
         clc
@@ -2119,14 +2118,14 @@ _c11015:
         tax
         clr_ay
         lda     #$06
-        sta     f:$00211b
+        sta     f:hM7A
         lda     #$00
-        sta     f:$00211b
+        sta     f:hM7A
 @102d:  lda     f:SineTbl8,x   ; sine table
-        sta     f:$00211c
-        sta     f:$00211c
+        sta     f:hM7B
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         sta     $acb9,y
         sta     $a939,y
         sta     $a9b9,y
@@ -2152,19 +2151,19 @@ _c1105a:
         tax
         clr_ay
         phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$03
         sta     $88
         stz     $89
         lda     $dbe7
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $dbe8
-        sta     f:$00211b
+        sta     f:hM7A
 @107e:  lda     f:SineTbl8,x   ; sine table
-        sta     f:$00211c
-        sta     f:$00211c
+        sta     f:hM7B
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         sta     $acb9,y
         sta     $a939,y
         sta     $a9b9,y
@@ -2179,14 +2178,14 @@ _c1105a:
         plx
         clr_ay
         lda     $dbe5
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $dbe6
-        sta     f:$00211b
+        sta     f:hM7A
 @10bb:  lda     f:SineTbl8,x   ; sine table
-        sta     f:$00211c
-        sta     f:$00211c
+        sta     f:hM7B
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         clc
         adc     $88
         sta     $acb7,y
@@ -2211,19 +2210,21 @@ _c110eb:
         clc
         adc     #$04        ; oscillation period is 256/4 = 64 frames
         sta     $dba5
+
+_c110f4:
         lda     $dba5
         tax
         clr_ay
         lda     #$03        ; amplitude 3 pixels
-        sta     f:$00211b
+        sta     f:hM7A
         lda     #$00
-        sta     f:$00211b
+        sta     f:hM7A
 @1106:  lda     f:SineTbl8,x   ; sine table
-        sta     f:$00211c
-        sta     f:$00211c
-        lda     f:$002135
+        sta     f:hM7B
+        sta     f:hM7B
+        lda     f:hMPYM
         sta     $acb7,y     ; bg2 horizontal scroll hdma data
-        lda     f:$002136
+        lda     f:hMPYH
         sta     $acb8,y
         txa
         clc
@@ -2266,7 +2267,7 @@ _c1112f:
         ora     $88
         bne     @117a
         txa
-        jsr     $fc74
+        jsr     _c1fc74
         ora     $7c87
         sta     $7c87
 @117a:  inx
@@ -2291,12 +2292,14 @@ _c11186:
         lda     f:_c1119b+1,x
         sta     $89
         jmp     ($0088)
+
+_c1119a:
         rts
 
 _c1119b:
-        .addr   $119a, $4986, $49c4, $4a86, $4b22, $11e4, $53ce, $5c88
-        .addr   $5ba3, $119a, $53ce, $55d0, $4759, $4735, $11d3, $51a5
-        .addr   $51e9, $11c5, $4d80, $4cef, $fd07
+        .addr   _c1119a,_c14986,_c149c4,_c14a86,_c14b22,_c111e4,_c153ce,_c15c88
+        .addr   _c15ba3,_c1119a,_c153ce,_c155d0,_c14759,_c14735,_c111d3,_c151a5
+        .addr   _c151e9,_c111c5,_c14d80,_c14cef,_c1fd07
 
 ; ---------------------------------------------------------------------------
 
@@ -2331,34 +2334,34 @@ _c111e4:
 
 _c111f5:
 @11f5:  lda     $bc77
-        sta     f:$00210d     ; bg scroll registers
+        sta     f:hBG1HOFS     ; bg scroll registers
         lda     $bc78
-        sta     f:$00210d
+        sta     f:hBG1HOFS
         lda     $bc79
-        sta     f:$00210e
+        sta     f:hBG1VOFS
         lda     $bc7a
-        sta     f:$00210e
+        sta     f:hBG1VOFS
         lda     $bc7b
-        sta     f:$00210f
+        sta     f:hBG2HOFS
         lda     $bc7c
-        sta     f:$00210f
+        sta     f:hBG2HOFS
         lda     $bc7d
-        sta     f:$002110
+        sta     f:hBG2VOFS
         lda     $bc7e
-        sta     f:$002110
+        sta     f:hBG2VOFS
         lda     $bc80
-        sta     f:$002106     ; screen mosaic register
+        sta     f:hMOSAIC
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c11235:
-@1235:  jsr     $11f5       ; update bg scroll/mosaic registers
-        jsr     $12dd
+@1235:  jsr     _c111f5       ; update bg scroll/mosaic registers
+        jsr     _12dd
         lda     $bc84
-        sta     f:$00420c
+        sta     f:hHDMAEN
         lda     $bc85
-        sta     f:$002131
+        sta     f:hCGADSUB
         rts
 
 ; ---------------------------------------------------------------------------
@@ -2366,13 +2369,13 @@ _c11235:
 ; [  ]
 
 _c1124a:
-@124a:  jsr     $11f5       ; update bg scroll/mosaic registers
+@124a:  jsr     _c111f5       ; update bg scroll/mosaic registers
         lda     $7edbd3
         beq     @125c
 
 ; credits
         lda     $bc85
-        sta     f:$002131
+        sta     f:hCGADSUB
         bra     @12b1
 
 ; neo-exdeath
@@ -2383,45 +2386,45 @@ _c1124a:
         bne     @1292
         lda     $bc9b
         ora     #$20
-        sta     f:$002132
+        sta     f:hCOLDATA
         lda     $bc9c
         ora     #$40
-        sta     f:$002132
+        sta     f:hCOLDATA
         lda     $bc9d
         ora     #$80
-        sta     f:$002132
+        sta     f:hCOLDATA
         lda     $bc9e
         sta     $bc9f
         sta     $bc86
-        sta     f:$002131
+        sta     f:hCGADSUB
         bra     @12b1
 
 ; normal
 @1292:  lda     $bc88
-        sta     f:$002132
+        sta     f:hCOLDATA
         lda     $bc89
-        sta     f:$002132
+        sta     f:hCOLDATA
         lda     $bc8a
-        sta     f:$002132
+        sta     f:hCOLDATA
         lda     $bc85
         sta     $bc86
-        sta     f:$002131
+        sta     f:hCGADSUB
 @12b1:  lda     $bc81
         sta     $bc82
-        sta     f:$002105
-        jsr     $1482
+        sta     f:hBGMODE
+        jsr     _c11482
         lda     $dbc1
         sta     $dbc2
-        sta     f:$002108
+        sta     f:hBG2SC
         lda     $bc84
-        sta     f:$00420c
+        sta     f:hHDMAEN
         lda     $bc8b
-        sta     f:$00212d
+        sta     f:hTS
         lda     $bc8c
-        sta     f:$002130
-@12dd:  lda     $bc8d
+        sta     f:hCGSWSEL
+_12dd:  lda     $bc8d
         beq     @12e5
-        jsr     $12e8
+        jsr     _c112e8
 @12e5:  jmp     _c1fcd7
 
 ; ---------------------------------------------------------------------------
@@ -2430,38 +2433,40 @@ _c1124a:
 
 _c112e8:
 @12e8:  lda     $bc8e
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $bc8f
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $bc90
-        sta     f:$00211c
+        sta     f:hM7B
         lda     $bc91
-        sta     f:$00211c
+        sta     f:hM7B
         lda     $bc92
-        sta     f:$00211d
+        sta     f:hM7C
         lda     $bc93
-        sta     f:$00211d
+        sta     f:hM7C
         lda     $bc94
-        sta     f:$00211e
+        sta     f:hM7D
         lda     $bc95
-        sta     f:$00211e
+        sta     f:hM7D
         lda     $bc96
-        sta     f:$00211f
+        sta     f:hM7X
         lda     $bc97
-        sta     f:$00211f
+        sta     f:hM7X
         lda     $bc98
-        sta     f:$002120
+        sta     f:hM7Y
         lda     $bc99
-        sta     f:$002120
+        sta     f:hM7Y
         rts
 
 ; ---------------------------------------------------------------------------
 
 ; [ copy battle bg graphics to vram ]
 
+; transfers 8 tiles per frame, takes 8 frames to transfer 64 tiles
+
 _c1133d:
 @133d:  lda     $a895       ; battle bg graphics vram transfer counter
-        and     #$07        ; copy $0100 bytes per frame, 8 frames to update
+        and     #$07
         asl
         tax
         lda     f:_c1136e,x
@@ -2472,17 +2477,18 @@ _c1133d:
         sta     $8c
         lda     f:_c1137e+1,x
         sta     $8d
-        ldx     #$0100
+        ldx     #$0100                  ; copy 256 bytes per frame (8 tiles)
         stx     $88
         ldx     $8a
         ldy     $8c
         lda     #$7e
-        jsr     $fdb6       ; copy data to vram
+        jsr     _c1fdb6       ; copy data to vram
         inc     $a895
         rts
 
 ; ---------------------------------------------------------------------------
 
+; source address for battle bg graphics vram transfer
 _c1136e:
         .word   $8809
         .word   $8909
@@ -2493,6 +2499,7 @@ _c1136e:
         .word   $8e09
         .word   $8f09
 
+; destination address for battle bg graphics vram transfer
 _c1137e:
         .word   $0800
         .word   $0880
@@ -2504,6 +2511,8 @@ _c1137e:
         .word   $0b80
 
 ; ---------------------------------------------------------------------------
+
+; [ update battle bg animation ]
 
 _c1138e:
 @138e:  lda     $dbe3
@@ -2517,13 +2526,13 @@ _c1138e:
         cpx     #$00e0
         bne     @1396
         stz     $dbe3
-@13a9:  lda     #$10
+@13a9:  lda     #$10                    ; update 16 tiles per frame
         sta     $8e
         lda     $a2
-        and     #$03
+        and     #$03                    ; choose a block of 16 tiles
         asl5
         tax
-        lda     $a2
+        lda     $a2                     ; get the current frame (7.5 hz)
         asl3
         and     #$c0
         sta     $8c
@@ -2531,10 +2540,10 @@ _c1138e:
         cmp     #$ff
         beq     @13d9
         sta     $88
-        and     #$c0
+        and     #$c0                    ; check vs current frame
         cmp     $8c
         bne     @13d2
-        jsr     $13da
+        jsr     _c113da
 @13d2:  inx2
         dec     $8e
         jmp     @13c0
@@ -2542,7 +2551,7 @@ _c1138e:
 
 ; ---------------------------------------------------------------------------
 
-; [  ]
+; [ copy animated bg tile ]
 
 _c113da:
 @13da:  phx
@@ -2572,7 +2581,7 @@ _c113da:
         adc     $8b
         sta     $8b
         ldy     #$0000
-@1420:  lda     ($8a),y
+@1420:  lda     ($8a),y                 ; copy 32 bytes (one tile)
         sta     ($88),y
         iny
         cpy     #$0020
@@ -2806,11 +2815,11 @@ _c115d1:
         ldx     #$0000
         longa
 @1603:  lda     $88
-        sta     f:$002116
+        sta     f:hVMADDL
         lda     #$0007
         sta     $8a
 @160e:  lda     $f9a2,x
-        sta     f:$002118
+        sta     f:hVMDATAL
         inx2
         dec     $8a
         bne     @160e
@@ -2836,11 +2845,11 @@ _c1162c:
         ldx     #$0000
         longa
 @1642:  lda     $88
-        sta     f:$002116
+        sta     f:hVMADDL
         lda     #$0007
         sta     $8a
         clr_a
-@164e:  sta     f:$002118
+@164e:  sta     f:hVMDATAL
         inx
         dec     $8a
         bne     @164e
@@ -2855,13 +2864,13 @@ _c1162c:
 @1669:  ldx     #$0000
         longa
 @166e:  lda     $88
-        sta     f:$002116
+        sta     f:hVMADDL
         lda     #$0007
         sta     $8a
 @1679:  lda     f:_c115bc,x
         and     #$00ff
         ora     #$2000
-        sta     f:$002118
+        sta     f:hVMDATAL
         inx
         dec     $8a
         bne     @1679
@@ -2926,7 +2935,7 @@ _c116f2:
         ldx     #$b3c4
         ldy     #$4800
         lda     #$7e
-        jsr     $fdb6       ; copy data to vram
+        jsr     _c1fdb6       ; copy data to vram
         stz     $b3c0
 @170a:  rts
 
@@ -2984,19 +2993,19 @@ _c1170b:
         stx     $98
         ldx     #$003c
         stx     $9a
-        jsr     $fe19
+        jsr     _c1fe19
         ldx     $9c
         stx     $98
         ldx     #$003c
         stx     $9a
-        jsr     $fe19
+        jsr     _c1fe19
         ldx     $9e
         phx
         ldx     $9c
         stx     $98
         ldx     #$000a
         stx     $9a
-        jsr     $fe19
+        jsr     _c1fe19
         lda     $9c
         clc
         adc     #$53
@@ -3009,7 +3018,7 @@ _c1170b:
         stx     $98
         ldx     #$000a
         stx     $9a
-        jsr     $fe19
+        jsr     _c1fe19
         lda     $9c
         clc
         adc     #$53
@@ -3042,7 +3051,7 @@ _c117d7:
         ldx     #$bcb1
         ldy     $ff01
         lda     #$7e
-        jsr     $fdb6       ; copy data to vram
+        jsr     _c1fdb6       ; copy data to vram
         stz     $ff00
 @17ef:  rts
 
@@ -3051,14 +3060,14 @@ _c117d7:
 ; [  ]
 
 _c117f0:
-@17f0:  jsr     $1235
-        jsr     $fd9c
+@17f0:  jsr     _c11235
+        jsr     _c1fd9c
         lda     $bc81
-        sta     f:$002105
+        sta     f:hBGMODE
         lda     $fefb
-        sta     f:$00212c
+        sta     f:hTM
         lda     $bc7f
-        sta     f:$002100
+        sta     f:hINIDISP
         ldx     $a2
         inx
         stx     $a2
@@ -3069,36 +3078,36 @@ _c117f0:
 ; ---------------------------------------------------------------------------
 
 _c11815:
-@1815:  jsr     $1235
-        jsr     $fd9c
-        jsr     $133d
-        jsr     $17d7
+@1815:  jsr     _c11235
+        jsr     _c1fd9c
+        jsr     _c1133d
+        jsr     _c117d7
         lda     #$09
-        sta     f:$002105
+        sta     f:hBGMODE
         lda     #$00
-        sta     f:$002125
+        sta     f:hWOBJSEL
         lda     $fefb
-        sta     f:$00212c
+        sta     f:hTM
         lda     #$08
-        sta     f:$002126
+        sta     f:hWH0
         lda     #$f7
-        sta     f:$002127
+        sta     f:hWH1
         lda     $fefc
-        sta     f:$002111
+        sta     f:hBG3HOFS
         lda     $fefd
-        sta     f:$002111
+        sta     f:hBG3HOFS
         lda     $fefe
-        sta     f:$002112
+        sta     f:hBG3VOFS
         lda     $feff
-        sta     f:$002112
+        sta     f:hBG3VOFS
         lda     #$5a
-        sta     f:$002107
+        sta     f:hBG1SC
         lda     #$4a
-        sta     f:$002109
+        sta     f:hBG3SC
         lda     $bc7f
-        sta     f:$002100
-        jsr     $138e
-        jsr     $3309
+        sta     f:hINIDISP
+        jsr     _c1138e
+        jsr     _c13309
         ldx     $a2
         inx
         stx     $a2
@@ -3111,10 +3120,10 @@ _c11815:
 ; [  ]
 
 _c1187f:
-@187f:  jsr     $124a
-        jsr     $fd9c
+@187f:  jsr     _c1124a
+        jsr     _c1fd9c
         lda     $bc7f
-        sta     f:$002100
+        sta     f:hINIDISP
         ldx     #$0000
 @188f:  lda     $7f7700,x
         sta     $0200,x
@@ -3136,10 +3145,10 @@ _c1187f:
 ; [  ]
 
 _c118ae:
-@18ae:  jsr     $124a
-        jsr     $fd9c
+@18ae:  jsr     _c1124a
+        jsr     _c1fd9c
         lda     $bc7f
-        sta     f:$002100
+        sta     f:hINIDISP
         clr_ax
 @18bd:  lda     $7f7700,x
         sta     $0200,x
@@ -3156,27 +3165,27 @@ _c118ae:
 ; [ normal battle nmi ??? ]
 
 _c118d2:
-@18d2:  jsr     $124a
-        jsr     $fd9c
-        jsr     $133d
-        jsr     $4a68
-        jsr     $4a4f
-        jsr     $555b
-        jsr     $16f2
-        jsr     $4a05
-        jsr     $1d25
-        jsr     $aca8
-        jsr     $15d1
-        jsr     $162c
+@18d2:  jsr     _c1124a
+        jsr     _c1fd9c
+        jsr     _c1133d
+        jsr     _c14a68
+        jsr     _c14a4f
+        jsr     _c1555b
+        jsr     _c116f2
+        jsr     _c14a05
+        jsr     _c11d25
+        jsr     _c1aca8
+        jsr     _c115d1
+        jsr     _c1162c
         lda     $bc7f
-        sta     f:$002100
-        jsr     $fff4
-        jsr     $0ba4
+        sta     f:hINIDISP
+        jsr     _c1fff4
+        jsr     _c10ba4
         lda     $dbb3
         bne     @1915
         lda     $dbd3
         bne     @1915
-        jsr     $169d
+        jsr     _c1169d
         jcc     @19d4
 @1915:  jsr     _c1138e
         jsr     _c13309
@@ -3187,34 +3196,34 @@ _c118d2:
         jsr     _c1170b
         lda     $db60
         bne     @1941
-        jsr     $70d3
-        jsr     $6fd5
-        jsr     $667c
-        jsr     $1434
-        jsr     $112f
-        jsr     $0f51
-@1941:  jsr     $5ff0
+        jsr     _c170d3
+        jsr     _c16fd5
+        jsr     _c1667c
+        jsr     _c11434
+        jsr     _c1112f
+        jsr     _c10f51
+@1941:  jsr     _c15ff0
         lda     $db72
         bne     @195d
-        jsr     $64b0
+        jsr     _c164b0
         lda     $db60
         bne     @195d
-        jsr     $67e4
-        jsr     $68f1
-        jsr     $6c58
-        jsr     $b12a
-@195d:  jsr     $5fcc
-        jsr     $5f92
-        jsr     $6533
-        jsr     $6cd4       ; update damage numeral sprites
-        jsr     $61c3
+        jsr     _c167e4
+        jsr     _c168f1
+        jsr     _c16c58
+        jsr     _c1b12a
+@195d:  jsr     _c15fcc
+        jsr     _c15f92
+        jsr     _c16533
+        jsr     _c16cd4       ; update damage numeral sprites
+        jsr     _c161c3
         lda     $dbbb
         bne     @198d
         lda     $04
         and     #$30
         cmp     #$30
         bne     @198d       ; branch if l+r not pressed
-        jsr     $706b
+        jsr     _c1706b
         lda     $7be8
         bmi     @1998       ; branch if exit spell was used
         lda     $7c52
@@ -3222,7 +3231,7 @@ _c118d2:
         lda     #$01
         sta     $7be8       ; party is trying to run
         bra     @1998
-@198d:  jsr     $705c
+@198d:  jsr     _c1705c
         lda     $7be8
         bmi     @1998
 @1995:  stz     $7be8
@@ -3236,7 +3245,7 @@ _c118d2:
         beq     @19d4
         lda     $cdf8
         bne     @19d4
-        jsr     $486e
+        jsr     _c1486e
         lda     $0974
         bmi     @19ba       ; branch if multi-controller
         clr_a                 ; cursor sound effect 0 (player 1)
@@ -3254,9 +3263,9 @@ _c118d2:
         jsl     ExecSound_ext
 @19d4:  lda     $dbb3
         bne     @19e2
-        jsr     $fc05       ; play queued game sound effect/set volume
-        jsr     $fc44       ; play queued system sound effect
-        jsr     $0b81       ; play queued song
+        jsr     _c1fc05       ; play queued game sound effect/set volume
+        jsr     _c1fc44       ; play queued system sound effect
+        jsr     _c10b81       ; play queued song
 @19e2:  stz     $a5         ; clear vblank flag
         stz     $a4
         jmp     _c117c4
@@ -3284,18 +3293,18 @@ _c119ea:
         phx
         pld
         shorta0
-        lda     f:$004210
+        lda     f:hRDNMI
         lda     #$7e
         pha
         plb
         lda     $a4
         bne     @1a4e
         inc     $a4
-        lda     f:$00213f
+        lda     f:hSTAT78
         lda     #$00
-        sta     f:$002100
-        jsr     $fdc0
-        jsr     $fdc5
+        sta     f:hINIDISP
+        jsr     _c1fdc0
+        jsr     _c1fdc5
         lda     $dbf5
         beq     @1a4b
         cmp     #$01
@@ -3306,17 +3315,17 @@ _c119ea:
         beq     @1a39
         cmp     #$04
         beq     @1a33
-        jsr     $fadc
+        jsr     _c1fadc
         jmp     @1a4e
-@1a33:  jsr     $17f0
+@1a33:  jsr     _c117f0
         jmp     @1a4e
-@1a39:  jsr     $18ae
+@1a39:  jsr     _c118ae
         jmp     @1a4e
-@1a3f:  jsr     $187f
+@1a3f:  jsr     _c1187f
         jmp     @1a4e
-@1a45:  jsr     $1815
+@1a45:  jsr     _c11815
         jmp     @1a4e
-@1a4b:  jsr     $18d2
+@1a4b:  jsr     _c118d2
 @1a4e:  longai
         pld
         plb
@@ -3335,13 +3344,17 @@ _c11a57:
         ldx     #near _d0e003          ; d0/e003 (mini, frog, shadow graphics)
         lda     #^_d0e003
         ldy     #$0100
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
         ldx     #$000a
         stx     $70
         ldx     #near MiscSpriteGfx2
         ldy     #$0010
         lda     #^MiscSpriteGfx2
         jmp     _c1fca2
+
+; ---------------------------------------------------------------------------
+
+_c11a77:
         phx
         phy
         sta     $81
@@ -3353,7 +3366,7 @@ _c11a57:
         cpy     #$000c
         bne     @1a7f
         shorta0
-        jsr     $1ceb
+        jsr     _c11ceb
         jsr     _c18b2a
         longa
         ldy     #$000c
@@ -3398,7 +3411,7 @@ _c11aa6:
         adc     $d026,x
         sta     $72
         txa
-        jsr     $202f
+        jsr     _c1202f
 @1ade:  lda     $81
         sta     $7e
         lda     $80
@@ -3410,7 +3423,7 @@ _c11aa6:
         adc     $d026,x
         sta     $72
         txa
-        jsr     $1f22
+        jsr     _c11f22
         inc     $dba4
         longa
         ldy     #$000c
@@ -3599,17 +3612,17 @@ _c11b65:
 ; ---------------------------------------------------------------------------
 
 _c11c84:
-        jsr     $1cdf
+        jsr     _c11cdf
         jmp     _1c94
 
 ; ---------------------------------------------------------------------------
 
 _c11c8a:
-        jsr     $1ceb
+        jsr     _c11ceb
         lda     $de
         sta     $70
-        jsr     $2068       ; load monster palettes
-_1c94:  jsr     $1d65
+        jsr     _c12068       ; load monster palettes
+_1c94:  jsr     _c11d65
         ldx     #$0500
         stx     $70
         ldx     #$7800
@@ -3627,19 +3640,21 @@ _1c94:  jsr     $1d65
 
 _c11cb1:
         sta     $7b
-        jsr     $1ced
-        bra     _1cc2
+        jsr     _c11ced
+        bra     _c11cc2
 
 ; ---------------------------------------------------------------------------
 
 ; [ restore monster palette ??? ]
 
 _c11cb8:
-        jsr     $1ceb
+        jsr     _c11ceb
         lda     $de
         sta     $70
-        jsr     $2068       ; load monster palettes
-_1cc2:  jsr     $1d65
+        jsr     _c12068       ; load monster palettes
+
+_c11cc2:
+        jsr     _c11d65
         ldx     #$0500
         stx     $70
         ldx     #$7800
@@ -3665,7 +3680,9 @@ _c11cdf:
 
 _c11ceb:
 @1ceb:  stz     $7b
-@1ced:  jsr     $1cdf
+
+_c11ced:
+@1ced:  jsr     _c11cdf
         lda     $de
         sta     $7a
         clr_ax
@@ -3685,7 +3702,7 @@ _c11ceb:
         adc     $d026,x
         sta     $72
         txa
-        jsr     $1f22
+        jsr     _c11f22
         bra     @1d1e
 @1d1c:  asl     $7b
 @1d1e:  inx
@@ -3714,7 +3731,7 @@ _c11d25:
 ; ---------------------------------------------------------------------------
 
 _c11d48:
-        jsr     $1d65
+        jsr     _c11d65
         ldx     #$0500
         stx     $70
         ldx     #$7800
@@ -3954,7 +3971,7 @@ _c11f22:
         ldx     $7a
         phx
         phy
-        jsr     $1df6
+        jsr     _c11df6
         ply
         lda     $cffe,y
         asl
@@ -4197,7 +4214,7 @@ _c120c4:
         sta     $dbf8
         ldx     $82
         tya
-        jsr     $2306       ;
+        jsr     _c12306       ;
         lda     $dbfb
         inc
         sta     $cffe,y
@@ -4206,8 +4223,8 @@ _c120c4:
         sta     $d006,y
         lda     $dbfd
         sta     $d0e6,y
-        jsr     $2157       ;
-        jsr     $2133       ; get pointer to monster palette
+        jsr     _c12157       ;
+        jsr     _c12133       ; get pointer to monster palette
         bra     @212a
 @2123:  clr_a
         sta     $cffe,y
@@ -4282,10 +4299,10 @@ _c12157:
         bne     @21c7       ; if msb is set, graphics are 3bpp
         longa
         lda     $dbfe
-        sta     f:$002116
+        sta     f:hVMADDL
 @21a5:  ldx     #$0010
 @21a8:  lda     [$72],y
-        sta     f:$002118
+        sta     f:hVMDATAL
         iny2
         dex
         bne     @21a8
@@ -4301,17 +4318,17 @@ _c12157:
         rts
 @21c7:  longa
         lda     $dbfe
-        sta     f:$002116
+        sta     f:hVMADDL
 @21d0:  ldx     #$0008
 @21d3:  lda     [$72],y
-        sta     f:$002118
+        sta     f:hVMDATAL
         iny2
         dex
         bne     @21d3
         ldx     #$0008
 @21e1:  lda     [$72],y
         and     #$00ff
-        sta     f:$002118
+        sta     f:hVMDATAL
         iny
         dex
         bne     @21e1
@@ -4332,11 +4349,11 @@ _c12157:
 
 _c12202:
         lda     #$00
-        sta     f:$002181
+        sta     f:hWMADDL
         lda     #$c0
-        sta     f:$002182
+        sta     f:hWMADDM
         lda     #$01
-        sta     f:$002183
+        sta     f:hWMADDH
         clr_ay
 @2216:  tya
         asl
@@ -4352,7 +4369,7 @@ _c12202:
         jsr     _c1fe67       ; ++$82 = +$7e * +$80
         ldx     $82
         lda     $d0e6,y
-        jsr     $2289
+        jsr     _c12289
 @2237:  iny
         cpy     #$0008
         bne     @2216
@@ -4408,14 +4425,14 @@ _c12289:
         phx
         sta     $76
         stz     $77
-        jsr     $2251       ; get pointer to monster graphics
+        jsr     _c12251       ; get pointer to monster graphics
         clr_ay
         lda     $70
         and     #$80
         bne     @22bd
 @229a:  ldx     #$0020
 @229d:  lda     [$72],y
-        sta     f:$002180
+        sta     f:hWMDATA
         iny
         dex
         bne     @229d
@@ -4432,15 +4449,15 @@ _c12289:
         rts
 @22bd:  ldx     #$0010
 @22c0:  lda     [$72],y
-        sta     f:$002180
+        sta     f:hWMDATA
         iny
         dex
         bne     @22c0
         ldx     #$0008
 @22cd:  lda     [$72],y
-        sta     f:$002180
+        sta     f:hWMDATA
         clr_a
-        sta     f:$002180
+        sta     f:hWMDATA
         iny
         dex
         bne     @22cd
@@ -4614,13 +4631,13 @@ _c1242a:
         ldx     #near SmallFontGfx
         ldy     #$4000
         lda     #^SmallFontGfx
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
         longa
         lda     #$4080
-        sta     f:$002116
+        sta     f:hVMADDL
         ldx     #$0200
         lda     #$00ff
-@2449:  sta     f:$002118
+@2449:  sta     f:hVMDATAL
         dex
         bne     @2449
         shorta0
@@ -4631,13 +4648,13 @@ _c1242a:
 _c12454:
         ldx     #$0500
         ldy     #$0600
-        jsr     $fdbb
+        jsr     _c1fdbb
         ldx     #$0500
         stx     $74
         clr_ax
 @2464:  ldy     $74
         lda     f:_ceff95,x
-        jsr     $2481
+        jsr     _c12481
         longa
         lda     $74
         clc
@@ -4666,7 +4683,7 @@ _c12481:
         sta     $70
         shorta0
         lda     #^SmallFontGfx
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
         plx
         rts
 
@@ -4712,8 +4729,8 @@ _c124cb:
 ; [  ]
 
 _c124d5:
-        jsr     $24e2       ; load character graphics
-        jsr     $28c4       ; copy character graphics to vram
+        jsr     _c124e2       ; load character graphics
+        jsr     _c128c4       ; copy character graphics to vram
         stz     $db61
         stz     $db60
         rts
@@ -4790,7 +4807,7 @@ _c124e2:
         sta     $7a
         shorta0
         ldy     #$03c0
-@257a:  jsr     $25a5
+@257a:  jsr     _c125a5
         longa
         tya
         clc
@@ -4808,7 +4825,7 @@ _c124e2:
 @259a:  ply
         iny
         cpy     #$0004
-        jne     $24ed
+        jne     @24ed
         rts
 
 ; ---------------------------------------------------------------------------
@@ -4818,10 +4835,10 @@ _c124e2:
 _c125a5:
 @25a5:  phy
         ldx     #$0000
-        jsr     $25e8
+        jsr     _c125e8
         iny
         ldx     #$0001
-        jsr     $25e8
+        jsr     _c125e8
         longa
         tya
         clc
@@ -4829,10 +4846,10 @@ _c125a5:
         tay
         shorta0
         ldx     #$0010
-        jsr     $25e8
+        jsr     _c125e8
         ldx     #$0011
         iny
-        jsr     $25e8
+        jsr     _c125e8
         clr_ay
         longa
 @25cf:  lda     $dbf6,y
@@ -4947,21 +4964,25 @@ _c12689:
         ldx     #near MiscSpriteGfx1
         ldy     #$7800
         lda     #^MiscSpriteGfx1
-        jsr     $fca2
+        jsr     _c1fca2
         ldy     #$7e48
         ldx     #$0960
-        jsr     $26ab
+        jsr     _c126ab
         ldy     #$7f48
         ldx     #$0ae0
-        jmp     @26ab
+        jmp     _c126ab
+
+; ---------------------------------------------------------------------------
+
+_c126ab:
 @26ab:  sty     $70
         stx     $76
         lda     #$0a
         sta     $74
 @26b3:  lda     $70
-        sta     f:$002116
+        sta     f:hVMADDL
         lda     $71
-        sta     f:$002117
+        sta     f:hVMADDH
         lda     #$08
         sta     $72
         ldx     $76
@@ -4972,7 +4993,7 @@ _c12689:
         tyx
         ora     f:MiscSpriteGfx1+16,x
         plx
-        sta     f:$002119
+        sta     f:hVMDATAH
         iny
         inx2
         dec     $72
@@ -5037,7 +5058,7 @@ _c12736:
         cpx     #$0020
         bne     @2744
         ldx     $82
-        jsr     $2251       ; get pointer to monster graphics
+        jsr     _c12251       ; get pointer to monster graphics
         lda     #^MonsterStencil
         sta     $78
         lda     $70
@@ -5114,9 +5135,9 @@ _c12736:
         sta     $80
 @27fd:  asl     $80
         bcc     @2806
-        jsr     $2900
+        jsr     _c12900
         bra     @2809
-@2806:  jsr     $295e
+@2806:  jsr     _c1295e
 @2809:  longa
         dec     $7e
         bne     @27fd
@@ -5133,9 +5154,9 @@ _c12736:
         sta     $80
 @2827:  asl     $80
         bcc     @2830
-        jsr     $28d7
+        jsr     _c128d7
         bra     @2833
-@2830:  jsr     $295e
+@2830:  jsr     _c1295e
 @2833:  longa
         dec     $7e
         bne     @2827
@@ -5195,7 +5216,7 @@ _c12736:
         pha
         lda     $84
         pha
-        jsr     $28c4       ; copy character graphics to vram
+        jsr     _c128c4       ; copy character graphics to vram
         pla
         inc
         sta     $74
@@ -5218,7 +5239,7 @@ _c128c4:
         ldx     #$d000      ; 7f/d000 (character graphics buffer)
         ldy     #$6000      ; vram address
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
         plx
         rts
 
@@ -5230,7 +5251,7 @@ _c128d7:
 @28d7:  longa
         clr_ay
 @28db:  lda     [$72],y
-        jsr     $293d
+        jsr     _c1293d
         sta     $7fd000,x
         inx2
         iny2
@@ -5245,10 +5266,14 @@ _c128d7:
         sta     $74
         shorta0
         rts
+
+; ---------------------------------------------------------------------------
+
+_c12900:
 @2900:  longa
         clr_ay
 @2904:  lda     [$72],y
-        jsr     $293d
+        jsr     _c1293d
         sta     $7fd000,x
         inx2
         iny2
@@ -5256,7 +5281,7 @@ _c128d7:
         bne     @2904
 @2916:  lda     [$72],y
         and     #$00ff
-        jsr     $293d
+        jsr     _c1293d
         sta     $7fd000,x
         inx2
         iny
@@ -5271,6 +5296,10 @@ _c128d7:
         sta     $74
         shorta0
         rts
+
+; ---------------------------------------------------------------------------
+
+_c1293d:
 @293d:  phx
         sta     $84
         shorta
@@ -5290,6 +5319,8 @@ _c128d7:
         lda     $84
         plx
         rts
+
+_c1295e:
 @295e:  longa
         ldy     #$0010
         clr_a
@@ -5315,11 +5346,11 @@ _c12971:
         beq     @2999
         cmp     #$20
         bcc     @2990
-        jsr     $2cf1
-        jsr     $299a       ; get next byte
+        jsr     _c12cf1
+        jsr     _c1299a       ; get next byte
         jmp     @297b
-@2990:  jsr     $29a0       ; do big text escape code
-        jsr     $299a       ; get next byte
+@2990:  jsr     _c129a0       ; do big text escape code
+        jsr     _c1299a       ; get next byte
         jmp     @297b
 @2999:  rts
 
@@ -5387,7 +5418,7 @@ _c129f1:
 @2a1a:  lda     $0990,x
         cmp     #$ff
         beq     @2a29
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2a1a
@@ -5406,7 +5437,7 @@ _c12a2a:
 _c12a2f:
         lda     ($f4)       ; message variable
         bmi     @2a4b
-        jsr     $2bcf
+        jsr     _c12bcf
 .if LANG_EN
         lda     #$07
 .else
@@ -5416,7 +5447,7 @@ _c12a2f:
 @2a3a:  lda     f:BattleCmdName,x
         cmp     #$ff
         beq     @2a4a
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2a3a
@@ -5441,7 +5472,7 @@ _c12a2f:
 @2a5d:  lda     f:PassiveAbilityName,x
         cmp     #$ff
         beq     @2a6d
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2a5d
@@ -5463,7 +5494,7 @@ _c12a6e:
 @2a7f:  lda     f:JobName,x
         cmp     #$ff
         beq     @2a8f
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2a7f
@@ -5497,7 +5528,7 @@ _c12a90:
 .endif
         cmp     #$ff
         beq     @2ab6
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2aa6
@@ -5513,7 +5544,7 @@ _c12a90:
 @2ac8:  lda     f:MagicName,x
         cmp     #$ff
         beq     @2ad8
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2ac8
@@ -5528,7 +5559,7 @@ _c12a90:
 @2ae8:  lda     f:MagicName+1,x
         cmp     #$ff
         beq     @2af8
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2ae8
@@ -5540,7 +5571,7 @@ _c12a90:
 
 _c12af9:
         lda     ($f4)
-        jsr     $2c75
+        jsr     _c12c75
 .if LANG_EN
         .import _e02f25
         lda     #$18
@@ -5548,7 +5579,7 @@ _c12af9:
 _2b02:  lda     $e75860,x
         jml     _e02f25
         .export _c12b0a := *
-        jsr     $2cf1
+        jsr     _c12cf1
         .export _c12b0d := *
         inx
         dec     $70
@@ -5560,7 +5591,7 @@ _2b02:  lda     $e75860,x
 @2b02:  lda     f:ItemName+1,x
         cmp     #$ff
         beq     @2b12
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2b02
@@ -5583,7 +5614,7 @@ _c12b13:
 @2b24:  lda     f:$000990,x
         cmp     #$ff
         beq     @2b34
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $76
         bne     @2b24
@@ -5595,7 +5626,7 @@ _c12b13:
 
 _c12b35:
         phy
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     [$b8]
         sta     $7e
         asl
@@ -5621,16 +5652,16 @@ _c12b35:
         bne     @2b72
         ldx     #$0000
 @2b65:  lda     #$cb
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         cpx     #$0004
         bne     @2b65
         ply
         rts
-@2b72:  jsr     $ff88       ; convert hex to decimal digits
-        jsr     $fefe
+@2b72:  jsr     _c1ff88       ; convert hex to decimal digits
+        jsr     _c1fefe
 @2b78:  lda     $c4,x
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         cpx     #$0008
         bne     @2b78
@@ -5669,22 +5700,24 @@ _c12b91:
 
 ; [ $19: special ability name (animals/conjure/combine/terrain) ]
 
+.import _e02fb2
+
 _c12b9d:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
 .if LANG_EN
-        jsl     $e02fb2
+        jsl     _e02fb2
         nop
         lda     #$10
         sta     $70
 @2ba9:  lda     $e70900,x
 .else
         lda     [$b8]
-        jsr     $2b85
+        jsr     _c12b85
         lda     #$09
         sta     $70
 @2ba9:  lda     f:SpecialAbilityName,x
 .endif
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2ba9
@@ -5695,9 +5728,9 @@ _c12b9d:
 ; [ $1a: monster special attack name ]
 
 _c12bb6:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     [$b8]
-        jsr     $2b91
+        jsr     _c12b91
 .if LANG_EN
         lda     #$10
         sta     $70
@@ -5707,11 +5740,15 @@ _c12bb6:
         sta     $70
 @2bc2:  lda     f:MonsterSpecialName,x
 .endif
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2bc2
         rts
+
+; ---------------------------------------------------------------------------
+
+_c12bcf:
 @2bcf:  sta     $7e
 .if LANG_EN
         lda     #$07
@@ -5728,7 +5765,7 @@ _c12bb6:
 ; [ $18: ability name ]
 
 _c12bdb:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     [$b8]
         cmp     #$80
         bcc     @2c01
@@ -5750,12 +5787,12 @@ _c12bdb:
 .else
         lda     f:PassiveAbilityName,x
 .endif
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2bf4
         rts
-@2c01:  jsr     $2bcf
+@2c01:  jsr     _c12bcf
 .if LANG_EN
         lda     #$07
 .else
@@ -5763,7 +5800,7 @@ _c12bdb:
 .endif
         sta     $70
 @2c08:  lda     f:BattleCmdName,x
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2c08
@@ -5774,7 +5811,7 @@ _c12bdb:
 ; [ $0f: attack name ]
 
 _c12c15:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     [$b8]
         cmp     #$57
         bcc     @2c3b
@@ -5796,7 +5833,7 @@ _c12c15:
 .else
         lda     f:AttackName,x
 .endif
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2c2e
@@ -5810,7 +5847,7 @@ _c12c15:
         jsr     _c1feba       ; +$82 = $7e * $80
         ldx     $82
 @2c4c:  lda     f:MagicName,x
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2c4c
@@ -5823,11 +5860,15 @@ _c12c15:
         jsr     _c1feba       ; +$82 = $7e * $80
         ldx     $82
 @2c68:  lda     f:MagicName+1,x
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2c68
         rts
+
+; ---------------------------------------------------------------------------
+
+_c12c75:
 @2c75:  sta     $7e
 .if LANG_EN
         lda     #$18
@@ -5844,14 +5885,14 @@ _c12c15:
 ; [ $0e: item name ]
 
 _c12c81:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     [$b8]
-        jsr     $2c75
+        jsr     _c12c75
 .if LANG_EN
         .import _e00000, _e00014
         jml     _e00000
         .export _c12c8d := *
-        jsr     $2cf1
+        jsr     _c12cf1
         jml     _e00014
         nop5
         .export _c12c99 := *
@@ -5859,7 +5900,7 @@ _c12c81:
         lda     #$08
         sta     $70
 @2c8d:  lda     f:ItemName+1,x
-        jsr     $2cf1
+        jsr     _c12cf1
         inx
         dec     $70
         bne     @2c8d
@@ -5869,11 +5910,11 @@ _c12c81:
 ; ---------------------------------------------------------------------------
 
 _c12c9a:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     [$b8]
         sta     $70
 @2ca1:  lda     #$ff
-        jsr     $2cf1
+        jsr     _c12cf1
         dec     $70
         bne     @2ca1
         rts
@@ -5896,7 +5937,7 @@ _c12cb2:
         stx     $70
 _2cb7:  phy
         phx
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     [$b8]
         longa
         clc
@@ -6051,11 +6092,11 @@ _c12dac:
         beq     @2de9
         cmp     #$20
         bcc     @2de0
-        jsr     $2dea       ; draw small text character
-        jsr     $299a       ; get next byte
+        jsr     _c12dea       ; draw small text character
+        jsr     _c1299a       ; get next byte
         jmp     @2dcf
-@2de0:  jsr     $2f5d       ; decode small text escape code
-        jsr     $299a       ; get next byte
+@2de0:  jsr     _c12f5d       ; decode small text escape code
+        jsr     _c1299a       ; get next byte
         jmp     @2dcf
 @2de9:  rts
 
@@ -6094,10 +6135,10 @@ _2dfd:  cmp     #$49
 
 ; jump table for small text escape codes $00-$20
 _c12e15:
-        .addr   $2f0f,$2f10,$2f0f,$2f55,$2f0f,$2f31,$2f42,$3061 ; $00
-        .addr   $306e,$307b,$3088,$3004,$303e,$2f29,$2fe3,$2fa3
-        .addr   $2ebf,$2e9a,$2e9f,$2ea4,$2e55,$2f0f,$2f0f,$2f0f ; $10
-        .addr   $2f0f,$2f0f,$2f0f,$2f6e,$2f0f,$2f0f,$2f0f,$2f0f
+        .addr   _c12f0f,_c12f10,_c12f0f,_c12f55,_c12f0f,_c12f31,_c12f42,_c13061 ; $00
+        .addr   _c1306e,_c1307b,_c13088,_c13004,_c1303e,_c12f29,_c12fe3,_c12fa3
+        .addr   _c12ebf,_c12e9a,_c12e9f,_c12ea4,_c12e55,_c12f0f,_c12f0f,_c12f0f ; $10
+        .addr   _c12f0f,_c12f0f,_c12f0f,_c12f6e,_c12f0f,_c12f0f,_c12f0f,_c12f0f
 
 ; ---------------------------------------------------------------------------
 
@@ -6163,11 +6204,11 @@ _c12ea4:
 _2ea7:  stx     $70
         stz     $72
 _2eab:  phy
-        jsr     $ff88       ; convert hex to decimal digits
-        jsr     $fefe
+        jsr     _c1ff88       ; convert hex to decimal digits
+        jsr     _c1fefe
         ply
 @2eb3:  lda     $c4,x
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         cpx     #$0008
         bne     @2eb3
@@ -6208,9 +6249,9 @@ _c12ebf:
         stx     $70
         ldx     $84
         stx     $72
-        jsr     $ff88       ; convert hex to decimal digits
+        jsr     _c1ff88       ; convert hex to decimal digits
         lda     a:$00c6
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         lda     a:$00c7
         jmp     _c12dea       ; draw small text character
 
@@ -6245,7 +6286,7 @@ _c12f10:
 ; [ small text escape code $0d:  ]
 
 _c12f29:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     ($b8)
         sta     $be
         rts
@@ -6255,11 +6296,11 @@ _c12f29:
 ; [ small text escape code $05:  ]
 
 _c12f31:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     ($b8)
         sta     $70
 @2f38:  lda     #$ff
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         dec     $70
         bne     @2f38
         rts
@@ -6269,12 +6310,12 @@ _c12f31:
 ; [ small text escape code $06:  ]
 
 _c12f42:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     ($b8)
         sta     $70
 @2f49:  lda     #$00
         sta     ($bc),y
-        jsr     $2df2
+        jsr     _2df2
         dec     $70
         bne     @2f49
         rts
@@ -6284,7 +6325,7 @@ _c12f42:
 ; [ small text escape code $03:  ]
 
 _c12f55:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     ($b8)
         jmp     _c12dee
 
@@ -6306,7 +6347,7 @@ _c12f5d:
 ; [ small text escape code $1b: variable ]
 
 _c12f6e:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         stz     $70
         lda     ($b8)
 @2f75:  sec
@@ -6338,7 +6379,7 @@ _c12f6e:
 ; [ small text escape code $0f: attack name ]
 
 _c12fa3:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     ($b8)
         cmp     #$57
         bcc     _2fc9
@@ -6362,7 +6403,7 @@ _c12fa3:
 .else
         lda     f:AttackName,x   ; short attack names
 .endif
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         dec     $70
         bne     @2fbc
@@ -6374,7 +6415,7 @@ _2fc9:  sta     $7e
         jsr     _c1feba       ; +$82 = $7e * $80
         ldx     $82
 @2fd6:  lda     f:MagicName,x   ; spell names
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         dec     $70
         bne     @2fd6
@@ -6385,7 +6426,7 @@ _2fc9:  sta     $7e
 ; [ small text escape code $0e: item name ]
 
 _c12fe3:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     ($b8)
         sta     $7e
         lda     #$09
@@ -6400,7 +6441,7 @@ _c12fe3:
 .else
         lda     f:ItemName,x   ; item names
 .endif
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         dec     $76
         bne     @2ff7
@@ -6411,7 +6452,7 @@ _c12fe3:
 ; [ small text escape code $0b: monster name ]
 
 _c13004:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     ($b8)
         asl2
         tax
@@ -6438,13 +6479,13 @@ _c13004:
 .else
         lda     f:MonsterName+$0800,x
 .endif
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         dec     $70
         bne     @3024
         rts
 @3031:  lda     f:MonsterName,x
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         dec     $70
         bne     @3031
@@ -6455,7 +6496,7 @@ _c13004:
 ; [ small text escape code $0c:  ]
 
 _c1303e:
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         ldx     $04f0
         cpx     #$01ef
         beq     @3060
@@ -6474,7 +6515,7 @@ _c1303e:
         bcc     @3060
         clc
         adc     #$53
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
 .endif
 @3060:  rts
 
@@ -6522,7 +6563,7 @@ _c13088:
         stx     $78
 _3092:  lda     #$7e
         sta     $72
-        jsr     $299a       ; get next byte
+        jsr     _c1299a       ; get next byte
         lda     ($b8)
         asl
         tax
@@ -6533,9 +6574,9 @@ _3092:  lda     #$7e
         jmp     ($007e)
 
 _c130ac:
-        .addr   $327b,$313f,$3144,$3149,$314e,$315d,$3177,$3182
-        .addr   $318d,$3198,$3112,$30e5,$31a3,$31aa,$31b1,$31b8
-        .addr   $31bf,$31c6,$3158,$3153,$30d6
+        .addr   _c1327b,_c1313f,_c13144,_c13149,_c1314e,_c1315d,_c13177,_c13182
+        .addr   _c1318d,_c13198,_c13112,_c130e5,_c131a3,_c131aa,_c131b1,_c131b8
+        .addr   _c131bf,_c131c6,_c13158,_c13153,_c130d6
 
 ; ---------------------------------------------------------------------------
 
@@ -6544,10 +6585,14 @@ _c130ac:
 _c130d6:
         lda     $08f4
         tax
-        jsr     $ff2e
-        jsr     $ff12
+        jsr     _c1ff2e
+        jsr     _c1ff12
         clr_ax
         jmp     _c132f0
+
+; ---------------------------------------------------------------------------
+
+_c130e5:
         phy
         ldy     #$0003
         lda     [$70],y
@@ -6562,11 +6607,11 @@ _c130d6:
         sta     $70
         lda     $75
         sta     $71
-        jsr     $ff88       ; convert hex to decimal digits
-        jsr     $fefe
+        jsr     _c1ff88       ; convert hex to decimal digits
+        jsr     _c1fefe
         ply
 @3106:  lda     $c4,x
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         cpx     #$0008
         bne     @3106
@@ -6591,7 +6636,7 @@ _c13112:
         cmp     #$ff
         beq     @313e
         inc     $fef5
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         dec     $70
         bne     @312b
@@ -6628,11 +6673,11 @@ _c1315d:
         ldy     #$0002
         lda     [$70],y
         tax
-        jsr     $ff2e
+        jsr     _c1ff2e
         ply
         ldx     #$0000
 @316b:  lda     $c6,x
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         cpx     #$0002
         bne     @316b
@@ -6642,7 +6687,7 @@ _c1315d:
 
 _c13177:
         lda     #$16
-        jsr     $3231
+        jsr     _c13231
         lda     $72
         sta     $fef0
         rts
@@ -6651,7 +6696,7 @@ _c13177:
 
 _c13182:
         lda     #$17
-        jsr     $3231
+        jsr     _c13231
         lda     $72
         sta     $fef1
         rts
@@ -6660,7 +6705,7 @@ _c13182:
 
 _c1318d:
         lda     #$18
-        jsr     $3231
+        jsr     _c13231
         lda     $72
         sta     $fef2
         rts
@@ -6669,7 +6714,7 @@ _c1318d:
 
 _c13198:
         lda     #$19
-        jsr     $3231
+        jsr     _c13231
         lda     $72
         sta     $fef3
         rts
@@ -6677,42 +6722,42 @@ _c13198:
 ; ---------------------------------------------------------------------------
 
 _c131a3:
-        jsr     $31cd
+        jsr     _c131cd
         sta     $fef0
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c131aa:
-        jsr     $31cd
+        jsr     _c131cd
         sta     $fef1
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c131b1:
-        jsr     $31cd
+        jsr     _c131cd
         sta     $fef2
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c131b8:
-        jsr     $31cd
+        jsr     _c131cd
         sta     $fef3
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c131bf:
-        jsr     $31cd
+        jsr     _c131cd
         sta     $fef4
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c131c6:
-        jsr     $31cd
+        jsr     _c131cd
         sta     $fef5
         rts
 
@@ -6721,12 +6766,12 @@ _c131c6:
 ; [  ]
 
 _c131cd:
-@31cd:  jsr     $299a       ; get next byte
+@31cd:  jsr     _c1299a       ; get next byte
         lda     ($b8)
         tax
         lda     $b535,x
         pha
-        jsr     $3236
+        jsr     _3236
         pla
         cmp     #$2c
         bcc     @31fb
@@ -6735,13 +6780,13 @@ _c131cd:
         bra     @31fb
 @31e5:  pha
         lda     #$2b
-        jsr     $2dee
+        jsr     _c12dee
         pla
         sec
         sbc     #$2c
         tax
         lda     f:_c13211,x
-        jsr     $2dee
+        jsr     _c12dee
         inc     $72
         inc     $72
 @31fb:  lda     $72
@@ -6749,7 +6794,7 @@ _c131cd:
         beq     @320e
         sta     $73
         lda     #$00
-        jsr     $2dee
+        jsr     _c12dee
         inc     $73
         lda     $73
         bra     @31fd
@@ -6771,7 +6816,7 @@ _c13231:
         tay
         lda     [$70],y
         ply
-@3236:  cmp     #$80
+_3236:  cmp     #$80
         bcc     @325f
         sec
         sbc     #$80
@@ -6795,12 +6840,12 @@ _c13231:
         cmp     #$ff
         beq     @325e
         inc     $72
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         dec     $70
         bne     @324c
 @325e:  rts
-@325f:  jsr     $2bcf
+@325f:  jsr     _c12bcf
 .if LANG_EN
         lda     #$07
 .else
@@ -6812,7 +6857,7 @@ _c13231:
         cmp     #$ff
         beq     @327a
         inc     $72
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         dec     $70
         bne     @3268
@@ -6835,7 +6880,7 @@ _c1327b:
         cmp     #$ff
         beq     @329c
         inc     $fef4
-@329c:  jsr     $2dea       ; draw small text character
+@329c:  jsr     _c12dea       ; draw small text character
         inx
         dec     $76
         bne     @3291
@@ -6853,17 +6898,17 @@ _c132a5:
         sta     $75
         ply
         ldx     $74
-        jsr     $ff2e
-        jsr     $ff12
+        jsr     _c1ff2e
+        jsr     _c1ff12
         clr_ax
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c132bc:
-@32bc:  jsr     $32a5
+@32bc:  jsr     _c132a5
 @32bf:  lda     $c4,x
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         cpx     #$0004
         bne     @32bf
@@ -6872,9 +6917,9 @@ _c132bc:
 ; ---------------------------------------------------------------------------
 
 _c132cb:
-@32cb:  jsr     $32a5
+@32cb:  jsr     _c132a5
 @32ce:  lda     $c5,x
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
         inx
         cpx     #$0003
         bne     @32ce
@@ -6883,11 +6928,11 @@ _c132cb:
 ; ---------------------------------------------------------------------------
 
 _c132da:
-@32da:  jsr     $32a5
+@32da:  jsr     _c132a5
 @32dd:  lda     $c4,x
         cmp     #$ff
         beq     @32e6
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
 @32e6:  inx
         cpx     #$0004
         bne     @32dd
@@ -6896,13 +6941,13 @@ _c132da:
 ; ---------------------------------------------------------------------------
 
 _c132ed:
-@32ed:  jsr     $32a5
+@32ed:  jsr     _c132a5
 
 _c132f0:
 @32f0:  lda     $c5,x
         cmp     #$ff
         beq     @32f9
-        jsr     $2dea       ; draw small text character
+        jsr     _c12dea       ; draw small text character
 @32f9:  inx
         cpx     #$0003
         bne     @32f0
@@ -6912,40 +6957,42 @@ _c132f0:
 
 _c13300:
 @3300:  lda     #$ff
-        jsr     $2dee
+        jsr     _c12dee
         dex
         bne     @3300
         rts
 
 ; ---------------------------------------------------------------------------
 
+; [ update battle bg palette animation ]
+
 _c13309:
         lda     $f8bd
         cmp     #$ff
         beq     @3359
-        inc     $f8c2
+        inc     $f8c2                   ; unused, increments every frame
         ldx     $f8be
         stx     $88
         lda     #^BattleBGPalAnim
         sta     $8a
         ldy     $f8c0
-        lda     [$88],y
+        lda     [$88],y                 ; restart loop if terminator
         cmp     #$ff
         bne     @3327
         clr_ay
 @3327:  lda     [$88],y
         bmi     @3330
-        ldx     #$0000
+        ldx     #$0000                  ; msb clear: first palette
         bra     @3333
-@3330:  ldx     #$0020
+@3330:  ldx     #$0020                  ; msb set: second palette
 @3333:  iny
-        sty     $f8c0
+        sty     $f8c0                   ; save location in palette animation data
         and     #$7f
         longa
         asl5
         txy
         tax
-        lda     #$0010
+        lda     #$0010                  ; copy 16 colors
         sta     $88
 @3347:  lda     f:BattleBGPal,x
         sta     $7e29,y
@@ -6962,14 +7009,16 @@ _c13309:
 
 _c1335a:
         lda     $04f2       ; battle bg
+
+_c1335d:
         longa
         asl3
         tax
         stx     $bca6       ; pointer to battle bg properties (+$d4ba21)
         shorta0
-        jsr     $33cc       ; load battle bg tile layout
-        jsr     $3725       ; load battle bg graphics
-        jsr     $36a5       ; load battle bg palette
+        jsr     _c133cc       ; load battle bg tile layout
+        jsr     _c13725       ; load battle bg graphics
+        jsr     _c136a5       ; load battle bg palette
         ldx     $bca6
         lda     f:BattleBGProp+7,x   ; palette animation
         sta     $f8bd
@@ -7125,6 +7174,8 @@ _c133cc:
         stz     $bcad
         stz     $bcae
         clr_ax
+
+; start of tile loop
 @34ca:  lda     $7f7000,x   ; tile index
         bmi     @34da
         ora     #$80
@@ -7138,21 +7189,21 @@ _c133cc:
         lda     $7f7001,x
         ora     $70
         sta     $70
-        jsr     $3670       ; get battle bg tile flip
+        jsr     _c13670       ; get battle bg tile flip
         ora     $70
         and     #$df        ; clear priority bit
         sta     $7f7001,x
         inx2
         cpx     #$0500
         bne     @34ca
-        jsr     $3599       ; flip battle bg horizontally
+        jsr     _c13599       ; flip battle bg horizontally
         lda     $dbe4
         beq     @3522
         lda     #^_d835b2        ; d8/35b2 (tile layout for ???)
         sta     $74
         ldx     #near _d835b2
         stx     $72
-        jsr     $fb77       ; decompress
+        jsr     _c1fb77       ; decompress
         ldx     #$1000
         stx     $70
         ldx     #$c000
@@ -7172,19 +7223,19 @@ _c133cc:
         ldx     #$7000
         lda     #$7f
         ldy     #$1000
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
         ldx     #$0500
         stx     $70
         ldx     #$7000
         lda     #$7f
         ldy     #$1400
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
         ldx     #$0040
         stx     $70
         ldx     #$74c0
         lda     #$7f
         ldy     #$1280
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
         ldx     #$0040
         stx     $70
         ldx     #$74c0
@@ -7209,7 +7260,7 @@ _c13577:
         stx     $70
         ldx     #$7000
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
 @3598:  rts
 
 ; ---------------------------------------------------------------------------
@@ -7267,7 +7318,7 @@ _c135e1:
         inx2
         cpx     #$0500
         bne     @35e6
-        jsr     $3577
+        jsr     _c13577
         pla
         sta     $70
         rts
@@ -7286,7 +7337,7 @@ _c135fe:
         inx2
         cpx     #$0500
         bne     @3603
-        jsr     $3577
+        jsr     _c13577
         pla
         sta     $70
         rts
@@ -7345,7 +7396,7 @@ _c13670:
         lda     $bcaa       ; bit index
         and     #$07
         bne     @367c
-        jsr     $361b       ; get next byte of battle bg tile flip data
+        jsr     _c1361b       ; get next byte of battle bg tile flip data
 @367c:  lda     $bca8
         beq     @3684       ; branch if there is no h-flip data
         stz     $bcab
@@ -7372,7 +7423,7 @@ _c13670:
 _c136a5:
 @36a5:  ldx     $bca6
         lda     f:BattleBGProp+1,x   ; palette 1
-        jsr     $36dc
+        jsr     _c136dc
 @36af:  lda     f:BattleBGPal,x
         sta     $7e29,y
         sta     $f540,y
@@ -7382,7 +7433,7 @@ _c136a5:
         bne     @36af
         ldx     $bca6
         lda     f:BattleBGProp+2,x   ; palette 2
-        jsr     $36dc
+        jsr     _c136dc
 @36ca:  lda     f:BattleBGPal,x
         sta     $7e49,y
         sta     $f560,y
@@ -7423,7 +7474,7 @@ _c136eb:
         sta     $73
         lda     f:BattleBGGfxPtrs+2,x
         sta     $74
-        jsr     $fb77       ; decompress
+        jsr     _c1fb77       ; decompress
         lda     f:_d84157,x   ; destination address for battle bg graphics
         sta     $72
         lda     f:_d84157+1,x
@@ -7437,7 +7488,7 @@ _c136eb:
 ; [ load battle bg graphics ]
 
 _c13725:
-@3725:  jsr     $36eb       ; decompress battle bg graphics
+@3725:  jsr     _c136eb       ; decompress battle bg graphics
         clr_ay
 @372a:  lda     [$72],y
         sta     $9009,y
@@ -7454,10 +7505,10 @@ _c13725:
         lda     $dbe4
         beq     @3753
 @374c:  lda     $74
-        jsr     $fd27
+        jsr     _c1fd27
         bra     @3758
 @3753:  lda     $74
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
 @3758:  clr_ay
 @375a:  lda     $9009,y     ; flip tiles vertically
         sta     $a010,y
@@ -7480,7 +7531,7 @@ _c13725:
         bne     @375a
         clr_ay
 @3799:  lda     $9009,y
-        jsr     $37ac       ; reverse bit order
+        jsr     _c137ac       ; reverse bit order
         sta     $9809,y
         lda     $a009,y     ; i don't think this does anything
         iny
@@ -7558,13 +7609,13 @@ _c137ef:
         sta     $70
         lda     f:_c1381d+1,x
         sta     $71
-        jsr     $381a
+        jsr     @381a
         inc     $cd47
 @3819:  rts
 @381a:  jmp     ($0070)
 
 _c1381d:
-        .addr   $38fe,$3940,$3954,$382d,$397e,$38c2,$3835,$382d
+        .addr   _c138fe,_c13940,_c13954,_c1382d,_c1397e,_c138c2,_c13835,_c1382d
 
 ; ---------------------------------------------------------------------------
 
@@ -7574,7 +7625,7 @@ _c1382d:
 ; ---------------------------------------------------------------------------
 
 _c1382e:
-        jsr     $3835
+        jsr     _c13835
         stz     $cd38
         rts
 
@@ -7586,7 +7637,7 @@ _c13835:
         lda     #$08
         sta     $76
         lda     #$22
-        jsr     $39b2
+        jsr     _c139b2
         clr_ay
         lda     #$ff
 @3848:  sta     $dbf6,y
@@ -7647,16 +7698,22 @@ _c13835:
         jsr     _c12dac
         lda     #$07
         jmp     _c14622
+
+_c138c2:
         ldx     #$0004
-@38c5:  jsr     $38dc
+@38c5:  jsr     _c138dc
         bcs     @38d4
         inx4
         cpx     #$0024
         bne     @38c5
         rts
-@38d4:  jsr     $40e4
+@38d4:  jsr     _c140e4
         lda     #$05
         jmp     _c14622
+
+; ---------------------------------------------------------------------------
+
+_c138dc:
 @38dc:  lda     #$04
         sta     $71
         stz     $70
@@ -7681,14 +7738,14 @@ _c13835:
 _c138fe:
         stz     $db49
         clr_ax
-@3903:  jsr     $38dc
+@3903:  jsr     _c138dc
         bcs     @3913
         inx4
         cpx     #$0020
         bne     @3903
         bra     @3919
 @3913:  inc     $db49
-        jsr     $405b
+        jsr     _c1405b
 @3919:  lda     $0425
         beq     @3936
         clr_ax
@@ -7699,7 +7756,7 @@ _c138fe:
         cpx     #$0004
         bne     @3920
         bra     @3936
-@3930:  jsr     $3ff4
+@3930:  jsr     _c13ff4
         inc     $db49
 @3936:  lda     $db49
         beq     @393f
@@ -7715,7 +7772,7 @@ _c13940:
         lda     #$08
         sta     $76
         lda     #$12
-        jsr     $39b2
+        jsr     _c139b2
         lda     #$01
         jmp     _c14622
 
@@ -7736,7 +7793,7 @@ _c13954:
         txa
         cmp     $70
         beq     @397d
-        jsr     $3fa8
+        jsr     _c13fa8
         clr_a
         jsr     _c14622
 @397d:  rts
@@ -7753,16 +7810,16 @@ _c1397e:
         lda     $0426
         bpl     @39a8
         lda     #$02
-        jsr     $39b2
+        jsr     _c139b2
         ldx     #$beb5
         ldy     #$c135
         lda     #$01
         sta     $76
         lda     #$0a
-        jsr     $39b2
+        jsr     _c139b2
         bra     @39ad
 @39a8:  lda     #$0a
-        jsr     $39b2
+        jsr     _c139b2
 @39ad:  lda     #$01
         jmp     _c14622
 
@@ -7841,8 +7898,8 @@ _c139f9:
         lda     $0426
         and     #$01
         bne     @3a3e
-        jsr     $0871
-@3a3e:  jsr     $39e2
+        jsr     _c10871
+@3a3e:  jsr     _c139e2
         lda     $70
         sta     $cd42
         sta     $010d       ; selected character (for multi controller)
@@ -7976,8 +8033,8 @@ _c13b11:
 ; [  ]
 
 _c13b1f:
-        jsr     $3ad2
-        jsr     $3ade
+        jsr     _c13ad2
+        jsr     _c13ade
         ldx     #$0060
         jsr     _c13f95
         ldx     $bca0
@@ -7996,9 +8053,9 @@ _c13b1f:
         inx2
         cpx     #$001e
         bne     @3b3b
-        jsr     $3b5c
-        jsr     $2971       ; draw big text string
-        jsr     $3aea
+        jsr     _c13b5c
+        jsr     _c12971       ; draw big text string
+        jsr     _c13aea
         inc     $bc76
         rts
 
@@ -8121,7 +8178,7 @@ _c13b87:
 
 _c13c02:
 @3c02:  lda     $dbf7
-        jsr     $2bcf
+        jsr     _c12bcf
 .if LANG_EN
         lda     #$07
 .else
@@ -8155,7 +8212,7 @@ _c13c22:
         lda     #$10
 .else
 @3c22:  lda     $dbf7
-        jsr     $2b85
+        jsr     _c12b85
         lda     #$09
 .endif
         sta     $7e
@@ -8180,7 +8237,7 @@ _c13c22:
 
 _c13c42:
 @3c42:  lda     $dbf7
-        jsr     $2b91
+        jsr     _c12b91
 .if LANG_EN
         lda     #$10
 .else
@@ -8208,7 +8265,7 @@ _c13c42:
 
 _c13c62:
 @3c62:  lda     $dbf7
-        jsr     $2c75
+        jsr     _c12c75
 .if LANG_EN
         lda     #$18
 .else
@@ -8245,8 +8302,8 @@ _c13c7f:
 ; [ draw battle message/dialogue ]
 
 _c13c88:
-        jsr     $3ad2
-        jsr     $3ade
+        jsr     _c13ad2
+        jsr     _c13ade
         ldx     #$0050
         jsr     _c13f95
         clr_ax
@@ -8262,8 +8319,8 @@ _c13c88:
         cpx     #$0034
         bne     @3c9a
         stz     $f507
-        jsr     $2971       ; draw big text string
-        jsr     $3aea
+        jsr     _c12971       ; draw big text string
+        jsr     _c13aea
         inc     $bc76
         rts
 
@@ -8274,7 +8331,7 @@ _c13c88:
 ; or maybe just clear text ???
 
 _c13cbb:
-        jsr     $3ad2
+        jsr     _c13ad2
         inc     $bc76
         jsr     _c102f2       ; wait one frame
         jmp     _c13b11
@@ -8370,9 +8427,9 @@ _c13cfa:
 ; [  ]
 
 _c13cff:
-        jsr     $3dc5
-        jsr     $3f71
-        jsr     $3d8c
+        jsr     _c13dc5
+        jsr     _c13f71
+        jsr     _c13d8c
         ldx     #$00ff
         stx     $70
         ldx     #$b535
@@ -8407,7 +8464,7 @@ _c13cff:
         inx
         cpx     #$0004
         bne     @3d40
-        jsr     $40a0
+        jsr     _c140a0
         lda     $dbd3
         bne     @3d7c
         ldx     #$0280
@@ -8415,7 +8472,7 @@ _c13cff:
         ldy     #$4a80
         ldx     #$bcb1
         lda     #$7e
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
 @3d7c:  ldx     #$0100
         stx     $70
         ldy     #$1f80
@@ -8430,8 +8487,8 @@ _c13cff:
 _c13d8c:
 @3d8c:  ldx     #$0000
         jsr     _c13f95
-        jsr     $3fa8
-        jsr     $405b
+        jsr     _c13fa8
+        jsr     _c1405b
         jsr     _c1416b
         lda     $cd40
         jne     _c14176
@@ -8544,6 +8601,8 @@ _c13dc5:
         cpx     #$0080
         bne     @3e8e
         shorta0
+
+_c13ea8:
         clr_axy
 @3eab:  lda     #$04
         sta     $70
@@ -8593,39 +8652,39 @@ _c13ed3:
         dec     $bc72
         dec     $bc72
         asl     $bc71
-        jsr     $3f53
+        jsr     _c13f53
         inx
-@3f0e:  jsr     $3f53
+@3f0e:  jsr     _c13f53
         tya
         cmp     $bc71
         bne     @3f0e
         inx
-        jsr     $3f53
-        jsr     $3f60
+        jsr     _c13f53
+        jsr     _c13f60
 @3f1e:  lda     $bc73
         clc
         adc     #$03
         tax
-        jsr     $3f53
+        jsr     _c13f53
         inx
-@3f29:  jsr     $3f53
+@3f29:  jsr     _c13f53
         tya
         cmp     $bc71
         bne     @3f29
         inx
-        jsr     $3f53
-        jsr     $3f60
+        jsr     _c13f53
+        jsr     _c13f60
         dec     $bc72
         bne     @3f1e
         inx
-        jsr     $3f53
+        jsr     _c13f53
         inx
-@3f43:  jsr     $3f53
+@3f43:  jsr     _c13f53
         tya
         cmp     $bc71
         bne     @3f43
         inx
-        jsr     $3f53
+        jsr     _c13f53
         ply
         plx
         rts
@@ -8819,7 +8878,7 @@ _c1405b:
         sta     $bd21
         lda     $0425
         beq     @409f
-        jsr     $3ff4
+        jsr     _c13ff4
 @409f:  rts
 
 ; ---------------------------------------------------------------------------
@@ -8878,12 +8937,12 @@ _c140e4:
         sta     $ce
         ldx     $70
         ldy     #$00ae
-        jsr     $412f
+        jsr     _c1412f
         lda     #$76
         sta     $c265
         iny2
         ldx     $72
-        jsr     $412f
+        jsr     _c1412f
         lda     $cd42
         tay
         asl
@@ -8905,8 +8964,8 @@ _c140e4:
 ; [  ]
 
 _c1412f:
-@412f:  jsr     $ff2e
-        jsr     $ff0e
+@412f:  jsr     _c1ff2e
+        jsr     _c1ff0e
         lda     $c5
         sta     $c1b1,y
         iny2
@@ -8921,7 +8980,7 @@ _c1412f:
 ; ---------------------------------------------------------------------------
 
 _c1414b:
-        jsr     $40e4
+        jsr     _c140e4
         lda     $ce
         pha
         lda     #$69
@@ -8929,7 +8988,7 @@ _c1414b:
         lda     $2e38,x
         tax
         ldy     #$01b2
-        jsr     $412f
+        jsr     _c1412f
         pla
         sta     $ce
         lda     #$05
@@ -8940,7 +8999,7 @@ _c1414b:
 ; ---------------------------------------------------------------------------
 
 _c1416b:
-        jsr     $40a0
+        jsr     _c140a0
         clr_a
         jsr     _c14622
         stz     $cd38
@@ -8957,10 +9016,10 @@ _c14176:
         jsr     _c1fce1       ; move data
         ldx     #$0028
         jsr     _c13f95
-        jsr     $41a7
+        jsr     _c141a7
         lda     #$04
         sta     $75
-        jsr     $427f
+        jsr     _c1427f
         lda     #$03
         jsr     _c14641
         jsr     _c12dac
@@ -9040,14 +9099,14 @@ _41dd:  stx     $72
 ; ---------------------------------------------------------------------------
 
 _c1421d:
-        jsr     $41da
+        jsr     _c141da
         stz     $cd38
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c14224:
-        jsr     $41d5
+        jsr     _c141d5
         stz     $cd38
         rts
 
@@ -9056,7 +9115,7 @@ _c14224:
 ; [ battle graphics function $05:  ]
 
 _c1422b:
-        jsr     $40a0
+        jsr     _c140a0
         lda     $cd40
         jne     _c14176
         ldx     #$027f
@@ -9069,17 +9128,17 @@ _c1422b:
         bpl     @425e
         ldx     #$0078
         jsr     _c13f95
-        jsr     $41be
-        jsr     $4365
+        jsr     _c141be
+        jsr     _c14365
         lda     #$08
         jsr     _c14641
         bra     @4273
 @425e:  ldx     #$0010
         jsr     _c13f95
-        jsr     $41be
+        jsr     _c141be
         lda     #$04
         sta     $75
-        jsr     $42f3
+        jsr     _c142f3
         lda     #$03
         jsr     _c14641
 @4273:  jsr     _c12dac
@@ -9165,8 +9224,8 @@ _c1427f:
 
 _c142f3:
 @42f3:  clr_ay
-@42f5:  jsr     $4316
-        jsr     $4336
+@42f5:  jsr     _c14316
+        jsr     _c14336
         lda     #$01
         sta     $dbf6,y
         iny
@@ -9259,39 +9318,39 @@ _c14365:
         stx     $7a
         clr_ay
         clr_a
-        jsr     $434f
-        jsr     $4316
+        jsr     _c1434f
+        jsr     _c14316
         lda     #$ff
-        jsr     $434a
-        jsr     $434a
-        jsr     $434a
-        jsr     $434a
-        jsr     $4336
+        jsr     _c1434a
+        jsr     _c1434a
+        jsr     _c1434a
+        jsr     _c1434a
+        jsr     _c14336
         lda     #$01
-        jsr     $434a
+        jsr     _c1434a
         lda     #$01
-        jsr     $434f
-        jsr     $4316
-        jsr     $4336
+        jsr     _c1434f
+        jsr     _c14316
+        jsr     _c14336
         lda     #$ff
-        jsr     $434a
+        jsr     _c1434a
         lda     #$02
-        jsr     $434f
-        jsr     $4316
+        jsr     _c1434f
+        jsr     _c14316
         lda     #$ff
-        jsr     $434a
-        jsr     $4336
+        jsr     _c1434a
+        jsr     _c14336
         lda     #$01
-        jsr     $434a
+        jsr     _c1434a
         lda     #$03
-        jsr     $434f
-        jsr     $4316
+        jsr     _c1434f
+        jsr     _c14316
         lda     #$ff
-        jsr     $434a
-        jsr     $434a
-        jsr     $434a
-        jsr     $434a
-        jsr     $4336
+        jsr     _c1434a
+        jsr     _c1434a
+        jsr     _c1434a
+        jsr     _c1434a
+        jsr     _c14336
         clr_a
         jmp     _c1434a
 
@@ -9328,10 +9387,10 @@ _c143ce:
         bpl     @4415
         inc     $70
 @4415:  ldy     #$000a
-        jsr     $442e
+        jsr     _c1442e
         inx
         ldy     #$0013
-        jsr     $442e
+        jsr     _c1442e
         jsr     _c12dac
         lda     #$02
         jsr     _c14622
@@ -9362,9 +9421,9 @@ _c1442e:
 ; [  ]
 
 _c14451:
-        jsr     $37b6
-        jsr     $45f1
-        jsr     $3ea8
+        jsr     _c137b6
+        jsr     _c145f1
+        jsr     _c13ea8
 
 _c1445a:
         lda     #$06
@@ -9423,9 +9482,9 @@ _c1445a:
 ; ---------------------------------------------------------------------------
 
 _c144c8:
-        jsr     $37b6
-        jsr     $45f1
-        jsr     $3ea8
+        jsr     _c137b6
+        jsr     _c145f1
+        jsr     _c13ea8
 
 _c144d1:
         lda     #$05
@@ -9494,12 +9553,12 @@ _c144d1:
 ; ---------------------------------------------------------------------------
 
 _c14552:
-        jsr     $45f1
-        jsr     $3ea8
+        jsr     _c145f1
+        jsr     _c13ea8
         jmp     _c1455e
 
 _c1455b:
-        jsr     $45f1
+        jsr     _c145f1
 
 _c1455e:
         lda     #$03
@@ -9658,7 +9717,7 @@ _c14656:
 _c14676:
         lda     $cd42
         tax
-        jsr     $5270
+        jsr     _c15270
         lda     ($88)
         pha
         lda     #$09
@@ -9680,7 +9739,7 @@ _c1468c:
 ; [ battle command menu $0d: combine ]
 
 _c1468d:
-        jsr     $47b6
+        jsr     _c147b6
         lda     #$08
         sta     $f891
         lda     #$01
@@ -9694,7 +9753,7 @@ _c1468d:
 ; [ battle command menu $0e: drink ]
 
 _c1469f:
-        jsr     $47b6
+        jsr     _c147b6
         lda     #$01
         sta     $cfc3
         sta     $db4e
@@ -9705,7 +9764,7 @@ _c1469f:
 ; [ battle command menu $0f: throw ]
 
 _c146ab:
-        jsr     $47b6
+        jsr     _c147b6
         lda     #$01
         sta     $cfc3
         sta     $db4f
@@ -9816,7 +9875,7 @@ _470b:  sta     $cd39       ; menu id ???
         lda     #$04
         sta     $cdfa
         lda     #$04
-        jsr     $496a
+        jsr     _c1496a
         lda     #$05
         sta     $cd3a
         lda     #$01
@@ -9824,8 +9883,8 @@ _470b:  sta     $cd39       ; menu id ???
         lda     #$0c
         sta     $cd3c
         lda     #$20
-        jsr     $5318
-        jsr     $47ef
+        jsr     _c15318
+        jsr     _c147ef
         jmp     _c15494
 
 ; ---------------------------------------------------------------------------
@@ -9836,7 +9895,7 @@ _c14735:
         stz     $cd6c
         stz     $cd70
         lda     #$05
-        jsr     $496a
+        jsr     _c1496a
         lda     #$07
         sta     $cd39
         lda     #$05
@@ -9857,7 +9916,7 @@ _c14759:
         lda     #$12
         sta     $cd39
         lda     #$0a
-        jsr     $496a
+        jsr     _c1496a
         lda     #$05
         sta     $cd3a
         lda     #$01
@@ -9874,7 +9933,7 @@ _c14773:
         stz     $cd6c
         stz     $cd70
         lda     #$0b
-        jsr     $496a
+        jsr     _c1496a
         lda     #$02
         sta     $cd3a
         lda     #$0d
@@ -9887,7 +9946,7 @@ _c14773:
 
 _c14789:
         lda     #$06
-        jsr     $496a
+        jsr     _c1496a
         lda     #$04
         sta     $cd39
         lda     #$05
@@ -9904,7 +9963,7 @@ _c14789:
 
 _c147a3:
         lda     #$07
-        jsr     $496a
+        jsr     _c1496a
         lda     #$02
         sta     $cd3a
         lda     #$07
@@ -9923,7 +9982,7 @@ _c147b6:
         lda     #$04
         sta     $cdfa
         lda     #$04
-        jsr     $496a
+        jsr     _c1496a
         lda     #$08
         sta     $cd39
         lda     #$05
@@ -9932,7 +9991,7 @@ _c147b6:
         sta     $cd3b
         lda     #$07
         sta     $cd3c
-        jsr     $47ef
+        jsr     _c147ef
         stz     $f891
         stz     $f88c
         stz     $f88e
@@ -9958,7 +10017,7 @@ _c147ef:
 
 _c147fe:
         lda     #$05
-        jsr     $496a
+        jsr     _c1496a
         lda     #$06
         clc
         adc     $cdf7
@@ -9990,7 +10049,7 @@ _c1483b:
         lda     #$09
         sta     $bc83
         lda     #$0e
-        jsr     $496a
+        jsr     _c1496a
         lda     #$1d
         sta     $cd39
         lda     #$05
@@ -10008,7 +10067,7 @@ _c1483b:
 _c1485c:
 @485c:  pha
         lda     #$0f
-        jsr     $496a
+        jsr     _c1496a
         lda     #$02
         sta     $cd3a
         pla
@@ -10028,7 +10087,7 @@ _c1486e:
         and     #$fe
         sta     $cf56,x
         lda     #$02
-        jsr     $496a
+        jsr     _c1496a
         lda     #$02
         sta     $cd39
         lda     #$05
@@ -10047,7 +10106,7 @@ _c1486e:
 
 _c148a2:
         lda     #$03
-        jsr     $496a
+        jsr     _c1496a
         lda     #$01
         sta     $cd39
         lda     #$05
@@ -10109,8 +10168,8 @@ _c148f7:
 
 _c1491d:
         lda     #$0d
-        jsr     $496a
-        jsr     $48f7
+        jsr     _c1496a
+        jsr     _c148f7
         lda     #$02
         sta     $cd3a
         lda     #$06
@@ -10121,8 +10180,8 @@ _c1491d:
 
 _c14930:
         lda     #$0c
-        jsr     $496a
-        jsr     $48f7
+        jsr     _c1496a
+        jsr     _c148f7
         lda     #$14
         sta     $cd39
         lda     #$05
@@ -10137,8 +10196,8 @@ _c14930:
 
 _c1494d:
         lda     #$0c
-        jsr     $496a
-        jsr     $48f7
+        jsr     _c1496a
+        jsr     _c148f7
         lda     #$13
         sta     $cd39
         lda     #$05
@@ -10195,7 +10254,7 @@ _c14986:
         shorta0
         dec     $cd35
         bne     @49c3
-        jsr     $fd07
+        jsr     _c1fd07
 @49c3:  rts
 
 ; ---------------------------------------------------------------------------
@@ -10227,7 +10286,7 @@ _c149c4:
         shorta0
         dec     $cd35
         bne     @4a04
-        jsr     $fd07
+        jsr     _c1fd07
         lda     #$01
         sta     $bc83
 @4a04:  rts
@@ -10242,24 +10301,24 @@ _c14a05:
         ldx     #$c9b1
         lda     #$7e
         ldy     #$4820
-        jsr     $fdb6       ; copy data to vram
+        jsr     _c1fdb6       ; copy data to vram
         stz     $bc76
         longa
         lda     #$4080
-        sta     f:$002116
+        sta     f:hVMADDL
         lda     #$f357
-        sta     f:$004342
+        sta     f:hDMA4::ADDR
         lda     #$01a0
-        sta     f:$004345
+        sta     f:hDMA4::SIZE
         shorta0
         lda     #$7e
-        sta     f:$004344
+        sta     f:hDMA4::ADDR_B
         clr_a
-        sta     f:$004340
-        lda     #$19
-        sta     f:$004341
+        sta     f:hDMA4::CTRL
+        lda     #<hVMDATAH
+        sta     f:hDMA4::HREG
         lda     #$10
-        sta     f:$00420b
+        sta     f:hMDMAEN
 @4a4e:  rts
 
 ; ---------------------------------------------------------------------------
@@ -10272,7 +10331,7 @@ _c14a4f:
         ldy     $cd75
         ldx     #$cd77
         lda     #$7e
-        jsr     $fdb6       ; copy data to vram
+        jsr     _c1fdb6       ; copy data to vram
         stz     $cd74
 @4a67:  rts
 
@@ -10288,7 +10347,7 @@ _c14a68:
         ldy     $bc68
         ldx     $bc6a
         lda     #$7e
-        jsr     $fdb6       ; copy data to vram
+        jsr     _c1fdb6       ; copy data to vram
         stz     $bc65
 @4a85:  rts
 
@@ -10354,11 +10413,11 @@ _c14a86:
         sbc     #$0004
         sta     $cf3e
         shorta0
-        jsr     $4bbc
+        jsr     _c14bbc
         dec     $cd37
         bne     @4b21
-        jsr     $fd07
-        jsr     $1186
+        jsr     _c1fd07
+        jsr     _c11186
 @4b21:  rts
 
 ; ---------------------------------------------------------------------------
@@ -10422,11 +10481,11 @@ _c14b22:
         adc     #$0004
         sta     $cf3e
         shorta0
-        jsr     $4bbc
+        jsr     _c14bbc
         dec     $cd37
         bne     @4bbb
-        jsr     $fd07
-        jsr     $1186
+        jsr     _c1fd07
+        jsr     _c11186
 @4bbb:  rts
 
 ; ---------------------------------------------------------------------------
@@ -10483,7 +10542,7 @@ _c14bf6:
 ; ---------------------------------------------------------------------------
 
 _c14c1d:
-@4c1d:  jsr     $4be9
+@4c1d:  jsr     _c14be9
         lda     $d0c5
         beq     @4c59
         cmp     #$01
@@ -10524,7 +10583,7 @@ _c14c1d:
 ; ---------------------------------------------------------------------------
 
 _c14c73:
-@4c73:  jsr     $fc96       ; generate random number
+@4c73:  jsr     _c1fc96       ; generate random number
         and     #$0f
         sta     $88
         asl
@@ -10544,7 +10603,7 @@ _c14c73:
 ; ---------------------------------------------------------------------------
 
 _c14c97:
-@4c97:  jsr     $fbad       ; play system sound effect $10
+@4c97:  jsr     _c1fbad       ; play system sound effect $10
         lda     $d0c4
         sta     $88
 @4c9f:  inc     $88
@@ -10598,14 +10657,14 @@ _c14cef:
         lda     $db48
         and     #$02
         beq     @4d00
-        jsr     $4be9
+        jsr     _c14be9
         bra     @4d03
 @4d00:  jsr     _c14c1d
 @4d03:  dec     $db48
         bne     @4d11
-        jsr     $4d3c
-        jsr     $4be9
-        jsr     $4d28
+        jsr     _c14d3c
+        jsr     _c14be9
+        jsr     _c14d28
 @4d11:  rts
 @4d12:  dec     $db47
         bne     @4d1c
@@ -10614,7 +10673,7 @@ _c14cef:
 @4d1c:  lda     $a2
         and     #$0f
         bne     @4d25
-        jsr     $4c97
+        jsr     _c14c97
 @4d25:  jmp     _c14c1d
 
 ; ---------------------------------------------------------------------------
@@ -10632,7 +10691,7 @@ _c14d28:
 ; ---------------------------------------------------------------------------
 
 _c14d3c:
-@4d3c:  jsr     $4cc4
+@4d3c:  jsr     _c14cc4
         lda     $f890
         tax
         lda     $88
@@ -10642,7 +10701,7 @@ _c14d3c:
         lda     $d0c2
         and     #$04
         bne     @4d57
-        jsr     $4be9
+        jsr     _c14be9
 @4d57:  lda     $db4e
         cmp     #$02
         bne     @4d69
@@ -10667,18 +10726,18 @@ _c14d80:
         lda     $01
         and     #$0f
         beq     @4d89
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
 @4d89:  lda     $d0c2
         cmp     #$08
         beq     @4d97
         lda     $00
         bpl     @4db9
-        jsr     $fbb8       ; play system sound effect $11
+        jsr     _c1fbb8       ; play system sound effect $11
 @4d97:  lda     $d0c2
         and     #$04
         beq     @4db3
         jsr     _c15494
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$3f
         clc
         adc     #$20
@@ -10686,23 +10745,23 @@ _c14d80:
         lda     #$13
         sta     $cd3a
         bra     @4db6
-@4db3:  jsr     $4d28
+@4db3:  jsr     _c14d28
 @4db6:  jmp     _c14d3c
 @4db9:  lda     $cdf8
         bne     @4dc8
         lda     $01
         bpl     @4de4
-        jsr     $fbc3       ; play system sound effect $11
+        jsr     _c1fbc3       ; play system sound effect $11
         jsr     _c15494
 @4dc8:  lda     $d0c2
         and     #$08
         bne     @4dd7
         lda     $d0c3
-        jsr     $485c
+        jsr     _c1485c
         bra     @4ddd
 @4dd7:  lda     $d0c3
         sta     $cd3a
-@4ddd:  jsr     $4be9
+@4ddd:  jsr     _c14be9
         stz     $f890
         rts
 @4de4:  lda     $d0c2
@@ -10714,31 +10773,31 @@ _c14d80:
         lda     $a2
         and     #$03
         bne     @4e2d
-        jsr     $4c97
+        jsr     _c14c97
         bra     @4e2d
 @4dfd:  lda     $01
         and     #$0f
         cmp     #$08
         bne     @4e0a
-        jsr     $4ea3
+        jsr     _c14ea3
         bra     @4e2d
 @4e0a:  cmp     #$04
         bne     @4e13
-        jsr     $4ec6
+        jsr     _c14ec6
         bra     @4e2d
 @4e13:  cmp     #$02
         bne     @4e20
         lda     $f6
         bne     @4e28
-@4e1b:  jsr     $4f28
+@4e1b:  jsr     _c14f28
         bra     @4e2d
 @4e20:  cmp     #$01
         bne     @4e2d
         lda     $f6
         bne     @4e1b
-@4e28:  jsr     $4ee9
+@4e28:  jsr     _c14ee9
         bra     @4e2d
-@4e2d:  jsr     $4e5e
+@4e2d:  jsr     _c14e5e
         bcc     @4dc8
         jmp     _c14c1d
 
@@ -10789,7 +10848,7 @@ _c14e5e:
         beq     @4e7f
         clr_ay
 @4e87:  lda     $d0aa,y
-        jsr     $5195
+        jsr     _c15195
         bcs     @4e98
         iny
         cpy     #$0008
@@ -10836,7 +10895,7 @@ _c14ec6:
         pla
         inc
         jmp     _c14e35
-@4edc:  jsr     $5041
+@4edc:  jsr     _c15041
         lda     $e2
         cmp     #$ff
         beq     @4ee8
@@ -10861,7 +10920,7 @@ _c14ee9:
         bne     @4f0b
         stz     $d0c5
         rts
-@4f0b:  jsr     $50c9
+@4f0b:  jsr     _c150c9
         lda     $e2
         cmp     #$ff
         bne     @4f24
@@ -10891,7 +10950,7 @@ _c14f28:
         beq     @4f58
         clr_ay
 @4f43:  lda     $d0aa,y
-        jsr     $5195
+        jsr     _c15195
         bcs     @4f52
         iny
         cpy     #$0008
@@ -10900,7 +10959,7 @@ _c14f28:
 @4f52:  lda     $d0aa,y
         sta     $d0c4
 @4f58:  rts
-@4f59:  jsr     $5086
+@4f59:  jsr     _c15086
         lda     $e2
         cmp     #$ff
         bne     @4f6d
@@ -10995,19 +11054,19 @@ _c14fba:
 ; ---------------------------------------------------------------------------
 
 _c14ffe:
-        jsr     $4f71
+        jsr     _c14f71
         clr_ay
 @5003:  tya
         cmp     $d0c4
         beq     @500e
-        jsr     $5195
+        jsr     _c15195
         bcs     @5018
 @500e:  shorta0
         iny
         cpy     #$0008
         bne     @5003
         rts
-@5018:  jsr     $4f92
+@5018:  jsr     _c14f92
         longa
         lda     $92
         bpl     @500e
@@ -11024,25 +11083,25 @@ _c14ffe:
         beq     @5038
         bpl     @500e
 @5038:  shorta0
-        jsr     $4fba
+        jsr     _c14fba
         jmp     @500e
 
 ; ---------------------------------------------------------------------------
 
 _c15041:
-        jsr     $4f71
+        jsr     _c14f71
         clr_ay
 @5046:  tya
         cmp     $d0c4
         beq     @5051
-        jsr     $5195
+        jsr     _c15195
         bcs     @505b
 @5051:  shorta0
         iny
         cpy     #$0008
         bne     @5046
         rts
-@505b:  jsr     $4f92
+@505b:  jsr     _c14f92
         longa
         lda     $92
         beq     @5051
@@ -11060,25 +11119,25 @@ _c15041:
         beq     @507d
         bmi     @5051
 @507d:  shorta0
-        jsr     $4fba
+        jsr     _c14fba
         jmp     @5051
 
 ; ---------------------------------------------------------------------------
 
 _c15086:
-        jsr     $4f71
+        jsr     _c14f71
         clr_ay
 @508b:  tya
         cmp     $d0c4
         beq     @5096
-        jsr     $5195
+        jsr     _c15195
         bcs     @50a0
 @5096:  shorta0
         iny
         cpy     #$0008
         bne     @508b
         rts
-@50a0:  jsr     $4f92
+@50a0:  jsr     _c14f92
         longa
         lda     $90
         bpl     @5096
@@ -11095,25 +11154,25 @@ _c15086:
         beq     @50c0
         bpl     @5096
 @50c0:  shorta0
-        jsr     $4fba
+        jsr     _c14fba
         jmp     @5096
 
 ; ---------------------------------------------------------------------------
 
 _c150c9:
-        jsr     $4f71
+        jsr     _c14f71
         clr_ay
 @50ce:  tya
         cmp     $d0c4
         beq     @50d9
-        jsr     $5195
+        jsr     _c15195
         bcs     @50e3
 @50d9:  shorta0
         iny
         cpy     #$0008
         bne     @50ce
         rts
-@50e3:  jsr     $4f92
+@50e3:  jsr     _c14f92
         longa
         lda     $90
         beq     @50d9
@@ -11131,7 +11190,7 @@ _c150c9:
         beq     @5105
         bmi     @50d9
 @5105:  shorta0
-        jsr     $4fba
+        jsr     _c14fba
         jmp     @50d9
 
 ; ---------------------------------------------------------------------------
@@ -11165,7 +11224,7 @@ _c1510e:
         jmp     @5160
 @514a:  clr_ay
 @514c:  lda     $d0aa,y
-        jsr     $5195
+        jsr     _c15195
         bcs     @515a
         iny
         cpy     #$0008
@@ -11175,7 +11234,7 @@ _c1510e:
 @5160:  lda     $d0c2
         and     #$04
         beq     @516c
-        jsr     $4c73
+        jsr     _c14c73
         bra     @5185
 @516c:  lda     $d0c2
         and     #$48
@@ -11190,7 +11249,7 @@ _c1510e:
         sta     $d0c5
 @5185:  lda     $d0c2
         and     #$08
-        jeq     $483b
+        jeq     _c1483b
         lda     #$12
         sta     $cd3a
         rts
@@ -11216,7 +11275,7 @@ _c151a5:
         jne     _c1491d
         lda     $00
         bpl     @51c2
-        jsr     $fbb8       ; play system sound effect $11
+        jsr     _c1fbb8       ; play system sound effect $11
         lda     #$03
         sta     $41b2
         inc     $cdf8
@@ -11224,7 +11283,7 @@ _c151a5:
 @51c2:  lda     $01
         and     #$01
         beq     @51cd
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         bra     @51e1
 @51cd:  lda     $0426
         bpl     @51da
@@ -11234,7 +11293,7 @@ _c151a5:
         bne     @51e1
 @51da:  lda     $01
         bpl     @51e4
-        jsr     $fbc3       ; play system sound effect $11
+        jsr     _c1fbc3       ; play system sound effect $11
 @51e1:  jmp     _c1491d
 @51e4:  lda     #$08
         jmp     _c1522f
@@ -11247,7 +11306,7 @@ _c151e9:
         jne     _c1491d
         lda     $00
         bpl     @520b
-        jsr     $fbb8       ; play system sound effect $11
+        jsr     _c1fbb8       ; play system sound effect $11
         lda     #$04
         sta     $41b2
         inc     $cdf8
@@ -11255,7 +11314,7 @@ _c151e9:
 @520b:  lda     $01
         and     #$02
         beq     @5216
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         bra     @522a
 @5216:  lda     $0426
         bpl     @5223
@@ -11265,7 +11324,7 @@ _c151e9:
         bne     @522a
 @5223:  lda     $01
         bpl     @522d
-        jsr     $fbc3       ; play system sound effect $11
+        jsr     _c1fbc3       ; play system sound effect $11
 @522a:  jmp     _c1491d
 @522d:  lda     #$60
 
@@ -11416,7 +11475,7 @@ _c15318:
 _c1531f:
 @531f:  lda     $042d,x
         sta     $98
-        jsr     $52ad
+        jsr     _c152ad
         lda     ($88)
         bpl     @5332
         lda     #$03
@@ -11443,13 +11502,13 @@ _c1531f:
 @5355:  tay
         lda     $fef6,y
         sta     $042d,x
-        jsr     $52ad
+        jsr     _c152ad
         lda     ($88)
         bpl     @536a
         lda     $98
         sta     $042d,x
         bra     @536d
-@536a:  jsr     $fbad       ; play system sound effect $10
+@536a:  jsr     _c1fbad       ; play system sound effect $10
 @536d:  lda     $cd40
         bne     @5394
         lda     $02
@@ -11457,14 +11516,14 @@ _c1531f:
         cmp     #$20
         bne     @5383
         stz     $cd48
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         jmp     _c1494d
 @5383:  lda     $02
         and     #$30
         cmp     #$10
         bne     @5394
         stz     $cd48
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         jmp     _c14930
 @5394:  phx
         lda     $042d,x
@@ -11488,9 +11547,9 @@ _c1531f:
         plx
         lda     $00
         bpl     @53cd
-        jsr     $fbb8       ; play system sound effect $11
+        jsr     _c1fbb8       ; play system sound effect $11
         stz     $cd48
-        jsr     $54a1
+        jsr     _c154a1
 @53cd:  rts
 
 ; ---------------------------------------------------------------------------
@@ -11514,7 +11573,7 @@ _c153ce:
         stz     $f891
         stz     $f890
         lda     #$80
-        jsr     $5318
+        jsr     _c15318
         lda     #$01
         sta     $cdf7
         lda     $cd42
@@ -11522,25 +11581,25 @@ _c153ce:
         lda     $cd40
         bne     @541b
         lda     $0426
-        jmi     $531f
+        jmi     _c1531f
 @541b:  lda     $01
         and     #$0c
         beq     @5442
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         cmp     #$08
         beq     @5438
         cmp     #$04
         bne     @5442
 @542c:  inc     $042d,x
-        jsr     $52ad
+        jsr     _c152ad
         lda     ($88)
         bmi     @542c
         bra     @5442
 @5438:  dec     $042d,x
-        jsr     $52ad
+        jsr     _c152ad
         lda     ($88)
         bmi     @5438
-@5442:  jsr     $52ad
+@5442:  jsr     _c152ad
         lda     ($88)
         bmi     @542c
         phx
@@ -11560,19 +11619,19 @@ _c153ce:
         and     #$02
         beq     @5477
         stz     $cd48
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         jmp     _c1494d
 @5477:  lda     $01
         and     #$01
         beq     @5486
         stz     $cd48
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         jmp     _c14930
 @5486:  lda     $00
         bpl     @5493
-        jsr     $fbb8       ; play system sound effect $11
+        jsr     _c1fbb8       ; play system sound effect $11
         stz     $cd48
-        jsr     $54a1
+        jsr     _c154a1
 @5493:  rts
 
 ; ---------------------------------------------------------------------------
@@ -11614,7 +11673,7 @@ _c154a1:
         lda     ($88),y
         sta     $41b2
         lda     ($88),y
-        jsr     $52a7       ; get menu id for battle command
+        jsr     _c152a7       ; get menu id for battle command
         asl
         tax
         lda     f:_c154f1,x
@@ -11627,8 +11686,8 @@ _c154a1:
 
 ; battle command menu jump table
 _c154f1:
-        .addr   $4676,$46b7,$46bc,$46c1,$46c6,$46cb,$46d0,$46da
-        .addr   $46df,$46d5,$4676,$468c,$47b6,$468d,$469f,$46ab
+        .addr   _c14676,_c146b7,_c146bc,_c146c1,_c146c6,_c146cb,_c146d0,_c146da
+        .addr   _c146df,_c146d5,_c14676,_c1468c,_c147b6,_c1468d,_c1469f,_c146ab
 
 ; ---------------------------------------------------------------------------
 
@@ -11646,7 +11705,7 @@ _c15511:
         sta     $cd4a
         lda     #$01
         sta     $cd48
-        jsr     $4bbc
+        jsr     _c14bbc
         plx
         rts
 
@@ -11685,7 +11744,7 @@ _c1555b:
         ldx     #$c363
         ldy     #$1f59
         lda     #$7e
-        jsr     $fdb6       ; copy data to vram
+        jsr     _c1fdb6       ; copy data to vram
         stz     $cd44
 @5573:  rts
 
@@ -11766,7 +11825,7 @@ _c155d0:
         stz     $cd70
 @5601:  lda     $00
         bpl     @564c
-        jsr     $fbb8       ; play system sound effect $11
+        jsr     _c1fbb8       ; play system sound effect $11
         lda     ($d3),y
         clc
         adc     $db
@@ -11777,7 +11836,7 @@ _c155d0:
         shorta0
         lda     $2f3c,x
         bpl     @5623
-        jsr     $fbce       ; play system sound effect $12
+        jsr     _c1fbce       ; play system sound effect $12
         jmp     @5683
 @5623:  stz     $cd48
         phx
@@ -11799,28 +11858,30 @@ _c155d0:
         jmp     _c14773
 @564c:  lda     $01
         bpl     @5659
-        jsr     $fbc3       ; play system sound effect $11
+        jsr     _c1fbc3       ; play system sound effect $11
         stz     $cd48
         jmp     _c14773
-@5659:  jsr     $5574
-        jsr     $5536
+@5659:  jsr     _c15574
+        jsr     _c15536
         lda     $01
         and     #$02
-        jne     $56b5
+        jne     _c156b5
         lda     $01
         and     #$01
-        jne     $5684
+        jne     _c15684
         lda     $01
         and     #$04
-        jne     $56e0
+        jne     _c156e0
         lda     $01
         and     #$08
-        jne     $571a
+        jne     _c1571a
 @5683:  rts
+
+_c15684:
 @5684:  lda     ($d5),y
         cmp     $d1
         beq     @5699
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         lda     ($d3),y
         inc
         sta     ($d3),y
@@ -11833,18 +11894,20 @@ _c155d0:
         sbc     $db
         cmp     ($d3),y
         beq     @56b2
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         lda     ($d3),y
         sec
         sbc     $d1
         sta     ($d3),y
         clr_a
         sta     ($d5),y
-        jsr     $56e0
+        jsr     _c156e0
 @56b2:  jmp     _c15536
+
+_c156b5:
 @56b5:  lda     ($d5),y
         beq     @56c8
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         lda     ($d5),y
         dec
         sta     ($d5),y
@@ -11854,14 +11917,14 @@ _c155d0:
         bra     @56dd
 @56c8:  lda     ($d3),y
         beq     @56dd
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         lda     ($d3),y
         clc
         adc     $d1
         sta     ($d3),y
         lda     $d1
         sta     ($d5),y
-        jsr     $571a
+        jsr     _c1571a
 @56dd:  jmp     _c15536
 
 ; ---------------------------------------------------------------------------
@@ -11870,7 +11933,7 @@ _c156e0:
 @56e0:  lda     ($d7),y
         cmp     #$03
         beq     @56f6
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         lda     ($d3),y
         clc
         adc     $d2
@@ -11883,12 +11946,12 @@ _c156e0:
         cmp     $dd
         bne     @56fd
         rts
-@56fd:  jsr     $fbad       ; play system sound effect $10
+@56fd:  jsr     _c1fbad       ; play system sound effect $10
         lda     ($d3),y
         clc
         adc     $d2
         sta     ($d3),y
-        jsr     $5750
+        jsr     _c15750
         lda     #$03
         sta     $cd37
         lda     #$03
@@ -11902,7 +11965,7 @@ _c156e0:
 _c1571a:
 @571a:  lda     ($d7),y
         beq     @572e
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         lda     ($d3),y
         sec
         sbc     $d2
@@ -11914,12 +11977,12 @@ _c1571a:
 @572e:  lda     ($d9),y
         bne     @5733
         rts
-@5733:  jsr     $fbad       ; play system sound effect $10
+@5733:  jsr     _c1fbad       ; play system sound effect $10
         lda     ($d3),y
         sec
         sbc     $d2
         sta     ($d3),y
-        jsr     $576c
+        jsr     _c1576c
         lda     #$03
         sta     $cd37
         lda     #$04
@@ -11936,7 +11999,7 @@ _c15750:
         lda     ($d9),y
         inc
         sta     ($d9),y
-        jsr     $57b1
+        jsr     _c157b1
         lda     $cdfa
         cmp     #$04
         bne     @5768
@@ -11952,7 +12015,7 @@ _c1576c:
         lda     ($d9),y
         dec
         sta     ($d9),y
-        jsr     $57b1
+        jsr     _c157b1
         lda     $cdfa
         bne     @5780
         lda     #$05
@@ -12004,24 +12067,24 @@ _c157b1:
         tya                 ; y = character index
         asl
         tax
-        jsr     $5784
+        jsr     _c15784
         lda     $cf
         beq     @57d5
         ldy     #$0000
-        jsr     $584b
+        jsr     _c1584b
         inx
-        jsr     $584b
+        jsr     _c1584b
         ldx     #$0008
         bra     @57e6
 @57d5:  ldy     #$0000
-        jsr     $5806
+        jsr     _c15806
         inx
-        jsr     $5806
+        jsr     _c15806
         inx
-        jsr     $5806
+        jsr     _c15806
         ldx     #$0007
 @57e6:  lda     #$ff
-        jsr     $5f6b
+        jsr     _c15f6b
         dex
         bne     @57e6
         lda     $cdfa
@@ -12052,7 +12115,7 @@ _c15806:
         phx
         ldx     #$0006
 @581e:  lda     #$ff
-        jsr     $5f6b
+        jsr     _c15f6b
         dex
         bne     @581e
         jmp     @5845
@@ -12065,7 +12128,7 @@ _c15806:
         lda     #$06
         sta     $88
 @5839:  lda     f:MagicName,x   ; spell names
-        jsr     $5f67
+        jsr     _c15f67
         inx
         dec     $88
         bne     @5839
@@ -12104,7 +12167,7 @@ _c1584b:
 .else
 @586e:  lda     f:AttackName,x   ; short attack names
 .endif
-        jsr     $5f67
+        jsr     _c15f67
         inx
         dec     $88
         bne     @586e
@@ -12146,7 +12209,7 @@ _c1588d:
         rts
 @58ab:  and     #$40
         bne     @58f1
-        jsr     $5880
+        jsr     _c15880
         lda     $cfd3
         tay
         lda     $37ac,x
@@ -12161,14 +12224,14 @@ _c1588d:
         lda     $cfd5
         bne     @5929
 @58d1:  lda     $88
-        jsr     $5ad0
+        jsr     _c15ad0
         lda     $2734,y
         sta     $d0d0
         lda     $2b34,y
         sta     $d0d1
         lda     $2c34,y
         sta     $d0d2
-        jsr     $5af9
+        jsr     _c15af9
         bcc     @5929
         lda     #$18
         bra     @58fa
@@ -12185,19 +12248,19 @@ _c1588d:
         sta     $cd3c
         lda     #$08
         sta     $cd3d
-        jsr     $5b93
+        jsr     _c15b93
         plx
         clc
         rts
-@5917:  jsr     $5880
-        jsr     $5b86
+@5917:  jsr     _c15880
+        jsr     _c15b86
         lda     $37b6,x
         and     $92
         bne     @5929
         lda     $37ac,x
         bpl     @5932
-@5929:  jsr     $fbce       ; play system sound effect $12
-        jsr     $5b93
+@5929:  jsr     _c1fbce       ; play system sound effect $12
+        jsr     _c15b93
         plx
         clc
         rts
@@ -12211,7 +12274,7 @@ _c1588d:
         sta     $88
         lda     $37b2,x
         jsr     _c1510e
-        jsr     $5b99
+        jsr     _c15b99
         plx
         sec
         rts
@@ -12240,7 +12303,7 @@ _c1594e:
         lda     $2b34,x
         plx
         and     #$02
-        jne     $5a97
+        jne     @5a97
 @5982:  lda     $f88c
         bmi     @59ac
         lda     $88
@@ -12278,17 +12341,17 @@ _c1594e:
         cmp     #$01
         beq     @59db
         lda     $cfd5
-        jne     $5a91
+        jne     @5a91
 @59db:  lda     $cfd3
-        jsr     $5ad0
+        jsr     _c15ad0
         lda     $2734,x
         sta     $d0d0
         lda     $2b34,x
         sta     $d0d1
         lda     $2c34,x
         sta     $d0d2
-        jsr     $5af9
-        jcc     $5a91
+        jsr     _c15af9
+        jcc     @5a91
         lda     #$16
         bra     @5a2a
 @59ff:  lda     $db4e
@@ -12318,7 +12381,7 @@ _c1594e:
         sta     $cd3c
         lda     #$07
         sta     $cd3d
-        jsr     $5b93
+        jsr     _c15b93
         plx
         clc
         rts
@@ -12345,7 +12408,7 @@ _c1594e:
         and     $92
         beq     @5a9a
         bra     @5a97
-@5a7a:  jsr     $5b86
+@5a7a:  jsr     _c15b86
         lda     $2c34,x
         and     $92
         bne     @5a91
@@ -12355,8 +12418,8 @@ _c1594e:
         bra     @5a9a
         and     $92
         beq     @5a9a
-@5a91:  jsr     $fbce       ; play system sound effect $12
-        jsr     $5b93
+@5a91:  jsr     _c1fbce       ; play system sound effect $12
+        jsr     _c15b93
 @5a97:  plx
         clc
         rts
@@ -12382,14 +12445,14 @@ _c1594e:
         bra     @5ac7
 @5ac4:  lda     $2a34,x
 @5ac7:  jsr     _c1510e
-        jsr     $5b99
+        jsr     _c15b99
         plx
         sec
         rts
 
 ; ---------------------------------------------------------------------------
 
-_c1ad0:
+_c15ad0:
 @5ad0:  phx
         phy
         and     #$01
@@ -12415,7 +12478,7 @@ _c1ad0:
 
 _c15af9:
 @5af9:  phx
-        jsr     $5b86
+        jsr     _c15b86
         lda     $d0ca
         bne     @5b05
         stz     $d0cc
@@ -12433,13 +12496,13 @@ _c15af9:
         sta     $88
         lda     $d0cb
         sta     $8a
-        jsr     $5b65
+        jsr     _c15b65
         sta     $8c
         lda     $d0d0
         sta     $88
         lda     $d0d1
         sta     $8a
-        jsr     $5b65
+        jsr     _c15b65
         sta     $8d
         lda     $8c
         ora     $8d
@@ -12489,7 +12552,7 @@ _c15b65:
 
 ; ---------------------------------------------------------------------------
 
-_c15bb8:
+_c15b86:
 @5b86:  phx
         lda     $cd42
         tax
@@ -12503,6 +12566,8 @@ _c15bb8:
 _c15b93:
 @5b93:  stz     $f88c
         stz     $f88e
+
+_c15b99:
 @5b99:  stz     $cf3b
         stz     $cd4c
         stz     $cd50
@@ -12521,9 +12586,9 @@ _c15ba3:
         sta     $043d,x
         lda     $00
         bpl     @5bda
-        jsr     $fbb8       ; play system sound effect $11
+        jsr     _c1fbb8       ; play system sound effect $11
         lda     $0435,x
-        jsr     $588d
+        jsr     _c1588d
         bcc     @5c44
         phx
         lda     $f890
@@ -12532,15 +12597,15 @@ _c15ba3:
         ora     $f891
         sta     $41b1,x
         plx
-        jsr     $5b93
+        jsr     _c15b93
         stz     $cd48
         rts
 @5bda:  lda     $01
         bpl     @5bf4
-        jsr     $fbc3       ; play system sound effect $11
+        jsr     _c1fbc3       ; play system sound effect $11
         lda     $f88c
         bpl     @5bec
-        jsr     $5b93
+        jsr     _c15b93
         jmp     @5c44
 @5bec:  lda     #$01
         sta     $0439,x
@@ -12548,7 +12613,7 @@ _c15ba3:
 @5bf4:  lda     $01
         and     #$04
         beq     @5c0f
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         lda     $0435,x
         sta     $0445,x
         sta     $0441,x
@@ -12560,13 +12625,13 @@ _c15ba3:
         beq     @5c22
         lda     $0435,x
         beq     @5c44
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         dec     $0435,x
         bra     @5c44
 @5c22:  lda     $01
         and     #$01
         beq     @5c44
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         lda     $0435,x
         beq     @5c41
         lda     #$00
@@ -12634,12 +12699,12 @@ _c15c88:
         beq     @5ccc
         stz     $cd48
         jmp     _c14789
-@5ccc:  jsr     $5511
+@5ccc:  jsr     _c15511
         lda     $00
         bpl     @5cf4
-        jsr     $fbb8       ; play system sound effect $11
+        jsr     _c1fbb8       ; play system sound effect $11
         lda     $0441,x
-        jsr     $594e
+        jsr     _c1594e
         bcc     @5cf3
         phx
         lda     $f890
@@ -12648,34 +12713,36 @@ _c15c88:
         ora     $f891
         sta     $41b1,x
         plx
-        jsr     $5b93
+        jsr     _c15b93
         stz     $cd48
         rts
 @5cf3:  rts
 @5cf4:  lda     $01
         bpl     @5d0c
-        jsr     $fbc3       ; play system sound effect $11
+        jsr     _c1fbc3       ; play system sound effect $11
         lda     $f88c
-        jmi     $5b93
+        jmi     _c15b93
 @5d03:  stz     $cd48
         stz     $0439,x
         jmp     _c147fe
 @5d0c:  lda     $01
         and     #$02
-        jne     $5d31
+        jne     _c15d31
         lda     $01
         and     #$01
-        jne     $5d66
+        jne     _c15d66
         lda     $01
         and     #$04
-        jne     $5ee0
+        jne     _c15ee0
         lda     $01
         and     #$08
-        jne     $5d8c
+        jne     _c15d8c
         rts
+
+_c15d31:
 @5d31:  lda     $0445,x
         beq     @5d41
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         dec     $0441,x
         dec     $0445,x
         bra     @5d63
@@ -12684,32 +12751,36 @@ _c15c88:
         lda     $cfc3
         beq     @5d4c
         rts
-@5d4c:  jsr     $fbad       ; play system sound effect $10
+@5d4c:  jsr     _c1fbad       ; play system sound effect $10
         stz     $cd48
         lda     #$01
         sta     $0435,x
         jmp     _c14789
 @5d5a:  inc     $0441,x
         inc     $0445,x
-        jsr     $5d8c
+        jsr     _c15d8c
 @5d63:  jmp     _c15511
+
+_c15d66:
 @5d66:  lda     $0445,x
         bne     @5d76
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         inc     $0441,x
         inc     $0445,x
         bra     @5d89
 @5d76:  lda     $0441,x
         cmp     #$ff
         beq     @5d89
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         dec     $0441,x
         stz     $0445,x
-        jsr     $5ee0
+        jsr     _c15ee0
 @5d89:  jmp     _c15511
+
+_c15d8c:
 @5d8c:  lda     $0449,x
         beq     @5d9e
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         dec     $0449,x
         dec     $0441,x
         dec     $0441,x
@@ -12719,15 +12790,15 @@ _c15c88:
         lda     $cfc3
         beq     @5da9
         rts
-@5da9:  jsr     $fbad       ; play system sound effect $10
+@5da9:  jsr     _c1fbad       ; play system sound effect $10
         stz     $cd48
         lda     $0445,x
         sta     $0435,x
         jmp     _c14789
-@5db8:  jsr     $fbad       ; play system sound effect $10
+@5db8:  jsr     _c1fbad       ; play system sound effect $10
         dec     $0441,x
         dec     $0441,x
-        jsr     $5dd4
+        jsr     _c15dd4
         lda     #$03
         sta     $cd37
         lda     #$04
@@ -12741,7 +12812,7 @@ _c15c88:
 _c15dd4:
 @5dd4:  stz     $88
         dec     $044d,x
-        jsr     $5e04
+        jsr     _c15e04
         lda     $cdfa
         bne     @5de6
         lda     #$05
@@ -12755,7 +12826,7 @@ _c15dea:
 @5dea:  lda     #$03
         sta     $88
         inc     $044d,x
-        jsr     $5e04
+        jsr     _c15e04
         lda     $cdfa
         cmp     #$04
         bne     @5e00
@@ -12768,7 +12839,7 @@ _c15dea:
 
 _c15e04:
 @5e04:  phx
-        jsr     $5b86
+        jsr     _c15b86
         ldy     #$cd7b
         sty     $bf
         ldy     #$cdbb
@@ -12779,9 +12850,9 @@ _c15e04:
         adc     $88
         asl
         tax
-        jsr     $5e3b
+        jsr     _c15e3b
         inx
-        jsr     $5e3b
+        jsr     _c15e3b
         lda     $cdfa
         asl
         tax
@@ -12798,9 +12869,9 @@ _c15e04:
 _c15e3b:
 @5e3b:  phx
         lda     #$ff
-        jsr     $5f6b
+        jsr     _c15f6b
         lda     #$ff
-        jsr     $5f6b
+        jsr     _c15f6b
         lda     $db4f
         beq     @5e54
         lda     $2b34,x
@@ -12841,7 +12912,7 @@ _c15e3b:
 .else
         lda     f:ItemName,x   ; item names
 .endif
-        jsr     $5f67
+        jsr     _c15f67
         inx
         dec     $88
         bne     @5e91
@@ -12851,7 +12922,7 @@ _c15e3b:
         lda     #$cf
         bra     @5ea9
 @5ea7:  lda     #$ff
-@5ea9:  jsr     $5f6b
+@5ea9:  jsr     _c15f6b
         stz     $88
         lda     $2834,x
 @5eb1:  sec
@@ -12867,7 +12938,7 @@ _c15e3b:
         lda     #$ac
 @5ec6:  clc
         adc     #$53
-        jsr     $5f6b
+        jsr     _c15f6b
         lda     $89
         ora     $88
         bne     @5ed6
@@ -12876,7 +12947,7 @@ _c15e3b:
 @5ed6:  lda     $89
         clc
         adc     #$53
-@5edb:  jsr     $5f6b
+@5edb:  jsr     _c15f6b
         plx
         rts
 
@@ -12886,7 +12957,7 @@ _c15ee0:
 @5ee0:  lda     $0449,x
         cmp     #$03
         beq     @5ef4
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         inc     $0441,x
         inc     $0441,x
         inc     $0449,x
@@ -12894,10 +12965,10 @@ _c15ee0:
 @5ef4:  lda     $044d,x
         cmp     #$7c
         beq     @5f16
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         inc     $0441,x
         inc     $0441,x
-        jsr     $5dea
+        jsr     _c15dea
         lda     #$03
         sta     $cd37
         lda     #$03
@@ -13099,7 +13170,7 @@ _c1608e:
 ; ---------------------------------------------------------------------------
 
 _c1609d:
-        jsr     $608e
+        jsr     _c1608e
         lda     #$06
         sta     $70
 @60a4:  lda     $37ac,x
@@ -13118,7 +13189,7 @@ _c1609d:
 ; [  ]
 
 _c160bb:
-        jsr     $608e
+        jsr     _c1608e
         lda     $82
         clc
         adc     $cfd4
@@ -13130,7 +13201,7 @@ _c160bb:
 ; ---------------------------------------------------------------------------
 
 _c160cc:
-        jsr     $608e
+        jsr     _c1608e
         lda     $82
         clc
         adc     $cfd3
@@ -13234,8 +13305,8 @@ _c160da:
 
 @61b6:
 _c161b6:
-        jsr     $39e2
-        jsr     $3ccd
+        jsr     _c139e2
+        jsr     _c13ccd
         stz     $cd38
         inc     $7b7d
         rts
@@ -13264,7 +13335,7 @@ _c161c3:
         sta     $db74
         sta     $db75
 @61ef:  lda     $dbed
-        jsr     $6268
+        jsr     _c16268
 @61f5:  inx
         lda     $db75
         and     #$40
@@ -13279,7 +13350,7 @@ _c161c3:
         sta     $db74
         sta     $db75
 @6215:  lda     $dbee
-        jsr     $6268
+        jsr     _c16268
 @621b:  inx
         lda     $db75
         and     #$20
@@ -13294,7 +13365,7 @@ _c161c3:
         sta     $db75
         sta     $db74
 @623b:  lda     $dbef
-        jsr     $6268
+        jsr     _c16268
 @6241:  inx
         lda     $db75
         and     #$10
@@ -13309,7 +13380,7 @@ _c161c3:
         sta     $db75
         sta     $db74
 @6261:  lda     $dbf0
-        jsr     $6268
+        jsr     _c16268
 @6267:  rts
 
 ; ---------------------------------------------------------------------------
@@ -13402,7 +13473,7 @@ _c162d7:
         lda     $db64
         sta     $9a
         shorta
-        jsr     $6295
+        jsr     _c16295
         lda     #$40
         sta     $92
         ldy     #$0100
@@ -13437,7 +13508,7 @@ _c162d7:
         adc     $9e
         sta     $9a
         shorta
-        jsr     $6295
+        jsr     _c16295
         lda     #$28
         sta     $92
         ldy     #$0020
@@ -13460,7 +13531,7 @@ _c162d7:
         adc     $9e
         sta     $9a
         shorta
-        jsr     $6295
+        jsr     _c16295
         lda     #$28
         sta     $92
         ldy     #$0084
@@ -13537,7 +13608,7 @@ _c16423:
         sta     $92
         sta     $db3a
         ldy     #$0000
-@6439:  jsr     $649a
+@6439:  jsr     _c1649a
         cpy     #$0100
         bne     @6439
         lda     $92
@@ -13549,7 +13620,7 @@ _c16423:
         lda     $db3a
         sta     $92
         ldy     #$0100
-@6456:  jsr     $649a
+@6456:  jsr     _c1649a
         cpy     #$0200
         bne     @6456
         inc     $db39
@@ -13566,7 +13637,7 @@ _c16423:
         inx4
         cpx     #$00f8
         bne     @6474
-@6480:  jsr     $6486
+@6480:  jsr     _c16486
         stz     $ef
         rts
 
@@ -13593,7 +13664,7 @@ _c1649a:
 @649a:  lda     $92
         sta     $d1d9,y
         phy
-        jsr     $65d7
+        jsr     _c165d7
         ply
         longa
         tya
@@ -13615,7 +13686,7 @@ _c164b0:
         jeq     _c16423
         lda     $db3b
         beq     @64c8
-        jsr     $64cf
+        jsr     @64cf
         jmp     @64f4
 @64c8:  lda     $db39
         and     #$01
@@ -13627,7 +13698,7 @@ _c164b0:
 @64d8:  lda     $92
         sta     $d1d9,y
         phy
-        jsr     $65d7
+        jsr     _c165d7
         ply
         tya
         sec
@@ -13645,7 +13716,7 @@ _c164b0:
 @64fc:  lda     $92
         sta     $d1d9,y
         phy
-        jsr     $65d7
+        jsr     _c165d7
         ply
         tya
         sec
@@ -13666,7 +13737,7 @@ _c164b0:
         bne     @651e
         stz     $ef
         inc     $db39
-        jsr     $6486
+        jsr     _c16486
         rts
 
 ; ---------------------------------------------------------------------------
@@ -13774,7 +13845,7 @@ _c165d7:
         bne     @65ea
         ply
         bra     @6603
-@6600:  jsr     $697d
+@6600:  jsr     _c1697d
 @6603:  lda     $d1e3,y     ; frame offset ???
         longa
         clc
@@ -13824,7 +13895,7 @@ _c165d7:
         lda     $95
         and     #$ef
         sta     $95
-@6678:  jsr     $698c
+@6678:  jsr     _c1698c
         rts
 
 ; ---------------------------------------------------------------------------
@@ -13842,7 +13913,7 @@ _c1667c:
         beq     @66ce
         cmp     #$08
         bne     @6698
-        jsr     $66d5
+        jsr     _c166d5
         bra     @66ce
 @6698:  pha
         txa
@@ -13868,7 +13939,7 @@ _c1667c:
         sta     $8a
         lda     $d1cf,x
 @66c9:  phx
-        jsr     $673a
+        jsr     _c1673a
         plx
 @66ce:  inx
         cpx     #$0004
@@ -14033,7 +14104,7 @@ _c167e4:
         lda     $d1ae
         jeq     @68f0
         stz     $ef
-        jsr     $697d
+        jsr     _c1697d
         clr_ax
         lda     #$aa
 @67f5:  sta     $0402,x
@@ -14042,12 +14113,12 @@ _c167e4:
         bne     @67f5
         lda     $d1bb
         bne     @6808
-        jsr     $67d3
+        jsr     _c167d3
         bra     @6857
 @6808:  lda     $d1bb
         cmp     #$ff
         bne     @6818
-        jsr     $67d3
+        jsr     _c167d3
         stz     $d1ae
         jmp     @68f0
 @6818:  lda     $d1bb
@@ -14127,7 +14198,7 @@ _c167e4:
 @68c4:  stz     $94
         lda     #$37
         sta     $95
-        jsr     $698c
+        jsr     _c1698c
         lda     $d1af
         sta     $88
         lda     #$10
@@ -14155,7 +14226,7 @@ _c168f1:
         bne     @68f7
         rts
 @68f7:  stz     $ef
-        jsr     $697d
+        jsr     _c1697d
         lda     $d1ab
         longa
         clc
@@ -14192,7 +14263,7 @@ _c168f1:
         stz     $94
         lda     #$35
         sta     $95
-        jsr     $698c       ;
+        jsr     _c1698c       ;
         lda     $d1a1
         sta     $88
         lda     #$04
@@ -14359,7 +14430,7 @@ _c1698c:
 @6a89:  lda     [$88]
         sta     $98
         bmi     @6a9b       ; branch if string of tiles
-        jsr     $6b6c       ; decode single animation frame tile
+        jsr     _c16b6c       ; decode single animation frame tile
         bcs     @6ab0
         ldy     $88
         iny
@@ -14370,7 +14441,7 @@ _c1698c:
         sty     $88
         lda     [$88]
         sta     $9e
-        jsr     $6ab1       ; decode string of animation frame tiles
+        jsr     _c16ab1       ; decode string of animation frame tiles
         bcs     @6ab0
         ldy     $88
         iny
@@ -14566,7 +14637,7 @@ _c16b6c:
 
 ; [ hide damage numeral sprites ]
 
-_c16bef:
+_c16bf0:
 @6bf0:  clr_ax
         lda     #$f8
 @6bf4:  sta     $0220,x
@@ -14584,7 +14655,7 @@ _c16bef:
 
 ; [  ]
 
-_c16c08:
+_c16c09:
 @6c09:  clr_ax
         lda     #$f8
 @6c0d:  sta     $02e0,x
@@ -14637,7 +14708,7 @@ _c16c1a:
 _c16c58:
         lda     $d116
         jeq     @6cd3
-        jsr     $6c09
+        jsr     _c16c09
         ldy     #$00e0
         clr_ax
         lda     $d118,x
@@ -14648,7 +14719,7 @@ _c16c58:
         sta     $8a
         lda     $d16c,x
         sta     $8b
-        jsr     $6c1a
+        jsr     _c16c1a
         phx
         txa
         asl2
@@ -14687,7 +14758,7 @@ _c16c58:
 @6cc6:  clr_ax
         lda     $d118,x
         bne     @6cd3
-        jsr     $6c09
+        jsr     _c16c09
         stz     $d116
 @6cd3:  rts
 
@@ -14697,9 +14768,8 @@ _c16c58:
 
 _c16cd4:
         lda     $d114
-        bne     @6cdc       ; branch if damage numerals pending
-        jmp     @6d5b
-@6cdc:  jsr     $6bf0       ; hide damage numeral sprites
+        jeq     @6d5b           ; branch if damage numerals pending
+        jsr     _c16bf0       ; hide damage numeral sprites
         ldy     #$0020
         clr_ax
 @6ce4:  lda     $d118,x
@@ -14710,7 +14780,7 @@ _c16cd4:
         sta     $8a
         lda     $d16c,x
         sta     $8b
-        jsr     $6c1a       ; get damage numeral vertical offset
+        jsr     _c16c1a       ; get damage numeral vertical offset
         phx
         txa
         asl2
@@ -14755,7 +14825,7 @@ _c16cd4:
         inx
         cpx     #$000c
         bne     @6d4a
-        jsr     $6bf0       ; hide damage numeral sprites
+        jsr     _c16bf0       ; hide damage numeral sprites
         stz     $d114
 @6d5b:  rts
 
@@ -14829,7 +14899,11 @@ _c16d5c:
         tax
         cpx     #$0080
         jne     @6d65
-        jmp     @6dfd
+        jmp     _c16dfd
+
+; ---------------------------------------------------------------------------
+
+_c16dfd:
 @6dfd:  clr_ax
         stz     $df
         lda     #$80
@@ -14850,7 +14924,7 @@ _c16d5c:
 
 ; ---------------------------------------------------------------------------
 
-_c16e1c:
+_c16e1d:
 @6e1d:  sta     $88
         sta     $8a
         lda     $cf54,x
@@ -14907,7 +14981,7 @@ _c16e52:
 @6e8c:  lda     #$01
         bra     @6e92
 @6e90:  lda     #$02
-@6e92:  jsr     $6e1d
+@6e92:  jsr     _c16e1d
         and     #$7f
         bne     @6ea9
         stz     $cf4d,x
@@ -14968,7 +15042,7 @@ _c16ef6:
         tay
         lda     $d1cb,y
         bne     @6f74
-        jsr     $6ed4
+        jsr     _c16ed4
         lda     $cf5a,x
         beq     @6f74
         cmp     #$01
@@ -15127,7 +15201,7 @@ _c16fd5:
         lda     $db40
         and     #$01
         beq     @7039
-        jsr     $67d3
+        jsr     _c167d3
 @7039:  rts
 
 ; ---------------------------------------------------------------------------
@@ -15214,8 +15288,8 @@ _c1706b:
 ; ---------------------------------------------------------------------------
 
 _c170d3:
-        jsr     $6dfd
-        jsr     $703a
+        jsr     _c16dfd
+        jsr     _c1703a
         clr_ax
         sta     $96
 @70dd:  lda     $cf44,x
@@ -15257,7 +15331,7 @@ _c170d3:
         lda     $a2
         and     #$02
         beq     @7116
-@7135:  jsr     $6e52
+@7135:  jsr     _c16e52
         lda     $cf4e,x
         beq     @7143
         phx
@@ -15340,8 +15414,8 @@ _c170d3:
         lda     $9a
         and     #$ef
         sta     $9a
-@71e0:  jsr     $6ef6
-        jsr     $6fa4
+@71e0:  jsr     _c16ef6
+        jsr     _c16fa4
         stz     $89
         lda     $cf4e,x
         bne     @71f2
@@ -15445,7 +15519,7 @@ _c170d3:
         dec     $88
         bne     @729b
 @72ad:  plx
-@72ae:  jsr     $72c1
+@72ae:  jsr     _c172c1
         inc     $96
         txa
         clc
@@ -15478,17 +15552,17 @@ _c172db:
 @72db:  pha
         lda     #$88
         sta     $dbb6
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$03
         beq     @72ec
         lda     #$56
         bra     @72ee
 @72ec:  lda     #$0e
-@72ee:  jsr     $fbd9       ; play sound effect
-        jsr     $78f5       ; flash screen
+@72ee:  jsr     _c1fbd9       ; play sound effect
+        jsr     _c178f5       ; flash screen
         pla
         beq     @72fa
-        jsr     $8141       ; wait
+        jsr     _c18141       ; wait
 @72fa:  rts
 
 ; ---------------------------------------------------------------------------
@@ -15497,14 +15571,14 @@ _c172db:
 
 _c172fb:
 @72fb:  lda     #$78
-        jsr     $72db
+        jsr     _c172db
         lda     #$78
-        jsr     $72db
-        jsr     $7539
+        jsr     _c172db
+        jsr     _c17539
         lda     #$13
         sta     $f9e9
         lda     #$84
-        jsr     $fbd9       ; play sound effect
+        jsr     _c1fbd9       ; play sound effect
         clr_ax
 @7314:  lda     $ee58,x
         and     #$03
@@ -15519,27 +15593,27 @@ _c172fb:
         ldx     $bc79
         dex
         stx     $bc79
-        jsr     $1cc2
-@7337:  jsr     $7529
+        jsr     _c11cc2
+@7337:  jsr     _c17529
         stz     $86
         lda     $f9e9
-        jsr     $7375
+        jsr     _c17375
         inc     $86
         lda     $f9e9
         clc
         adc     #$04
-        jsr     $7375
+        jsr     _c17375
         lda     #$10
         sta     $86
         lda     $f9e9
         clc
         adc     #$08
-        jsr     $7375
+        jsr     _c17375
         inc     $86
         lda     $f9e9
         clc
         adc     #$0c
-        jsr     $7375
+        jsr     _c17375
         dec     $f9e9
         lda     $f9e9
         cmp     #$f0
@@ -15550,7 +15624,7 @@ _c172fb:
 
 ; ---------------------------------------------------------------------------
 
-_c17374:
+_c17375:
 @7375:  sta     $81
         sta     $80
         stz     $82
@@ -15611,7 +15685,7 @@ _c17374:
 _c173ec:
         inc     $ff2e
         lda     #$78
-        jsr     $72db
+        jsr     _c172db
         lda     #$47
         sta     $ff04
         lda     #$03
@@ -15619,9 +15693,9 @@ _c173ec:
         stz     $ff2c
         inc     $dbeb
         lda     #$3c
-        jsr     $72db
+        jsr     _c172db
         lda     #$f0
-        jsr     $72db
+        jsr     _c172db
         lda     #$03
         sta     $bc9e
         lda     #$02
@@ -15633,30 +15707,30 @@ _c173ec:
         sta     $f9e9
         ldx     #$01e0
 @7428:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $fc96       ; generate random number
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1fc96       ; generate random number
         and     #$3f
         bne     @7436
-        jsr     $72db
+        jsr     _c172db
 @7436:  plx
         dex
         bne     @7428
-        jsr     $7539
-@743d:  jsr     $7529
-        jsr     $fc96       ; generate random number
+        jsr     _c17539
+@743d:  jsr     _c17529
+        jsr     _c1fc96       ; generate random number
         and     #$3f
         bne     @744a
-        jsr     $72db
+        jsr     _c172db
 @744a:  clr_ax
         stx     $86
         lda     $f9e9
-        jsr     $7471
+        jsr     _c17471
         ldx     #$0010
         stx     $86
         lda     $f9e9
         clc
         adc     #$04
-        jsr     $7471
+        jsr     _c17471
         dec     $f9e9
         lda     $f9e9
         cmp     #$f4
@@ -15698,7 +15772,7 @@ _c17471:
         clc
         adc     $86
         tay
-        jsr     $7864
+        jsr     _c17864
         txa
         clc
         adc     #$0040
@@ -15722,7 +15796,7 @@ _c17471:
 ; ---------------------------------------------------------------------------
 
 _c174d8:
-@74d8:  jsr     $7539
+@74d8:  jsr     _c17539
         lda     $e4
         sta     $70
         clr_axy
@@ -15753,7 +15827,7 @@ _c174d8:
 @7519:  iny
         cpy     #$0008
         bne     @74e2
-        jsr     $7529
+        jsr     _c17529
         lda     $e4
         sta     $70
         jmp     _c12068       ; load monster palettes
@@ -15788,11 +15862,11 @@ _c1754d:
         pha
         ldx     #$0010
 @7553:  phx
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         clr_ax
         longa
 @755b:  lda     $7e69,x
-        jsr     $7576
+        jsr     _c17576
         sta     $7e69,x
         inx2
         cpx     #$0020
@@ -15857,8 +15931,8 @@ _c175bb:
         jmp     _75db
 @75c6:  lda     $70
         pha
-        jsr     $7539
-        jsr     $7529
+        jsr     _c17539
+        jsr     _c17529
         pla
         ora     $de
         sta     $de
@@ -15876,8 +15950,8 @@ _75db:  lda     $70
         lda     $de
         ora     $e4
         sta     $de
-        jsr     $74d8
-        jsr     $1cb8
+        jsr     _c174d8
+        jsr     _c11cb8
         lda     $e4
         eor     #$ff
         sta     $74
@@ -15886,7 +15960,7 @@ _75db:  lda     $70
         inx
         cpx     #$0010
         bne     @75f3
-        jsr     $772c
+        jsr     _c1772c
         jmp     _c11cb8
 
 ; ---------------------------------------------------------------------------
@@ -15897,7 +15971,7 @@ _c17602:
         sta     $e5
         jmp     _c17695
 @760b:  sta     $e5
-        jsr     $75ac
+        jsr     _c175ac
         jmp     _c18b2a
 
 ; ---------------------------------------------------------------------------
@@ -15910,7 +15984,7 @@ _c17613:
         sta     $e5
         jmp     _c1765e
 @761c:  sta     $e5
-        jsr     $75ac
+        jsr     _c175ac
         jmp     _c18b2a
 
 ; ---------------------------------------------------------------------------
@@ -15924,7 +15998,7 @@ _c17624:
         bne     @7626
         lda     $70
         pha
-        jsr     $1cb1       ; load black and white monster palette
+        jsr     _c11cb1       ; load black and white monster palette
         pla
         sta     $70
         rts
@@ -15958,7 +16032,7 @@ _c1765e:
 @765e:  lda     $de
         and     $70
         beq     @766a
-        jsr     $76bc
+        jsr     _c176bc
         jmp     _c18b2a
 @766a:  rts
 
@@ -15979,7 +16053,7 @@ _c1766b:
         lda     $3efe
         and     #$01
         beq     @768b
-        jsr     $72fb
+        jsr     _c172fb
         stz     $de
         sec
         rts
@@ -15991,7 +16065,7 @@ _c1766b:
 ; [ battle graphics function $07: condemn death animation ]
 
 _c1768d:
-        jsr     $766b
+        jsr     _c1766b
         bcc     @7693
         rts
 @7693:  stz     $e5
@@ -16003,8 +16077,8 @@ _c17695:
         lda     #$33
         sta     $dbb6       ; sound effect volume
         lda     #$3b
-        jsr     $fbd9       ; play sound effect
-        jsr     $76bc
+        jsr     _c1fbd9       ; play sound effect
+        jsr     _c176bc
         jsr     _c18b2a
 @76ab:  lda     $ff2c
         and     $de
@@ -16025,10 +16099,10 @@ _c176bc:
         sta     $bc85
         lda     #$02
         sta     $bc8c
-        jsr     $35e1       ; set priority bit for battle bg tiles
-        jsr     $7624
-        jsr     $754d
-        jsr     $763d
+        jsr     _c135e1       ; set priority bit for battle bg tiles
+        jsr     _c17624
+        jsr     _c1754d
+        jsr     _c1763d
         lda     $70
         and     $73
         eor     #$ff
@@ -16038,11 +16112,11 @@ _c176bc:
         sta     $de
         lda     $70
         pha
-        jsr     $1cb1       ; load black and white monster palette
+        jsr     _c11cb1       ; load black and white monster palette
         pla
         sta     $70
-        jsr     $76fe
-        jsr     $35fe       ; clear priority bit for battle bg tiles
+        jsr     _c176fe
+        jsr     _c135fe       ; clear priority bit for battle bg tiles
         stz     $bc8c
         stz     $bc8b
         stz     $bc85
@@ -16071,7 +16145,7 @@ _c176fe:
         mvn     #$7f,#$7f
         shorta0
         plb
-        jsr     $772c
+        jsr     _c1772c
         jmp     _c11cb8
 @772b:  rts
 
@@ -16100,7 +16174,7 @@ _c1772c:
         ldy     #$2000
         sty     $d0e4
         ldy     #$0000
-@775c:  jsr     $778a
+@775c:  jsr     _c1778a
         longa
         lda     $d0e2
         clc
@@ -16178,11 +16252,11 @@ _c1778a:
         bra     @7801
 @77ef:  lda     $84
         bmi     @77fb
-        jsr     $7864
-        jsr     $7864
+        jsr     _c17864
+        jsr     _c17864
         bra     @7801
-@77fb:  jsr     $781d
-        jsr     $781d
+@77fb:  jsr     _c1781d
+        jsr     _c1781d
 @7801:  inx
         dec     $86
         bne     @77de
@@ -16193,7 +16267,7 @@ _c1778a:
         ldx     $d0e2
         lda     #$7f
         ldy     $d0e4
-        jsr     $fd27
+        jsr     _c1fd27
         ply
         plx
         rts
@@ -16392,22 +16466,22 @@ _c17930:
 ; ---------------------------------------------------------------------------
 
 _c17979:
-        jsr     $7930
+        jsr     _c17930
         lda     $d0ee
         beq     @7984
-        jsr     $7eb4
+        jsr     _c17eb4
 @7984:  lda     $d0f0
         beq     @798c
-        jsr     $7d5f
+        jsr     _c17d5f
 @798c:  lda     $d0f2
         beq     @7994
-        jsr     $7ba0
+        jsr     _c17ba0
 @7994:  lda     $d0f4
         beq     @799c
-        jsr     $7cb5
+        jsr     _c17cb5
 @799c:  lda     $d0f6
         beq     @79a4
-        jsr     $7c49
+        jsr     _c17c49
 @79a4:  rts
 
 ; ---------------------------------------------------------------------------
@@ -16460,7 +16534,7 @@ _c179a5:
         cpy     #$000c
         bne     @7a06
         shorta0
-        jsr     $3cbb
+        jsr     _c13cbb
         longa
         ldy     #$000c
 @7a1c:  pla
@@ -16587,7 +16661,7 @@ _c17b02:
         sta     $80
         lda     $d0f1
         bne     @7b18
-        jsr     $7d52
+        jsr     _c17d52
         lda     $7e
         sta     $d102
 @7b18:  lda     $7e
@@ -16600,7 +16674,7 @@ _c17b02:
         and     $80
         sta     $d0f1
         bne     @7b40
-        jsr     $7d8c
+        jsr     _c17d8c
         bra     @7b40
 @7b33:  lda     #$01
         sta     $d0f0
@@ -16627,7 +16701,7 @@ _c17b43:
         lda     $d0ef
         bne     @7b63
         stz     $d100
-        jsr     $7eab
+        jsr     _c17eab
         lda     $7e
         sta     $d0fe
 @7b63:  lda     $7e
@@ -16642,7 +16716,7 @@ _c17b43:
         bne     @7b91
         stz     $d0ee
         stz     $d0fe
-        jsr     $7ee2
+        jsr     _c17ee2
         bra     @7b91
 @7b84:  lda     #$01
         sta     $d0ee
@@ -16674,13 +16748,13 @@ _c17ba0:
         lda     $d106
         and     #$40
         beq     @7bc3
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     $8c
         sta     $d108
 @7bc3:  lda     $d106
         and     #$20
         beq     @7bd5
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     $8c
         eor     #$ff
         inc
@@ -16751,7 +16825,7 @@ _c17c49:
         lsr
         sta     $9a
         lda     $88
-        jsr     $0a32
+        jsr     _c10a32
         stz     $98
         sec
         sbc     $8e
@@ -16786,8 +16860,10 @@ _c17c49:
 
 _c17cb1:
         tsb     $08
-        bpl     @7cd5
-@7cb5:  lda     $d10a
+        bpl     _7cd5
+
+_c17cb5:
+        lda     $d10a
         and     #$60
         lsr5
         tax
@@ -16800,13 +16876,13 @@ _c17cb1:
         lda     $d10c
         sta     $88
         clr_ax
-@7cd5:  phx
+_7cd5:  phx
         lda     $d10a
         and     #$1c
         lsr
         sta     $9a
         lda     $88
-        jsr     $0a32
+        jsr     _c10a32
         plx
         sta     $f9cc,x
         lda     $88
@@ -16815,7 +16891,7 @@ _c17cb1:
         sta     $88
         inx
         cpx     #$0010
-        bne     @7cd5
+        bne     _7cd5
         lda     $d10b
         and     #$01
         bne     @7d1e
@@ -16881,7 +16957,7 @@ _c17d5f:
         sta     $88
         lda     f:_c17d7c+1,x
         sta     $89
-        jsr     $7d79
+        jsr     _c17d79
         inc     $d104
         rts
 
@@ -16891,7 +16967,7 @@ _c17d79:
 ; ---------------------------------------------------------------------------
 
 _c17d7c:
-        .addr   $7d8c,$7db0,$7e1f,$7e48,$7e6b,$7e1b,$7e44,$7e8b
+        .addr   _c17d8c,_c17db0,_c17e1f,_c17e48,_c17e6b,_c17e1b,_c17e44,_c17e8b
 
 ; ---------------------------------------------------------------------------
 
@@ -16976,7 +17052,7 @@ _c17e1b:
 _c17e1f:
 @7e1f:  lda     #$02
 _7e21:  sta     $bc85
-        jsr     $7ee5
+        jsr     _c17ee5
         lsr     $88
         lda     $d104
         and     $88
@@ -16987,17 +17063,19 @@ _7e21:  sta     $bc85
         inc     $d111
         inc     $d112
         inc     $d113
-        jsr     $7de7
+        jsr     _c17de7
 @7e43:  rts
 
 ; ---------------------------------------------------------------------------
 
 _c17e44:
 @7e44:  lda     #$82
-        bra     @7e4a
+        bra     _7e4a
+
+_c17e48:
 @7e48:  lda     #$02
-@7e4a:  sta     $bc85
-        jsr     $7ee5
+_7e4a:  sta     $bc85
+        jsr     _c17ee5
         lsr     $88
         lda     $d104
         and     $88
@@ -17007,7 +17085,7 @@ _c17e44:
         dec     $d111
         dec     $d112
         dec     $d113
-        jsr     $7de7
+        jsr     _c17de7
 @7e6a:  rts
 
 ; ---------------------------------------------------------------------------
@@ -17020,7 +17098,7 @@ _c17e6b:
         beq     @7e82
         jmp     _c17e1f
 @7e7a:  lda     $d111
-        jne     $7e48
+        jne     _c17e48
 @7e82:  lda     $d103
         eor     #$01
         sta     $d103
@@ -17036,7 +17114,7 @@ _c17e8b:
         beq     @7ea2
         jmp     _c17e1b
 @7e9a:  lda     $d111
-        jne     $7e44
+        jne     _c17e44
 @7ea2:  lda     $d103
         eor     #$01
         sta     $d103
@@ -17074,16 +17152,16 @@ _c17ed1:
 ; ---------------------------------------------------------------------------
 
 _c17ed2:
-        .addr   $7ee2,$7f43,$7ef5,$7f9a,$7fc7,$7f70,$7ed1,$7ed1
+        .addr   _c17ee2,_c17f43,_c17ef5,_c17f9a,_c17fc7,_c17f70,_c17ed1,_c17ed1
 
 ; ---------------------------------------------------------------------------
 
-_c17ee1:
+_c17ee2:
         jmp     _c17f34
 
 ; ---------------------------------------------------------------------------
 
-_c17ee4:
+_c17ee5:
         lda     $d0fe
         and     #$08
         beq     @7ef0
@@ -17096,7 +17174,7 @@ _c17ee4:
 ; ---------------------------------------------------------------------------
 
 _c17ef5:
-        jsr     $7ee5
+        jsr     _c17ee5
         lda     $d101
         and     $88
         bne     @7f2a
@@ -17153,7 +17231,7 @@ _c17f43:
         lda     $d101
         and     $88
         beq     @7f61
-        jsr     $7f34
+        jsr     _c17f34
         jmp     _c17f2b
 @7f61:  ldx     #$0002
         lda     #$ff
@@ -17179,7 +17257,7 @@ _c17f70:
         lda     $f8b4
         bne     @7f99
         jmp     _c17f9a
-@7f91:  jsr     $7fc7
+@7f91:  jsr     _c17fc7
         lda     #$01
         sta     $f8b4
 @7f99:  rts
@@ -17187,7 +17265,7 @@ _c17f70:
 ; ---------------------------------------------------------------------------
 
 _c17f9a:
-@7f9a:  jsr     $7ee5
+@7f9a:  jsr     _c17ee5
         lda     $d101
         and     $88
         bne     @7fc6
@@ -17198,7 +17276,7 @@ _c17f9a:
         clr_ay
         longa
 @7fb0:  lda     $f540,y
-        jsr     $7ffe
+        jsr     _c17ffe
         sta     $7e29,y
         iny2
         cpy     #$0040
@@ -17210,7 +17288,7 @@ _c17f9a:
 ; ---------------------------------------------------------------------------
 
 _c17fc7:
-@7fc7:  jsr     $7ee5
+@7fc7:  jsr     _c17ee5
         lda     $d101
         and     $88
         bne     @7ffd
@@ -17226,7 +17304,7 @@ _c17fc7:
         sbc     $98
         sta     $98
 @7fe7:  lda     $f540,y
-        jsr     $7ffe
+        jsr     _c17ffe
         sta     $7e29,y
         iny2
         cpy     #$0040
@@ -17297,7 +17375,7 @@ _c18062:
         pha
         asl5
         tax
-        jsr     $8103
+        jsr     _c18103
         pla
         pha
         tax
@@ -17325,7 +17403,7 @@ _c18062:
         lda     #$01
         sta     $cf53,x
         stz     $cf55,x
-        jsr     $8103
+        jsr     _c18103
         lda     $3bcd
         and     #$03
         tax
@@ -17342,7 +17420,7 @@ _c180b8:
         pha
         asl5
         tax
-        jsr     $8103
+        jsr     _c18103
         pla
         pha
         tax
@@ -17379,7 +17457,7 @@ _c180b8:
 
 _c18103:
 @8103:  phx
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         plx
         lda     $cf53,x
         bne     @8103
@@ -17397,7 +17475,7 @@ _c1810e:
         bne     @8110
         ldx     #$ffff
         stx     $7e6b
-        jsr     $8125       ; flash monster (twice)
+        jsr     _c18125       ; flash monster (twice)
         jmp     _c18125
 
 ; ---------------------------------------------------------------------------
@@ -17410,11 +17488,11 @@ _c18125:
         lda     #$c0
         bra     @8134
 @812e:  jsr     _c18d2f       ; get attacker id
-        jsr     $fc74       ; get monster mask
-@8134:  jsr     $1cb1       ; load black and white monster palette
+        jsr     _c1fc74       ; get monster mask
+@8134:  jsr     _c11cb1       ; load black and white monster palette
         lda     #$03
-        jsr     $8141       ; wait
-        jsr     $1cb8
+        jsr     _c18141       ; wait
+        jsr     _c11cb8
         lda     #$03
 ; fallthrough
 
@@ -17426,7 +17504,7 @@ _c18125:
 
 _c18141:
 @8141:  pha
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         pla
         dec
         bne     @8141
@@ -17450,12 +17528,12 @@ _c1814a:
         lda     ($eb)
         and     #$20
         bne     @8178
-        jsr     $80b8       ; move character forward to attack
+        jsr     _c180b8       ; move character forward to attack
         bra     @8178
 @816f:  lda     ($eb)
         and     #$20
         bne     @8178
-        jsr     $810e       ; flash active monster
+        jsr     _c1810e       ; flash active monster
 @8178:  rts
 
 ; ---------------------------------------------------------------------------
@@ -17468,7 +17546,7 @@ _c18179:
         bne     @8188
         lda     $3bcc
         bmi     @8188
-        jsr     $8062
+        jsr     _c18062
 @8188:  rts
 
 ; ---------------------------------------------------------------------------
@@ -17496,11 +17574,11 @@ _c18189:
         ldx     #$3c5f      ; pointer to message ids
         stx     $f2
         stz     $db76
-        jsr     $814a
+        jsr     _c1814a
 @81b2:  lda     ($e7)       ; script command
         cmp     #$ff
         beq     @820c       ; branch if terminator
-        jsr     $8d59       ; get graphics script parameter 1
+        jsr     _c18d59       ; get graphics script parameter 1
         cmp     #$f2        ; opcodes less than $f2 have no effect
         bcc     @81f9
         sec
@@ -17511,8 +17589,8 @@ _c18189:
         sta     $70
         lda     f:_c18218+1,x
         sta     $71
-        jsr     $8209
-        jsr     $8d59       ; get graphics script parameter 1
+        jsr     @8209
+        jsr     _c18d59       ; get graphics script parameter 1
         cmp     #$fc
         bne     @81f9       ; branch if not a graphics command
         iny
@@ -17539,24 +17617,24 @@ _c18189:
         shorta0
         jmp     @81b2
 @8209:  jmp     ($0070)
-@820c:  jsr     $9d93       ; wait for damage numerals
-        jsr     $8179
-        jsr     $3cbb
+@820c:  jsr     _c19d93       ; wait for damage numerals
+        jsr     _c18179
+        jsr     _c13cbb
         jmp     _c19d3c
 
 ; ---------------------------------------------------------------------------
 
 ; jump table for graphics script parameter 1 ($f2-$ff)
 _c18218:
-        .addr               $8b46,$82a4,$82a4,$82a4,$8cbd,$82a4
-        .addr   $8234,$82a4,$82a4,$82a4,$8b69,$82a4,$82a4,$82a4
+        .addr                   _c18b46,_c182a4,_c182a4,_c182a4,_c18cbd,_c182a4
+        .addr   _c18234,_c182a4,_c182a4,_c182a4,_c18b69,_c182a4,_c182a4,_c182a4
 
 ; ---------------------------------------------------------------------------
 
 ; [ graphics script command $f8: execute misc effect ]
 
 _c18234:
-        jsr     $8d4d       ; get graphics script parameter 2
+        jsr     _c18d4d       ; get graphics script parameter 2
         asl
         tax
         lda     f:_c18248,x
@@ -17569,8 +17647,8 @@ _c18234:
 
 ; misc effect jump table
 _c18248:
-        .addr   $833d,$8332,$830e,$78f5,$82ab,$8317,$8329,$82a5
-        .addr   $8320,$825e,$8281
+        .addr   _c1833d,_c18332,_c1830e,_c178f5,_c182ab,_c18317,_c18329,_c182a5
+        .addr   _c18320,_c1825e,_c18281
 
 ; ---------------------------------------------------------------------------
 
@@ -17633,7 +17711,7 @@ _c182a5:
 
 ; [ misc effect $04:  ]
 
-_c1821b:
+_c182ab:
         jsr     _c18d47       ; get graphics script parameter 3
         sta     $7e
         and     #$03
@@ -17652,10 +17730,10 @@ _c1821b:
 _c182c6:
 @82c6:  lda     $ff2a
         beq     @82d1
-        jsr     $02f2       ; wait one frame
-        jsr     $02f2       ; wait one frame
-@82d1:  jsr     $02f2       ; wait one frame
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
+@82d1:  jsr     _c102f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         lda     $bc80
         cmp     $ff29
         beq     @82ea
@@ -17666,10 +17744,10 @@ _c182c6:
         bra     @82c6
 @82ea:  lda     $ff2a
         beq     @82f5
-        jsr     $02f2       ; wait one frame
-        jsr     $02f2       ; wait one frame
-@82f5:  jsr     $02f2       ; wait one frame
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
+@82f5:  jsr     _c102f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         lda     $bc80
         and     #$f0
         beq     @830d
@@ -17771,7 +17849,7 @@ _c18352:
 
 _c18360:
 @8360:  lda     #$5a        ; bg1 screen size 32x64
-        sta     f:$002107
+        sta     f:hBG1SC
         rts
 
 ; ---------------------------------------------------------------------------
@@ -17780,7 +17858,7 @@ _c18360:
 
 _c18367:
 @8367:  lda     #$59        ; bg1 screen size 64x32 (default)
-        sta     f:$002107
+        sta     f:hBG1SC
         rts
 
 ; ---------------------------------------------------------------------------
@@ -17827,7 +17905,7 @@ _c1839b:
 
 ; ---------------------------------------------------------------------------
 
-_c18eb4:
+_c183b4:
 @83b4:  clr_ax
         longa
         lda     $70
@@ -17843,8 +17921,8 @@ _c18eb4:
 _c183ca:
 @83ca:  ldx     #$0015
 @83cd:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $875c
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1875c
         longa
         lda     $bc79
         sec
@@ -17852,7 +17930,7 @@ _c183ca:
         sta     $bc79
         sta     $70
         shorta0
-        jsr     $8382
+        jsr     _c18382
         plx
         dex
         bne     @83cd
@@ -17870,8 +17948,8 @@ _c183ca:
 _c18400:
 @8400:  ldx     #$0015
 @8403:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $875c
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1875c
         longa
         lda     $bc79
         clc
@@ -17879,7 +17957,7 @@ _c18400:
         sta     $bc79
         sta     $70
         shorta0
-        jsr     $8382
+        jsr     _c18382
         plx
         dex
         bne     @8403
@@ -17899,8 +17977,8 @@ _c18436:
         bne     _846b
 _843a:  ldx     #$0015
 @843d:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $875c
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1875c
         longa
         lda     $bc77
         sec
@@ -17925,8 +18003,8 @@ _c18467:
         bne     _843a
 _846b:  ldx     #$0015
 @846e:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $875c
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1875c
         longa
         lda     $bc77
         clc
@@ -17959,10 +18037,10 @@ _c18498:
 ; [ show monster $00: fade in ]
 
 _c184a7:
-        jsr     $8344
+        jsr     _c18344
         clr_a
-        jsr     $7602
-        jsr     $8352
+        jsr     _c17602
+        jsr     _c18352
         clr_a
         jmp     _c175bb
 
@@ -17983,13 +18061,13 @@ _c184b5:
 ; [ show monster $01: iron claw ]
 
 _c184c1:
-        jsr     $8360
-        jsr     $8400
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c18360
+        jsr     _c18400
+        jsr     _c184b5
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
-        jsr     $83ca
+        jsr     _c175bb
+        jsr     _c183ca
         jmp     _c18367
 
 ; ---------------------------------------------------------------------------
@@ -17997,17 +18075,17 @@ _c184c1:
 ; [ show monster $0b: merugene 3 ]
 
 _c184d8:
-        jsr     $8360
+        jsr     _c18360
         lda     $bc84
         ora     #$01
         sta     $bc84
-        jsr     $8400
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c18400
+        jsr     _c184b5
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
-        jsr     $8400
-        jsr     $8367
+        jsr     _c175bb
+        jsr     _c18400
+        jsr     _c18367
         lda     $bc84
         and     #$fe
         sta     $bc84
@@ -18018,17 +18096,17 @@ _c184d8:
 ; [ show monster $0c: merugene 4 ]
 
 _c18500:
-        jsr     $8360
+        jsr     _c18360
         lda     $bc84
         ora     #$01
         sta     $bc84
-        jsr     $83ca
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c183ca
+        jsr     _c184b5
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
-        jsr     $83ca
-        jsr     $8367
+        jsr     _c175bb
+        jsr     _c183ca
+        jsr     _c18367
         lda     $bc84
         and     #$fe
         sta     $bc84
@@ -18039,8 +18117,8 @@ _c18500:
 ; [ show monster $02: discreet ??? ]
 
 _c18528:
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c184b5
+        jsr     _c18352
         lda     #$0a
         jmp     _c175bb
 
@@ -18049,15 +18127,15 @@ _c18528:
 ; [ show monster $03: motor trap ]
 
 _c18533:
-        jsr     $8344
+        jsr     _c18344
         clr_a
-        jsr     $7602
-        jsr     $8360
-        jsr     $8400
-        jsr     $8352
+        jsr     _c17602
+        jsr     _c18360
+        jsr     _c18400
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
-        jsr     $83ca
+        jsr     _c175bb
+        jsr     _c183ca
         jmp     _c18367
 
 ; ---------------------------------------------------------------------------
@@ -18065,15 +18143,15 @@ _c18533:
 ; [ show monster $06: fade and drop ]
 
 _c1854e:
-        jsr     $8344
+        jsr     _c18344
         lda     #$02
-        jsr     $7602
-        jsr     $8360
-        jsr     $8400
-        jsr     $8352
+        jsr     _c17602
+        jsr     _c18360
+        jsr     _c18400
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
-        jsr     $83ca
+        jsr     _c175bb
+        jsr     _c183ca
         jmp     _c18367
 
 ; ---------------------------------------------------------------------------
@@ -18081,12 +18159,12 @@ _c1854e:
 ; [ show monster $09: merugene 1 ]
 
 _c1856a:
-        jsr     $8367
-        jsr     $8467
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c18367
+        jsr     _c18467
+        jsr     _c184b5
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
+        jsr     _c175bb
         jmp     _c18467
 
 ; ---------------------------------------------------------------------------
@@ -18094,12 +18172,12 @@ _c1856a:
 ; [ show monster $0a: merugene 2 ]
 
 _c1857e:
-        jsr     $8367
-        jsr     $8436
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c18367
+        jsr     _c18436
+        jsr     _c184b5
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
+        jsr     _c175bb
         jmp     _c18436
 
 ; ---------------------------------------------------------------------------
@@ -18107,12 +18185,12 @@ _c1857e:
 ; [ show monster $04: switch ??? ]
 
 _c18592:
-        jsr     $8367
-        jsr     $8467
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c18367
+        jsr     _c18467
+        jsr     _c184b5
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
+        jsr     _c175bb
         jmp     _c18436
 
 ; ---------------------------------------------------------------------------
@@ -18136,36 +18214,36 @@ _c185af:
 ; [ show monster $05: transform ]
 
 _c185b8:
-        jsr     $84b5
-        jsr     $7539
-        jsr     $7529
-        jsr     $8352
+        jsr     _c184b5
+        jsr     _c17539
+        jsr     _c17529
+        jsr     _c18352
         lda     $70
         ora     $de
         sta     $de
-        jsr     $1c8a
+        jsr     _c11c8a
         clr_ax
 @85cf:  phx
         lda     f:_c18606,x
         phx
-        jsr     $8141       ; wait
-        jsr     $8498
+        jsr     _c18141       ; wait
+        jsr     _c18498
         plx
         lda     f:_c18606+1,x
-        jsr     $8141       ; wait
-        jsr     $8498
+        jsr     _c18141       ; wait
+        jsr     _c18498
         plx
         inx2
         cpx     #$0020
         bne     @85cf
-        jsr     $8498
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c18498
+        jsr     _c184b5
+        jsr     _c18352
         lda     $70
         ora     $de
         sta     $de
-        jsr     $1cb8
-        jsr     $8498
+        jsr     _c11cb8
+        jsr     _c18498
         jmp     _c11c84
 
 ; ---------------------------------------------------------------------------
@@ -18193,8 +18271,8 @@ _c18606:
 ; [ show monster $07: pages ]
 
 _c18626:
-@8626:  jsr     $02f2       ; wait one frame
-        jsr     $1cb8
+@8626:  jsr     _c102f2       ; wait one frame
+        jsr     _c11cb8
         stz     $70
         clr_ax
 @8630:  lda     $d006,x
@@ -18210,10 +18288,10 @@ _c18626:
         lda     $70
         cmp     #$08
         bne     @8626
-        jsr     $84b5
-        jsr     $7539
-        jsr     $7529
-        jsr     $8352
+        jsr     _c184b5
+        jsr     _c17539
+        jsr     _c17529
+        jsr     _c18352
         lda     $70
         ora     $de
         sta     $de
@@ -18223,8 +18301,8 @@ _c18626:
         inx
         cpx     #$0008
         bne     @8661
-@866d:  jsr     $02f2
-        jsr     $1cb8
+@866d:  jsr     _c102f2
+        jsr     _c11cb8
         stz     $70
         clr_ax
 @8677:  lda     $d006,x
@@ -18260,9 +18338,9 @@ _c1869f:
         lda     $de
         and     #$1f
         beq     @86a8
-        jsr     $8695
-@86a8:  jsr     $02f2       ; wait one frame
-        jsr     $1cb8
+        jsr     _c18695
+@86a8:  jsr     _c102f2       ; wait one frame
+        jsr     _c11cb8
         stz     $70
         clr_ax
 @86b2:  lda     #$01
@@ -18281,10 +18359,10 @@ _c1869f:
         lda     $70
         cmp     #$08
         bne     @86a8
-        jsr     $84b5
-        jsr     $7539
-        jsr     $7529
-        jsr     $8352
+        jsr     _c184b5
+        jsr     _c17539
+        jsr     _c17529
+        jsr     _c18352
         lda     $70
         ora     $de
         sta     $de
@@ -18294,9 +18372,9 @@ _c1869f:
         inx
         cpx     #$0008
         bne     @86eb
-        jsr     $8695
-@86fa:  jsr     $02f2
-        jsr     $1cb8
+        jsr     _c18695
+@86fa:  jsr     _c102f2
+        jsr     _c11cb8
         stz     $70
         clr_ax
 @8704:  lda     #$01
@@ -18318,7 +18396,7 @@ _c1869f:
         lda     $70
         cmp     #$08
         bne     @86fa
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         jmp     _c11cb8
 
 ; ---------------------------------------------------------------------------
@@ -18340,14 +18418,14 @@ _c18736:
 
 ; monster entry jump table
 _c1874c:
-        .addr   $8962,$897c,$87e3,$890c,$8826,$8926,$8962,$8962
+        .addr   _c18962,_c1897c,_c187e3,_c1890c,_c18826,_c18926,_c18962,_c18962
 
 ; ---------------------------------------------------------------------------
 
 ; [  ]
 
 _c1875c:
-@875c:  jsr     $875f
+@875c:  jsr     @875f
 @875f:  lda     $dbbc
         beq     @879c
         lda     $dbbd
@@ -18413,8 +18491,8 @@ _c1879d:
 _c187cf:
 @87cf:  lda     $dbbc
         beq     @87dd
-        jsr     $02f2       ; wait one frame
-        jsr     $875c
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1875c
         jmp     @87cf
 @87dd:  lda     #$01
         sta     $f9a1
@@ -18432,8 +18510,8 @@ _c187e3:
         inx
         cpx     #$0008
         bne     @87e8
-@87f4:  jsr     $1c8a
-        jsr     $875c
+@87f4:  jsr     _c11c8a
+        jsr     _c1875c
         stz     $70
         clr_ax
 @87fe:  lda     $d006,x
@@ -18449,7 +18527,7 @@ _c187e3:
         lda     $70
         cmp     #$08
         bne     @87f4
-        jsr     $87cf
+        jsr     _c187cf
         clr_ax
         stx     $bc77
         jmp     _c11c84
@@ -18463,7 +18541,7 @@ _c18826:
         sta     $dbbd
         lda     #$52
         sta     $dbbe
-        jsr     $8836
+        jsr     _c18836
         jmp     _c10491
 
 ; ---------------------------------------------------------------------------
@@ -18473,9 +18551,9 @@ _c18826:
 _c18836:
 @8836:  clr_ax
         stx     $dbd9
-@883b:  jsr     $02f2       ; wait one frame
-        jsr     $879d
-        jsr     $88a8
+@883b:  jsr     _c102f2       ; wait one frame
+        jsr     _c1879d
+        jsr     _c188a8
         ldx     $dbd9
         inx2
         stx     $dbd9
@@ -18584,11 +18662,11 @@ _c1890c:
         lda     $de
         pha
         stz     $de
-        jsr     $1cb8
+        jsr     _c11cb8
         clr_ax
         stx     $bc77
         stx     $bc79
-        jsr     $87cf
+        jsr     _c187cf
         pla
         sta     $70
         clr_a
@@ -18605,11 +18683,11 @@ _c18926:
         stx     $bc79
         lda     #$0f
         sta     $b3b7
-        jsr     $1cb8
-@8939:  jsr     $02f2       ; wait one frame
-        jsr     $87cf
-        jsr     $1ceb
-        jsr     $1d65
+        jsr     _c11cb8
+@8939:  jsr     _c102f2       ; wait one frame
+        jsr     _c187cf
+        jsr     _c11ceb
+        jsr     _c11d65
         lda     $bc77
         sec
         sbc     #$08
@@ -18619,7 +18697,7 @@ _c18926:
         bpl     @8939
         stz     $bc77
         stz     $b3b7
-        jsr     $1cb8
+        jsr     _c11cb8
         jmp     _c187cf
 
 ; ---------------------------------------------------------------------------
@@ -18635,7 +18713,7 @@ _c18962:
 @896e:  stx     $bc77
         clr_ax
         stx     $bc79
-        jsr     $8436
+        jsr     _c18436
         jmp     _c187cf
 
 ; ---------------------------------------------------------------------------
@@ -18643,13 +18721,13 @@ _c18962:
 ; [ monster entry $01: enter from top ]
 
 _c1897c:
-        jsr     $8360
+        jsr     _c18360
         ldx     #$0100
         stx     $bc79
         clr_ax
         stx     $bc77
-        jsr     $83ca
-        jsr     $8367
+        jsr     _c183ca
+        jsr     _c18367
         jmp     _c187cf
 
 ; ---------------------------------------------------------------------------
@@ -18670,15 +18748,15 @@ _c1897c:
 ;   c: merugene 4
 ;   d: neo-exdeath
 _c18993:
-        .addr   $84a7,$84c1,$8528,$8533,$8592,$85b8,$854e,$8626
-        .addr   $869f,$856a,$857e,$84d8,$8500,$89d0
+        .addr   _c184a7,_c184c1,_c18528,_c18533,_c18592,_c185b8,_c1854e,_c18626
+        .addr   _c1869f,_c1856a,_c1857e,_c184d8,_c18500,_c189d0
 
 ; ---------------------------------------------------------------------------
 
 _c189af:
 @89af:  lda     #$e0
         sta     $bc8a
-@89b4:  jsr     $02f2       ; wait one frame
+@89b4:  jsr     _c102f2       ; wait one frame
         inc     $bc8a
         lda     $bc8a
         cmp     #$ff
@@ -18688,7 +18766,7 @@ _c189af:
 ; ---------------------------------------------------------------------------
 
 _c189c2:
-@89c2:  jsr     $02f2       ; wait one frame
+@89c2:  jsr     _c102f2       ; wait one frame
         dec     $bc8a
         lda     $bc8a
         cmp     #$e0
@@ -18702,36 +18780,36 @@ _c189c2:
 _c189d0:
         stz     $ee56
         lda     #$20
-        jsr     $72db
+        jsr     _c172db
         lda     #$40
-        jsr     $72db
+        jsr     _c172db
         lda     #$00
-        jsr     $72db
+        jsr     _c172db
         clr_ax
 @89e4:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $fc96       ; generate random number
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1fc96       ; generate random number
         and     #$3f
         bne     @89f2
-        jsr     $72db
-@89f2:  jsr     $fc96       ; generate random number
+        jsr     _c172db
+@89f2:  jsr     _c1fc96       ; generate random number
         and     #$03
         tax
         stx     $bc77
         stx     $70
-        jsr     $83b4
+        jsr     _c183b4
         plx
         inx
         cpx     #$0180
         bne     @89e4
-        jsr     $85af
+        jsr     _c185af
         clr_ax
         stx     $dbe5
         stx     $dbe7
         stz     $dbea
         lda     #$fe
         sta     $04f2
-@8a1a:  jsr     $02f2       ; wait one frame
+@8a1a:  jsr     _c102f2       ; wait one frame
         inc     $dbea
         lda     $dbea
         and     #$1f
@@ -18742,11 +18820,11 @@ _c189d0:
         cmp     #$08
         bne     @8a1a
         lda     #$38
-        jsr     $8141       ; wait
+        jsr     _c18141       ; wait
         stz     $ee56
-@8a3c:  jsr     $02f2       ; wait one frame
-        jsr     $02f2       ; wait one frame
-        jsr     $cb78
+@8a3c:  jsr     _c102f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1cb78
         lda     $ee56
         cmp     #$20
         bne     @8a3c
@@ -18754,34 +18832,34 @@ _c189d0:
         stz     $ee56
         lda     #$02
         sta     $bc85
-        jsr     $89af
+        jsr     _c189af
         lda     #$1e
-        sta     f:$00212c
+        sta     f:hTM
         lda     #$1c
         sta     $04f2
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         ldx     #$00f0
         stx     $bc77
-        jsr     $85a6
+        jsr     _c185a6
         inc     $dbe4
         lda     #$f0
-        jsr     $8141       ; wait
+        jsr     _c18141       ; wait
         lda     #$f0
-        jsr     $8141       ; wait
+        jsr     _c18141       ; wait
         lda     #$09
         sta     $ff04
         lda     #$1f
-        jsr     $335d
-        jsr     $02f2       ; wait one frame
-        jsr     $836e
-        jsr     $0401
+        jsr     _c1335d
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1836e
+        jsr     _c10401
         inc     $dbe9
         lda     #$02
         sta     $b3bb
         inc     $b3b8
         lda     #$1f
         sta     $04f2
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         ldx     #$00f0
         stx     $dbe5
         stx     $bc77
@@ -18789,25 +18867,25 @@ _c189d0:
         stx     $dbe7
         stx     $bc79
         stz     $dbe9
-        jsr     $8ca8       ; show neo-exdeath intro dialogue
-        jsr     $89c2
+        jsr     _c18ca8       ; show neo-exdeath intro dialogue
+        jsr     _c189c2
         stz     $bc85
-        jsr     $84b5
-        jsr     $8352
+        jsr     _c184b5
+        jsr     _c18352
         lda     #$0a
-        jsr     $75bb
+        jsr     _c175bb
         ldx     #$00f0
 @8acf:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $02f2       ; wait one frame
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         plx
         cpx     #$0080
         bne     @8ae2
-        jsr     $78f5       ; flash screen
+        jsr     _c178f5       ; flash screen
 @8ae2:  cpx     #$0040
         bne     @8aea
-        jsr     $78f5       ; flash screen
+        jsr     _c178f5       ; flash screen
 @8aea:  stx     $dbe5
         dex
         bne     @8acf
@@ -18817,19 +18895,19 @@ _c189d0:
         stz     $dbea
         lda     #$02
         sta     $dbe9
-        jsr     $78f5       ; flash screen
-        jsr     $9d46
+        jsr     _c178f5       ; flash screen
+        jsr     _c19d46
         lda     #$03
         sta     $dbec
-        jsr     $9d46
+        jsr     _c19d46
         lda     #$01
         sta     $dbec
-        jsr     $9d46
+        jsr     _c19d46
         stz     $dbeb
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         clr_ax
         stx     $70
-        jsr     $8382
+        jsr     _c18382
         clr_ax
         stx     $70
         jmp     _c1839b
@@ -18858,7 +18936,7 @@ _c18b2a:
 
 _c18b46:
         inc     $d110
-        jsr     $8d4d       ; get graphics script parameter 2
+        jsr     _c18d4d       ; get graphics script parameter 2
         and     #$3f
         asl
         tax
@@ -18877,7 +18955,7 @@ _c18b46:
 ; [ graphics script command $fc: execute graphics commands ]
 
 _c18b69:
-        jsr     $8d4d       ; get graphics script parameter 2
+        jsr     _c18d4d       ; get graphics script parameter 2
         asl
         tax
         lda     f:_c18b7d,x
@@ -18902,19 +18980,19 @@ _c18b69:
 ;   10: item ???
 
 _c18b7d:
-        .addr   $b677,$8d5f,$8cf1,$8cf1,$8be4,$8c37,$01fe,$b68c
-        .addr   $8ba9,$8baa,$8b93
+        .addr   _c1b677,_c18d5f,_c18cf1,_c18cf1,_c18be4,_c18c37,_c101fe,_c1b68c
+        .addr   _c18ba9,_c18baa,_c18b93
 
 ; ---------------------------------------------------------------------------
 
 _c18b93:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         sta     $cf58,y
-        jsr     $b68c
+        jsr     _c1b68c
         clr_a
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         sta     $cf58,y
         rts
 
@@ -18926,9 +19004,9 @@ _c18ba9:
 ; ---------------------------------------------------------------------------
 
 _c18baa:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         sta     $cf58,y
         jsr     _c18d47       ; get graphics script parameter 3
         sec
@@ -18938,9 +19016,9 @@ _c18baa:
         adc     #$018a
         tax
         shorta0
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         sta     $cf58,y
         rts
 
@@ -18959,11 +19037,11 @@ _c18bd0:
 ; [ show attack name ]
 
 _c18be4:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         jsr     _c18d47       ; get graphics script parameter 3 (string table)
         asl2
         tax
-        jsr     $8d53       ; get graphics script parameter 4 (string id)
+        jsr     _c18d53       ; get graphics script parameter 4 (string id)
         sta     $70
         lda     f:_c18bd0+2,x
         sta     $bca3       ; string length (5 or 9)
@@ -19007,7 +19085,7 @@ _c18c37:
         tax
         shorta0
         phy
-        jsr     $8c6d       ; display battle message
+        jsr     _c18c6d       ; display battle message
         ply
 @8c4d:  iny
         cpy     #$0018
@@ -19039,12 +19117,12 @@ _c18c6d:
         lda     #^BattleMsg
 .endif
         sta     $bca2
-        jsr     $3c88       ; draw battle message
+        jsr     _c13c88       ; draw battle message
         jsr     _c18d47       ; get graphics script parameter 3
         beq     @8c8d
-        jsr     $fc8c       ; wait for keypress
+        jsr     _c1fc8c       ; wait for keypress
         bra     @8c90
-@8c8d:  jsr     $8c93       ; wait for message
+@8c8d:  jsr     _c18c93       ; wait for message
 @8c90:  jmp     _c13cbb
 
 ; ---------------------------------------------------------------------------
@@ -19053,6 +19131,8 @@ _c18c6d:
 
 _c18c93:
 @8c93:  lda     $0424       ; message speed
+
+_c18c96:
 @8c96:  and     #$07
         tax
         lda     f:_c18ca0,x
@@ -19083,10 +19163,10 @@ _c18ca0:
 _c18ca8:
 @8ca8:  lda     #$cb
 @8caa:  pha
-        jsr     $8cd4       ; display battle dialogue
+        jsr     _c18cd4       ; display battle dialogue
         lda     #$04
-        jsr     $8c96
-        jsr     $3cbb       ;
+        jsr     _c18c96
+        jsr     _c13cbb       ;
         pla
         inc
         cmp     #$d0
@@ -19099,12 +19179,12 @@ _c18ca8:
 
 _c18cbd:
         jsr     _c18d47       ; get graphics script parameter 3
-        jsr     $8cd4       ; display battle dialogue
-        jsr     $8d4d       ; get graphics script parameter 2
-        jsr     $8c96
-        jsr     $8d4d       ; get graphics script parameter 2
+        jsr     _c18cd4       ; display battle dialogue
+        jsr     _c18d4d       ; get graphics script parameter 2
+        jsr     _c18c96
+        jsr     _c18d4d       ; get graphics script parameter 2
         bpl     @8cd1
-        jsr     $fc8c       ; wait for keypress
+        jsr     _c1fc8c       ; wait for keypress
 @8cd1:  jmp     _c13cbb
 
 ; ---------------------------------------------------------------------------
@@ -19133,9 +19213,9 @@ _c18cd4:
 ; [  ]
 
 _c18cf1:
-@8cf1:  jsr     $9d93       ; wait for damage numerals
+@8cf1:  jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         sta     $cf58,y
         jsr     _c18d47       ; get graphics script parameter 3
         longa
@@ -19143,9 +19223,9 @@ _c18cf1:
         adc     #$011e
         tax
         shorta0
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         sta     $cf58,y
         rts
 
@@ -19276,7 +19356,7 @@ _c18d74:
         lda     f:_d0dbe3,x
         cmp     #$ff
         beq     @8d85
-        jsr     $fbe4       ; play animation sound effect
+        jsr     _c1fbe4       ; play animation sound effect
 @8d85:  plx
         ply
         rts
@@ -19285,26 +19365,26 @@ _c18d74:
 
 ; ability animation pointers
 _c18d88:
-        .addr   $8d73,$98d3,$9e4d,$9986,$9f44,$9815,$9c7c,$998b ; $00
-        .addr   $9966,$8d73,$9951,$9951,$9b74,$98df,$992d,$9977
-        .addr   $9ef6,$8d73,$98c1,$9be3,$8d73,$8d73,$8d73,$8d73 ; $10
-        .addr   $8d73,$8d73,$98f7,$8d73,$98a9,$8d73,$8d73,$8d73
-        .addr   $9909,$991b,$8d73,$8d73,$972e,$974a,$8d73,$9897 ; $20
-        .addr   $987d,$981d,$8d73,$8d73,$8d73,$99e0,$99ad,$8d73
-        .addr   $8e14,$8e20,$8e29,$8e32,$8e3b,$8e44,$8e4a,$8e53 ; $30
-        .addr   $8e62,$8e72,$8e82,$8e92,$8ea2,$8eb2,$8ec2,$8ed2
-        .addr   $8eea,$8f01,$8f11,$8f21,$8f2a,$8f33             ; $40
+        .addr   _c18d73,_c198d3,_c19e4d,_c19986,_c19f44,_c19815,_c19c7c,_c1998b ; $00
+        .addr   _c19966,_c18d73,_c19951,_c19951,_c19b74,_c198df,_c1992d,_c19977
+        .addr   _c19ef6,_c18d73,_c198c1,_c19be3,_c18d73,_c18d73,_c18d73,_c18d73 ; $10
+        .addr   _c18d73,_c18d73,_c198f7,_c18d73,_c198a9,_c18d73,_c18d73,_c18d73
+        .addr   _c19909,_c1991b,_c18d73,_c18d73,_c1972e,_c1974a,_c18d73,_c19897 ; $20
+        .addr   _c1987d,_c1981d,_c18d73,_c18d73,_c18d73,_c199e0,_c199ad,_c18d73
+        .addr   _c18e14,_c18e20,_c18e29,_c18e32,_c18e3b,_c18e44,_c18e4a,_c18e53 ; $30
+        .addr   _c18e62,_c18e72,_c18e82,_c18e92,_c18ea2,_c18eb2,_c18ec2,_c18ed2
+        .addr   _c18eea,_c18f01,_c18f11,_c18f21,_c18f2a,_c18f33                 ; $40
 
 ; ---------------------------------------------------------------------------
 
 ; [ ability animation $30: knight (credits) ]
 
 _c18e14:
-        jsr     $80b8
-        jsr     $9f44
+        jsr     _c180b8
+        jsr     _c19f44
 
 _c18e1a:
-        jsr     $8062       ; move character back after attack
+        jsr     _c18062       ; move character back after attack
         jmp     _c1906f
 
 ; ---------------------------------------------------------------------------
@@ -19312,8 +19392,8 @@ _c18e1a:
 ; [ ability animation $31: monk (credits) ]
 
 _c18e20:
-        jsr     $80b8
-        jsr     $9f44
+        jsr     _c180b8
+        jsr     _c19f44
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19321,8 +19401,8 @@ _c18e20:
 ; [ ability animation $32: thief (credits) ]
 
 _c18e29:
-        jsr     $80b8
-        jsr     $9951
+        jsr     _c180b8
+        jsr     _c19951
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19330,8 +19410,8 @@ _c18e29:
 ; [ ability animation $33: dragoon (credits) ]
 
 _c18e32:
-        jsr     $9b74
-        jsr     $99e0
+        jsr     _c19b74
+        jsr     _c199e0
         jmp     _c1906f
 
 ; ---------------------------------------------------------------------------
@@ -19339,8 +19419,8 @@ _c18e32:
 ; [ ability animation $34: ninja (credits) ]
 
 _c18e3b:
-        jsr     $80b8
-        jsr     $9ef6
+        jsr     _c180b8
+        jsr     _c19ef6
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19348,7 +19428,7 @@ _c18e3b:
 ; [ ability animation $35: samurai (credits) ]
 
 _c18e44:
-        jsr     $9be3
+        jsr     _c19be3
         jmp     _c1906f
 
 ; ---------------------------------------------------------------------------
@@ -19356,8 +19436,8 @@ _c18e44:
 ; [ ability animation $36: berserker (credits) ]
 
 _c18e4a:
-        jsr     $80b8
-        jsr     $9f44
+        jsr     _c180b8
+        jsr     _c19f44
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19365,11 +19445,11 @@ _c18e4a:
 ; [ ability animation $37: hunter (credits) ]
 
 _c18e53:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0003
         clr_a
         sta     ($e7),y
-        jsr     $8cf1
+        jsr     _c18cf1
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19377,11 +19457,11 @@ _c18e53:
 ; [ ability animation $38: mystic knight (credits) ]
 
 _c18e62:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0004
         lda     #$01
         sta     ($e7),y
-        jsr     $9f44
+        jsr     _c19f44
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19389,11 +19469,11 @@ _c18e62:
 ; [ ability animation $39: white mage (credits) ]
 
 _c18e72:
-        jsr     $80b8       ; move character forward to attack
+        jsr     _c180b8       ; move character forward to attack
         ldy     #$0003
         lda     #$1e        ; spell animation $1e
         sta     ($e7),y
-        jsr     $b677
+        jsr     _c1b677
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19401,11 +19481,11 @@ _c18e72:
 ; [ ability animation $3a: black mage (credits) ]
 
 _c18e82:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0003
         lda     #$2b
         sta     ($e7),y
-        jsr     $b677
+        jsr     _c1b677
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19413,11 +19493,11 @@ _c18e82:
 ; [ ability animation $3b: time mage (credits) ]
 
 _c18e92:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0003
         lda     #$42
         sta     ($e7),y
-        jsr     $b677
+        jsr     _c1b677
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19425,11 +19505,11 @@ _c18e92:
 ; [ ability animation $3c: summoner (credits) ]
 
 _c18ea2:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0003
         lda     #$69
         sta     ($e7),y
-        jsr     $b677
+        jsr     _c1b677
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19437,11 +19517,11 @@ _c18ea2:
 ; [ ability animation $3d: blue mage (credits) ]
 
 _c18eb2:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0003
         lda     #$9f
         sta     ($e7),y
-        jsr     $b677
+        jsr     _c1b677
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19449,11 +19529,11 @@ _c18eb2:
 ; [ ability animation $3e: red mage (credits) ]
 
 _c18ec2:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0003
         lda     #$30
         sta     ($e7),y
-        jsr     $b677
+        jsr     _c1b677
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19461,13 +19541,13 @@ _c18ec2:
 ; [ ability animation $3f: mediator (credits) ]
 
 _c18ed2:
-        jsr     $80b8
+        jsr     _c180b8
         lda     #$c9
         sta     $7c4b
         ldy     #$0003
         lda     #$e1
         sta     ($e7),y
-        jsr     $b677
+        jsr     _c1b677
         stz     $7c4b
         jmp     _c18e1a
 
@@ -19476,13 +19556,13 @@ _c18ed2:
 ; [ ability animation $40: chemist (credits) ]
 
 _c18eea:
-        jsr     $80b8
+        jsr     _c180b8
         stz     $3bcc
         ldx     #$012a
-        jsr     $b58b
+        jsr     _c1b58b
         lda     #$01
-        jsr     $96ec
-        jsr     $9d3c
+        jsr     _c196ec
+        jsr     _c19d3c
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19490,11 +19570,11 @@ _c18eea:
 ; [ ability animation $41: geomancer (credits) ]
 
 _c18f01:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0003
         lda     #$51
         sta     ($e7),y
-        jsr     $8cf1
+        jsr     _c18cf1
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19502,11 +19582,11 @@ _c18f01:
 ; [ ability animation $42: bard (credits) ]
 
 _c18f11:
-        jsr     $80b8
+        jsr     _c180b8
         ldy     #$0003
         lda     #$57
         sta     ($e7),y
-        jsr     $b677
+        jsr     _c1b677
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19514,8 +19594,8 @@ _c18f11:
 ; [ ability animation $43: dancer (credits) ]
 
 _c18f21:
-        jsr     $80b8
-        jsr     $981d
+        jsr     _c180b8
+        jsr     _c1981d
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19523,8 +19603,8 @@ _c18f21:
 ; [ ability animation $44: mimic (credits) ]
 
 _c18f2a:
-        jsr     $80b8
-        jsr     $98df
+        jsr     _c180b8
+        jsr     _c198df
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19532,8 +19612,8 @@ _c18f2a:
 ; [ ability animation $45: freelancer (credits) ]
 
 _c18f33:
-        jsr     $80b8
-        jsr     $9f44
+        jsr     _c180b8
+        jsr     _c19f44
         jmp     _c18e1a
 
 ; ---------------------------------------------------------------------------
@@ -19703,12 +19783,12 @@ _c1906f:
         sta     $f9ee
         lda     $d04b
         sta     $f9ef
-        jsr     $8f3c
-        jsr     $fd1d       ; wait for vblank
+        jsr     _c18f3c
+        jsr     _c1fd1d       ; wait for vblank
         lda     #$02
         sta     $f9a1
-@908f:  jsr     $fd1d       ; wait for vblank
-        jsr     $8f3c
+@908f:  jsr     _c1fd1d       ; wait for vblank
+        jsr     _c18f3c
         lda     $f9ee
         cmp     $d03f
         beq     @90a3
@@ -19718,38 +19798,38 @@ _c1906f:
         lda     $f9ed
         cmp     #$18
         bne     @908f
-        jsr     $36eb       ; decompress battle bg graphics
+        jsr     _c136eb       ; decompress battle bg graphics
         ldx     #$1000
         stx     $70
         ldx     $72
         ldy     #$7800
         lda     $74
-        jsr     $fd27
-        jsr     $fc64
+        jsr     _c1fd27
+        jsr     _c1fc64
         clr_ax
 @90c4:  lda     $7e29,x
         sta     $7f29,x
         inx
         cpx     #$0040
         bne     @90c4
-        jsr     $9481
+        jsr     _c19481
         lda     #$02
         sta     $dbf5
-        jsr     $24e2       ; load character graphics
-        jsr     $962c
+        jsr     _c124e2       ; load character graphics
+        jsr     _c1962c
         lda     #$01
         sta     $cf63
         inc     $fefa
-        jsr     $3725       ; load battle bg graphics
+        jsr     _c13725       ; load battle bg graphics
         ldy     #$1080
         ldx     #$0500
         stx     $70
         ldx     #$7000
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
         lda     #$30
-        sta     f:$002123
-        jsr     $fd1d       ; wait for vblank
+        sta     f:hW12SEL
+        jsr     _c1fd1d       ; wait for vblank
         clr_ax
 @9104:  lda     $7f7703,x
         and     #$cf
@@ -19759,18 +19839,18 @@ _c1906f:
         bne     @9104
         lda     #$03
         sta     $dbf5
-@911c:  jsr     $fd1d       ; wait for vblank
-        jsr     $946b
+@911c:  jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1946b
         bcc     @911c
-        jsr     $fd1d       ; wait for vblank
-        jsr     $94ea
+        jsr     _c1fd1d       ; wait for vblank
+        jsr     _c194ea
         ldx     #$1800
         stx     $70
         ldx     #$8000
         ldy     #$6000
         lda     #$7f
-        jsr     $fd27
-        jsr     $fd1d       ; wait for vblank
+        jsr     _c1fd27
+        jsr     _c1fd1d       ; wait for vblank
         clr_ax
         lda     #$aa
 @9141:  sta     $0400,x
@@ -19797,8 +19877,8 @@ _c1906f:
         stz     $ff00
         lda     #$01
         sta     $dbf5
-@917c:  jsr     $fd1d       ; wait for vblank
-        jsr     $8f3c
+@917c:  jsr     _c1fd1d       ; wait for vblank
+        jsr     _c18f3c
         lda     $f9ee
         cmp     #$80
         beq     @9192
@@ -19871,13 +19951,13 @@ _c1906f:
         ldx     #$8000
         ldy     #$7000
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
         ldx     #$1000
         stx     $70
         ldx     #$c000
         ldy     #$4000
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
         clr_ax
 @9238:  sta     $7e09,x
         inx
@@ -19886,55 +19966,55 @@ _c1906f:
         ldx     #$7fff
         stx     $7e0d
         stx     $7e0f
-        jsr     $933e
+        jsr     _c1933e
         ldx     #$1000
         stx     $70
         ldx     #$bcb1
         ldy     #$5800
         lda     #$7e
-        jsr     $fd27
+        jsr     _c1fd27
         ldx     #$1000
         stx     $70
         ldx     #$bcb1
         ldy     #$4800
         lda     #$7e
-        jsr     $fd27
+        jsr     _c1fd27
         lda     #$07
-        sta     f:$00210b
+        sta     f:hBG12NBA
         clr_ax
 @9275:  lda     f:_d0e169,x
         sta     $dbf6,x
         inx
         cpx     #$0080
         bne     @9275
-        jsr     $933e
-        jsr     $2dac
+        jsr     _c1933e
+        jsr     _c12dac
         ldx     #$0500
         stx     $70
         ldx     #$bcb1
         ldy     #$5800
         lda     #$7e
-        jsr     $fd27
-        jsr     $fd1d       ; wait for vblank
+        jsr     _c1fd27
+        jsr     _c1fd1d       ; wait for vblank
         ldx     #$0100
         stx     $bc79
         clr_ax
         stx     $fefe
         lda     #$17
         sta     $fefb
-        jsr     $9360
-        jsr     $2dac
-        jsr     $93af
+        jsr     _c19360
+        jsr     _c12dac
+        jsr     _c193af
         stz     $ff32
         stz     $cdfa
         stz     $ff03
-@92bd:  jsr     $02f2       ; wait one frame
+@92bd:  jsr     _c102f2       ; wait one frame
         lda     $fefe
         and     #$0f
         bne     @92cf
         lda     $ff32
         bne     @92cf
-        jsr     $931a
+        jsr     _c1931a
 @92cf:  ldx     $bc79
         beq     @92d8
         dex
@@ -19950,14 +20030,14 @@ _c1906f:
         ldx     $04f0
         cpx     #$01b1
         bne     @9319
-@92f3:  jsr     $02f2       ; wait one frame
+@92f3:  jsr     _c102f2       ; wait one frame
         ldx     $fefe
         inx
         stx     $fefe
         txa
         and     #$0f
         bne     @9305
-        jsr     $931a
+        jsr     _c1931a
 @9305:  ldx     $bc79
         dex
         stx     $bc79
@@ -19973,8 +20053,8 @@ _c1906f:
 ; [  ]
 
 _c1931a:
-@931a:  jsr     $9360
-        jsr     $2dac
+@931a:  jsr     _c19360
+        jsr     _c12dac
         lda     $ff03
         and     #$1f
         longa
@@ -19997,6 +20077,8 @@ _c1933e:
         inx
         cpx     #$1000
         bne     @9340
+
+_c19349:
 @9349:  ldx     #$dbf6
         stx     $bca0
         ldx     #$bcb1
@@ -20017,7 +20099,7 @@ _c19360:
         inx
         cpx     #$0080
         bne     @9362
-        jsr     $9349
+        jsr     _c19349
         clr_ax
         lda     $cdfa
         tay
@@ -20061,28 +20143,28 @@ _c193af:
         stx     $70
         ldx     #$0006
 @93c5:  txa
-        jsr     $9443
+        jsr     _c19443
         inx
         cpx     #$006f
         bne     @93c5
         ldx     #$002c
         lda     #$05
-        jsr     $942f
+        jsr     _c1942f
         ldx     #$0032
         lda     #$05
-        jsr     $942f
+        jsr     _c1942f
         ldx     #$0038
         lda     #$05
-        jsr     $942f
+        jsr     _c1942f
         ldx     #$003e
         lda     #$05
-        jsr     $942f
+        jsr     _c1942f
         ldx     #$0044
         lda     #$04
-        jsr     $942f
+        jsr     _c1942f
         ldx     #$0049
         lda     #$02
-        jsr     $942f
+        jsr     _c1942f
         clr_axy
 @9402:  lda     $b535,x
         beq     @940c
@@ -20126,7 +20208,7 @@ _c1942f:
 
 _c1943d:
 @943d:  phx
-        jsr     $fc74
+        jsr     _c1fc74
         plx
         rts
 
@@ -20140,7 +20222,7 @@ _c19443:
         asl
         tax
         lda     f:AbilityBitTbl+1,x
-        jsr     $943d
+        jsr     _c1943d
         sta     $74
         lda     f:AbilityBitTbl,x
         tay
@@ -20233,7 +20315,7 @@ _c19481:
 ; [  ]
 
 _c194ea:
-@94ea:  jsr     $24e2       ; load character graphics
+@94ea:  jsr     _c124e2       ; load character graphics
         clr_ax
 @94ef:  longa
         lda     f:_d97ce1,x
@@ -20260,16 +20342,16 @@ _c194ea:
         plx
         clr_ay
         lda     [$82],y
-        jsr     $9559
+        jsr     _c19559
         ldy     #$0001
         lda     [$82],y
-        jsr     $9559
+        jsr     _c19559
         ldy     #$0010
         lda     [$82],y
-        jsr     $9559
+        jsr     _c19559
         ldy     #$0011
         lda     [$82],y
-        jsr     $9559
+        jsr     _c19559
         longa
         lda     $82
         clc
@@ -20293,16 +20375,16 @@ _c19559:
 @9559:  sty     $86
         sta     $70
         ldy     #$0000
-        jsr     $9581
-        jsr     $95a6
+        jsr     _c19581
+        jsr     _c195a6
         ldy     #$0020
-        jsr     $9581
-        jsr     $95a6
+        jsr     _c19581
+        jsr     _c195a6
         ldy     #$0040
-        jsr     $9581
-        jsr     $95a6
+        jsr     _c19581
+        jsr     _c195a6
         ldy     #$0060
-        jsr     $9581
+        jsr     _c19581
         jmp     _c195a6
 
 ; ---------------------------------------------------------------------------
@@ -20422,27 +20504,27 @@ _c195bf:
 _c1962c:
 @962c:  ldx     #$00c0
         stx     $7e
-        jsr     $95bf
+        jsr     _c195bf
         lda     #$c0
-        sta     f:$00211a
+        sta     f:hM7SEL
         ldx     #$2000
         stx     $70
         ldx     #$e000
         ldy     #$1000
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
         ldx     #$2000
         stx     $70
         ldx     #$e000
         ldy     #$2000
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
         ldx     #$2000
         stx     $70
         ldx     #$e000
         ldy     #$3000
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
         lda     #$01
         sta     $7fe000
         inc
@@ -20460,7 +20542,7 @@ _c1962c:
         ldx     #$e000
         clr_ay
         lda     #$7f
-        jsr     $fd27
+        jsr     _c1fd27
         clr_ax
 @969a:  lda     $ed96,x
         sta     $7e09,x
@@ -20497,11 +20579,11 @@ _c1962c:
 ; [ set attacker animation frame ]
 
 _c196ec:
-@96ec:  jsr     $9d80       ; get pointer to character graphics properties
+@96ec:  jsr     _c19d80       ; get pointer to character graphics properties
         sta     $cf58,y
         phy
         phx
-        jsr     $8d47       ; get graphics script parameter 3
+        jsr     _c18d47       ; get graphics script parameter 3
         tax
         lda     f:_d0dfbc,x   ; 0 or 1
         plx
@@ -20517,7 +20599,7 @@ _c196ec:
 ; [  ]
 
 _c19709:
-@9709:  jsr     $02f2       ; wait one frame
+@9709:  jsr     _c102f2       ; wait one frame
         lda     $cf53
         ora     $cf73
         ora     $cf93
@@ -20558,9 +20640,9 @@ _c1972e:
         tay
         lda     #$80
         sta     $72
-        jsr     $9763
-        jsr     $9da1
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19763
+        jsr     _c19da1
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     #$01
         sta     $cf43,y
         jmp     _c1971b
@@ -20570,7 +20652,7 @@ _c1972e:
 ; [ ability animation $25: show ]
 
 _c1974a:
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         clr_a
         sta     $cf43,y
         jsr     _c18d2f       ; get attacker id
@@ -20578,8 +20660,8 @@ _c1974a:
         asl2
         tay
         stz     $72
-        jsr     $9763
-        jsr     $9da1
+        jsr     _c19763
+        jsr     _c19da1
         jmp     _c19725
 
 ; ---------------------------------------------------------------------------
@@ -20621,11 +20703,11 @@ _c19763:
 
 _c1979e:
         inc     $dbbb
-        jsr     $9709
-        jsr     $9d93       ; wait for damage numerals
-        jsr     $8d3b
+        jsr     _c19709
+        jsr     _c19d93       ; wait for damage numerals
+        jsr     _c18d3b
         beq     @9814
-        jsr     $8d74
+        jsr     _c18d74
         stz     $d1cf
         stz     $d1d0
         stz     $d1d1
@@ -20641,12 +20723,12 @@ _c1979e:
         bne     @97d7
         lda     #$80
         sta     $72
-        jsr     $9763
+        jsr     _c19763
 @97d7:  inx
         iny4
         cpy     #$0010
         bne     @97c2
-@97e1:  jsr     $02f2       ; wait one frame
+@97e1:  jsr     _c102f2       ; wait one frame
         lda     #$04
         sta     $70
         clr_axy
@@ -20676,7 +20758,7 @@ _c1979e:
 ; [ ability animation $05: guard ]
 
 _c19815:
-        jsr     $8d74
+        jsr     _c18d74
         lda     #$01
         jmp     _c196ec
 
@@ -20685,17 +20767,17 @@ _c19815:
 ; [ ability animation $29: dance ]
 
 _c1981d:
-        jsr     $8d74
+        jsr     _c18d74
         lda     #$0e
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$0040
 @9828:  phx
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         plx
         txa
         and     #$07
         bne     @9862
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         phx
         txa
         lsr3
@@ -20718,7 +20800,7 @@ _c1981d:
 @9862:  dex
         bne     @9828
         clr_a
-        jsr     $96ec
+        jsr     _c196ec
         clr_a
         sta     $cf57,y
         sta     $cf49,y
@@ -20740,25 +20822,25 @@ _c19879:
 ; [ ability animation $28: flirt ]
 
 _c1987d:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0e
-        jsr     $96ec
-        jsr     $9d3c
+        jsr     _c196ec
+        jsr     _c19d3c
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$0108
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
 
 ; ---------------------------------------------------------------------------
 
 _c19897:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$010e
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
 
@@ -20767,13 +20849,13 @@ _c19897:
 ; [ ability animation $1c: catch ]
 
 _c198a9:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$010b
-        jsr     $b69c
+        jsr     _c1b69c
         ldx     #$0110
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
 
@@ -20782,11 +20864,11 @@ _c198a9:
 ; [ ability animation $12: gil toss ]
 
 _c198c1:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$010a
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
 
@@ -20794,8 +20876,8 @@ _c198c1:
 
 _c198d3:
         lda     #$0b
-        jsr     $96ec
-        jsr     $9d41
+        jsr     _c196ec
+        jsr     _c19d41
         clr_a
         jmp     _c196ec
 
@@ -20804,13 +20886,13 @@ _c198d3:
 ; [ ability animation $0d: dragon sword ]
 
 _c198df:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$0109
-        jsr     $b69c
+        jsr     _c1b69c
         ldx     #$010c
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
 
@@ -20819,11 +20901,11 @@ _c198df:
 ; [ ability animation $1a: tame ]
 
 _c198f7:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$00bf
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
 
@@ -20832,11 +20914,11 @@ _c198f7:
 ; [ ability animation $20: pray ]
 
 _c19909:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$00d8
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
 
@@ -20845,11 +20927,11 @@ _c19909:
 ; [ ability animation $21: revive ]
 
 _c1991b:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$0019
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
 
@@ -20858,19 +20940,19 @@ _c1991b:
 ; [ ability animation $0e: smoke ]
 
 _c1992d:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$0b
-        jsr     $96ec
-        jsr     $8d3b
+        jsr     _c196ec
+        jsr     _c18d3b
         beq     @993e
         lda     $df
         sta     ($eb),y
-@993e:  jsr     $8d4d       ; get graphics script parameter 2
+@993e:  jsr     _c18d4d       ; get graphics script parameter 2
         iny
         sta     ($e7),y
         ldx     #$010b
-        jsr     $b69c
-        jsr     $9d41
+        jsr     _c1b69c
+        jsr     _c19d41
         clr_a
         jmp     _c196ec
 
@@ -20879,12 +20961,12 @@ _c1992d:
 ; [ ability animation $0a: steal/capture ]
 
 _c19951:
-        jsr     $8d74
-        jsr     $9d37
-        jsr     $9d41
+        jsr     _c18d74
+        jsr     _c19d37
+        jsr     _c19d41
         lda     #$0b
-        jsr     $96ec
-        jsr     $9d41
+        jsr     _c196ec
+        jsr     _c19d41
         clr_a
         jmp     _c196ec
 
@@ -20893,11 +20975,11 @@ _c19951:
 ; [ ability animation $08: mantra ]
 
 _c19966:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         ldx     #$0111
-        jsr     $b58b
+        jsr     _c1b58b
         lda     #$01
-        jsr     $96ec
+        jsr     _c196ec
         jmp     _c19d3c
 
 ; ---------------------------------------------------------------------------
@@ -20905,10 +20987,10 @@ _c19966:
 ; [ ability animation $0f: image ]
 
 _c19977:
-        jsr     $8d74
+        jsr     _c18d74
         lda     #$0b
-        jsr     $96ec
-        jsr     $9d41
+        jsr     _c196ec
+        jsr     _c19d41
         clr_a
         jmp     _c196ec
 
@@ -20925,11 +21007,11 @@ _c19986:
 ; [ ability animation $07: buildup ]
 
 _c1998b:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         ldx     #$0107
-        jsr     $b58b
+        jsr     _c1b58b
         lda     #$01
-        jsr     $96ec
+        jsr     _c196ec
         jmp     _c19d3c
 
 ; ---------------------------------------------------------------------------
@@ -20949,14 +21031,14 @@ _c1999c:
 ; [ ability animation $2e: interceptor rocket ]
 
 _c199ad:
-        jsr     $9d93       ; wait for damage numerals
-        jsr     $999c
+        jsr     _c19d93       ; wait for damage numerals
+        jsr     _c1999c
         jsr     _c18d2f       ; get attacker id
         sta     $db3f
         inc     $db3e
         lda     #$0b
-        jsr     $9d8c
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d8c
+        jsr     _c19d80       ; get pointer to character graphics properties
         clr_a
         sta     $cf5d,y
         sta     $cf5e,y
@@ -20976,15 +21058,15 @@ _c199ad:
 ; [ ability animation $2d: jump attack ]
 
 _c199e0:
-        jsr     $9d93       ; wait for damage numerals
-        jsr     $999c
-        jsr     $fc64
+        jsr     _c19d93       ; wait for damage numerals
+        jsr     _c1999c
+        jsr     _c1fc64
         jsr     _c18d2f       ; get attacker id
         sta     $db3f
         inc     $db3e
         lda     #$0b
-        jsr     $9d8c
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d8c
+        jsr     _c19d80       ; get pointer to character graphics properties
         clr_a
         sta     $cf5d,y
         sta     $cf5e,y
@@ -20992,9 +21074,9 @@ _c199e0:
         sta     $cf60,y
         sta     $cf46,y
         phy
-        jsr     $8d74
-        jsr     $8d35       ; get target id
-        jsr     $fc7a
+        jsr     _c18d74
+        jsr     _c18d35       ; get target id
+        jsr     _c1fc7a
         tax
         ply
 _9a16:  phx
@@ -21012,8 +21094,8 @@ _9a16:  phx
         beq     @9a4e
         tax
 @9a33:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c102f2       ; wait one frame
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     $cf45,y
         dec
         sta     $cf45,y
@@ -21025,39 +21107,43 @@ _9a16:  phx
         dex
         bne     @9a33
 @9a4e:  plx
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     $d072,x
         sec
         sbc     #$18
         sta     $cf46,y
         lda     $d066,x
         sta     $cf45,y
-        jsr     $8d74
-        jsr     $9d37
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c18d74
+        jsr     _c19d37
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     $cf56,y
         ora     #$80
         sta     $cf56,y
         lda     #$0b
-        jsr     $9d8c
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d8c
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     $cf45,y
         sta     $a6
         lda     $cf46,y
         sta     $a7
-        jsr     $9a8a
+        jsr     _c19a8a
         jmp     _c19725
+
+; ---------------------------------------------------------------------------
+
+_c19a8a:
 @9a8a:  jsr     _c18d2f       ; get attacker id
         tax
         lda     $f8b9,x
         sta     $a9
         lda     $f8b5,x
         sta     $a8
-        jsr     $0a6e
-        jsr     $09a7
+        jsr     _c10a6e
+        jsr     _c109a7
         clr_ax
         lda     $ae
-        jsr     $0996
+        jsr     _c10996
         stz     $cdfb
         stz     $ce3b
         longa
@@ -21068,11 +21154,11 @@ _9a16:  phx
         sta     $b3
         stz     $b5
         shorta0
-@9abc:  jsr     $02f2       ; wait one frame
-        jsr     $9d4b
+@9abc:  jsr     _c102f2       ; wait one frame
+        jsr     _c19d4b
         clr_ax
         lda     #$0c
-        jsr     $09b9
+        jsr     _c109b9
         longa
         lda     $af
         sec
@@ -21125,16 +21211,16 @@ _9a16:  phx
         sta     $cf5e,y
         sta     $cf5f,y
         sta     $cf60,y
-        jsr     $9d37
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d37
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     $cf56,y
         and     #$7f
         sta     $cf56,y
         clr_a
-        jsr     $9d8c
-        jsr     $9d41
+        jsr     _c19d8c
+        jsr     _c19d41
         stz     $db3e
-        jsr     $67d3
+        jsr     _c167d3
         jsr     _c18d2f       ; get attacker id
         tax
         stz     $d1cb,x
@@ -21145,7 +21231,9 @@ _9a16:  phx
 _c19b5b:
         iny
         cld
-@9b5d:  jsr     $9d80       ; get pointer to character graphics properties
+
+_c19b5d:
+@9b5d:  jsr     _c19d80       ; get pointer to character graphics properties
         tya
         lsr5
         tax
@@ -21160,10 +21248,10 @@ _c19b5b:
 ; [ ability animation $0c: jump (part 1) ]
 
 _c19b74:
-        jsr     $9d93       ; wait for damage numerals
-        jsr     $999c
+        jsr     _c19d93       ; wait for damage numerals
+        jsr     _c1999c
         stz     $db41
-        jsr     $fc64
+        jsr     _c1fc64
         jsr     _c18d2f       ; get attacker id
         pha
         tay
@@ -21173,14 +21261,14 @@ _c19b74:
         sta     $db3f
         lda     #$01
         sta     $db3e
-        jsr     $8d74
-        jsr     $9b5d
-        jsr     $80b8
-        jsr     $9d37
+        jsr     _c18d74
+        jsr     _c19b5d
+        jsr     _c180b8
+        jsr     _c19d37
         lda     #$0b
-        jsr     $9d8c
-@9ba4:  jsr     $02f2       ; wait one frame
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d8c
+@9ba4:  jsr     _c102f2       ; wait one frame
+        jsr     _c19d80       ; get pointer to character graphics properties
         longa
         lda     $cf5d,y
         dec
@@ -21194,14 +21282,14 @@ _c19b74:
         sta     $cf46,y
         cmp     #$a0
         bcc     @9ba4
-        jsr     $02f2       ; wait one frame
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c102f2       ; wait one frame
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     #$01
         sta     $cf43,y
         lda     #$20
-        jsr     $8141       ; wait
+        jsr     _c18141       ; wait
         stz     $db3e
-        jsr     $67d3
+        jsr     _c167d3
         jmp     _c1fc6d
 
 ; ---------------------------------------------------------------------------
@@ -21209,15 +21297,15 @@ _c19b74:
 ; [ ability animation $13: slash ]
 
 _c19be3:
-        jsr     $8d14
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c18d14
+        jsr     _c19d93       ; wait for damage numerals
         lda     #$01
-        jsr     $9d8c
+        jsr     _c19d8c
         lda     $cf45,y
         sta     $a6
         lda     $cf46,y
         sta     $a7
-        jsr     $9b5d
+        jsr     _c19b5d
         lda     #$00
         sta     $a8
         lda     $dbd3
@@ -21226,19 +21314,19 @@ _c19be3:
         bra     @9c0a
 @9c08:  lda     #$50
 @9c0a:  sta     $a9
-        jsr     $0a6e
-        jsr     $09a7
+        jsr     _c10a6e
+        jsr     _c109a7
         clr_ax
         lda     $ae
-        jsr     $0996
+        jsr     _c10996
         stz     $cdfb
         stz     $ce3b
-        jsr     $8d74
-@9c22:  jsr     $02f2       ; wait one frame
-        jsr     $9d4b
+        jsr     _c18d74
+@9c22:  jsr     _c102f2       ; wait one frame
+        jsr     _c19d4b
         clr_ax
         lda     #$0c
-        jsr     $09b9
+        jsr     _c109b9
         longa
         lda     $af
         sec
@@ -21248,8 +21336,8 @@ _c19be3:
         lda     $b0
         bpl     @9c22
         ldx     #$010d
-        jsr     $b69c
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c1b69c
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     #$08
         sta     $a6
         sta     $cf45,y
@@ -21265,11 +21353,11 @@ _c19be3:
         ora     #$80
         sta     $cf56,y
         lda     #$0b
-        jsr     $96ec
-        jsr     $8d74
-        jsr     $9a8a
+        jsr     _c196ec
+        jsr     _c18d74
+        jsr     _c19a8a
         clr_a
-        jsr     $96ec
+        jsr     _c196ec
         jmp     _c18d22
 
 ; ---------------------------------------------------------------------------
@@ -21277,12 +21365,12 @@ _c19be3:
 ; [ ability animation $06: kick ]
 
 _c19c7c:
-        jsr     $8d14       ; show character in ready stance
-        jsr     $9d93       ; wait for damage numerals
-        jsr     $9d37       ;
+        jsr     _c18d14       ; show character in ready stance
+        jsr     _c19d93       ; wait for damage numerals
+        jsr     _c19d37       ;
         lda     #$0f
-        jsr     $9d8c
-        jsr     $8d74
+        jsr     _c19d8c
+        jsr     _c18d74
         lda     $cf45,y
         sta     $a6
         lda     $cf46,y
@@ -21291,20 +21379,20 @@ _c19c7c:
         sta     $a8
         lda     #$50
         sta     $a9
-        jsr     $0a6e
-        jsr     $09a7
+        jsr     _c10a6e
+        jsr     _c109a7
         clr_ax
         lda     $ae
-        jsr     $0996
+        jsr     _c10996
         stz     $cdfb
         stz     $ce3b
         ldx     $af
         phx
-@9cb5:  jsr     $02f2       ; wait one frame
-        jsr     $9d4b
+@9cb5:  jsr     _c102f2       ; wait one frame
+        jsr     _c19d4b
         clr_ax
         lda     #$0c
-        jsr     $09b9
+        jsr     _c109b9
         longa
         lda     $af
         sec
@@ -21313,21 +21401,21 @@ _c19c7c:
         shorta0
         lda     $b0
         bpl     @9cb5
-        jsr     $9d37
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c19d37
+        jsr     _c19d80       ; get pointer to character graphics properties
         lda     $cf56,y
         ora     #$80
         sta     $cf56,y
-        jsr     $9d37
+        jsr     _c19d37
         lda     #$0f
-        jsr     $9d8c
+        jsr     _c19d8c
         plx
         stx     $b1
-@9cec:  jsr     $02f2       ; wait one frame
-        jsr     $9d4b
+@9cec:  jsr     _c102f2       ; wait one frame
+        jsr     _c19d4b
         clr_ax
         lda     #$f4
-        jsr     $09b9
+        jsr     _c109b9
         longa
         lda     $af
         clc
@@ -21338,9 +21426,9 @@ _c19c7c:
         shorta0
         bra     @9cec
 @9d0c:  shorta0
-        jsr     $02f2       ; wait one frame
-        jsr     $9d4b
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c102f2       ; wait one frame
+        jsr     _c19d4b
+        jsr     _c19d80       ; get pointer to character graphics properties
         clr_a
         sta     $cf5d,y
         sta     $cf5e,y
@@ -21349,16 +21437,16 @@ _c19c7c:
         lda     $cf56,y
         and     #$7f
         sta     $cf56,y
-        jsr     $9d37
+        jsr     _c19d37
         clr_a
-        jsr     $9d8c
+        jsr     _c19d8c
         jmp     _c18d22
 
 ; ---------------------------------------------------------------------------
 
 _c19d37:
 @9d37:  lda     #$03
-        jsr     $9d8c
+        jsr     _c19d8c
 
 _c19d3c:
 @9d3c:  lda     #$08
@@ -21383,8 +21471,8 @@ _c19d4b:
         sta     $80
         stz     $81
         lda     $cebb
-        jsr     $0b59
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c10b59
+        jsr     _c19d80       ; get pointer to character graphics properties
         longa
         lda     $84
         sta     $cf5d,y
@@ -21393,8 +21481,8 @@ _c19d4b:
         sta     $80
         stz     $81
         lda     $ce7b
-        jsr     $0b59
-        jsr     $9d80       ; get pointer to character graphics properties
+        jsr     _c10b59
+        jsr     _c19d80       ; get pointer to character graphics properties
         longa
         lda     $84
         sta     $cf5f,y
@@ -21418,7 +21506,7 @@ _c19d80:
 ; [  ]
 
 _c19d8c:
-@9d8c:  jsr     $9d80       ; get pointer to character graphics properties
+@9d8c:  jsr     _c19d80       ; get pointer to character graphics properties
         sta     $cf58,y
         rts
 
@@ -21430,14 +21518,14 @@ _c19d93:
 @9d93:  lda     $d114
         ora     $d116
         beq     @9da0
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         bra     @9d93
 @9da0:  rts
 
 ; ---------------------------------------------------------------------------
 
 _c19da1:
-@9da1:  jsr     $02f2       ; wait one frame
+@9da1:  jsr     _c102f2       ; wait one frame
         jsr     _c18d2f       ; get attacker id
         asl5
         tay
@@ -21451,7 +21539,7 @@ _c19db3:
 @9db3:  phx
         lda     $7e
         pha
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         pla
         sta     $7e
         plx
@@ -21467,14 +21555,14 @@ _c19db3:
 ; [  ]
 
 _c19dcb:
-        jsr     $8d3b
+        jsr     _c18d3b
         sta     $7e
         clr_ax
 @9dd2:  asl     $7e
         bcc     @9e01
         lda     $d1d4,x
         bne     @9df9
-        jsr     $9db3
+        jsr     _c19db3
         lda     $d1bd,x
         ora     $d1cb,x
         bne     @9df9
@@ -21497,14 +21585,14 @@ _c19dcb:
 ; ---------------------------------------------------------------------------
 
 _c19e0a:
-        jsr     $8d3b
+        jsr     _c18d3b
         sta     $7e
         clr_ax
 @9e11:  asl     $7e
         bcc     @9e44
         lda     $d1d4,x
         bne     @9e3c
-        jsr     $9db3
+        jsr     _c19db3
         lda     $d1bd,x
         ora     $d1cb,x
         bne     @9e3c
@@ -21535,7 +21623,7 @@ _c19e4d:
         tax
         lda     $d1d4,x
         bne     @9e7e
-        jsr     $9da1
+        jsr     _c19da1
         phy
         jsr     _c18d2f       ; get attacker id
         tax
@@ -21566,8 +21654,8 @@ _c19e89:
         lda     ($eb)
         and     #$40
         bne     @9ed5
-        jsr     $8d35       ; get target id
-        jsr     $fc7a
+        jsr     _c18d35       ; get target id
+        jsr     _c1fc7a
         asl5
         tax
         lda     ($eb)
@@ -21588,7 +21676,7 @@ _c19e89:
         lda     #$07
         sta     $cf58,x
         phx
-        jsr     $9d41
+        jsr     _c19d41
         plx
         pla
         sta     $70
@@ -21631,19 +21719,19 @@ _c19ee7:
 ; [ ability animation $10: throw ]
 
 _c19ef6:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     $7c63
         cmp     #$5a
         beq     @9f13
         cmp     #$5b
         beq     @9f13
         lda     #$0b
-        jsr     $96ec
+        jsr     _c196ec
         ldx     #$010f
-        jsr     $b69c
+        jsr     _c1b69c
         clr_a
         jmp     _c196ec
-@9f13:  jsr     $8d14
+@9f13:  jsr     _c18d14
         stz     $d1d3
         stz     $71
         stz     $70
@@ -21658,10 +21746,10 @@ _c19ef6:
         clr_a
         bra     @9f35
 @9f32:  lda     $7c63
-@9f35:  jsr     $a8fc
+@9f35:  jsr     _c1a8fc
         lda     $f582
         sta     $d1bc
-        jsr     $a112
+        jsr     _c1a112
         jmp     _c18d22
 
 ; ---------------------------------------------------------------------------
@@ -21669,11 +21757,11 @@ _c19ef6:
 ; [ ability animation $04: fight ]
 
 _c19f44:
-        jsr     $9d93       ; wait for damage numerals
+        jsr     _c19d93       ; wait for damage numerals
         lda     ($eb)
         bmi     @9f5a       ; branch if attacker is a monster
-        jsr     $8d14
-        jsr     $8d53       ; get graphics script parameter 4
+        jsr     _c18d14
+        jsr     _c18d53       ; get graphics script parameter 4
         and     #$7f
         beq     @9f5a
         dec
@@ -21689,7 +21777,7 @@ _c19f44:
         lda     f:_d97cd1,x
         sta     $7e
         shorta0
-        jsr     $8d53       ; get graphics script parameter 4
+        jsr     _c18d53       ; get graphics script parameter 4
         bmi     @9f7a
         ldy     #$0013
         bra     @9f7d
@@ -21714,7 +21802,7 @@ _c19f44:
         tax
         lda     f:_ceff84,x
         tax
-        jsr     $8d53       ; get graphics script parameter 4
+        jsr     _c18d53       ; get graphics script parameter 4
         bmi     @9fb5
         lda     $37ac,x
         bra     @9fba
@@ -21725,18 +21813,18 @@ _c19f44:
         and     #$10
         sta     $70         ; crit flash
         pla
-        jsr     $a8fc
+        jsr     _c1a8fc
         lda     $f582
         sta     $d1bc
-        jsr     $a112
+        jsr     _c1a112
         lda     ($eb)
         bmi     @9fde
-        jsr     $8d53       ; get graphics script parameter 4
+        jsr     _c18d53       ; get graphics script parameter 4
         and     #$7f
         beq     @9fde
         dec
         tax
-        jsr     $9ed8
+        jsr     _c19ed8
 @9fde:  lda     ($eb)
         bmi     @9fe5
         jsr     _c18d22
@@ -21802,8 +21890,8 @@ _c1a01d:
         sta     $71
         pla
         bra     @a043
-@a040:  jsr     $8d35       ; get target id
-@a043:  jsr     $fc7a
+@a040:  jsr     _c18d35       ; get target id
+@a043:  jsr     _c1fc7a
         clc
         adc     $70
         tay
@@ -21827,7 +21915,7 @@ _c1a01d:
 
 _c1a065:
 @a065:  phy
-        jsr     $8d3b
+        jsr     _c18d3b
         ora     ($f0)       ; block type
         beq     @a070
         ply
@@ -21846,7 +21934,7 @@ _c1a073:
         ldy     #$0006
         lda     ($eb),y
         beq     @a08a
-        jsr     $a0a4
+        jsr     _c1a0a4
         lda     $f870
         sta     $cf45,x
         lda     $f871
@@ -21859,7 +21947,7 @@ _c1a073:
         lda     ($eb)
         and     #$40
         bne     @a0a3
-        jsr     $a0a4
+        jsr     _c1a0a4
         lda     $f872
         sta     $cf58,x
 @a0a3:  rts
@@ -21869,8 +21957,8 @@ _c1a073:
 ; [  ]
 
 _c1a0a4:
-@a0a4:  jsr     $8d35       ; get target id
-        jsr     $fc7a
+@a0a4:  jsr     _c18d35       ; get target id
+        jsr     _c1fc7a
         asl5
         tax
         rts
@@ -21886,10 +21974,10 @@ _c1a0b1:
         lda     ($eb)
         and     #$40
         bne     @a0d4
-        jsr     $a0a4
+        jsr     _c1a0a4
         lda     $cf58,x
         sta     $f872
-        jsr     $8d3b
+        jsr     _c18d3b
         beq     @a0d4
         lda     #$07
         sta     $cf58,x
@@ -21903,14 +21991,14 @@ _c1a0d6:
         ldy     #$0006
         lda     ($eb),y
         beq     @a110
-        jsr     $fc7a
+        jsr     _c1fc7a
         asl5
         tax
         lda     $cf45,x
         sta     $70
         lda     $cf46,x
         sta     $71
-        jsr     $a0a4
+        jsr     _c1a0a4
         lda     $cf45,x
         sta     $f870
         lda     $cf46,x
@@ -21921,7 +22009,7 @@ _c1a0d6:
         sta     $cf45,x
         lda     $71
         sta     $cf46,x
-        jsr     $9d41
+        jsr     _c19d41
 @a110:  plx
         rts
 
@@ -21966,17 +22054,17 @@ _c1a112:
         lda     ($eb)
         and     #$10
         beq     @a176       ; branch if no crit flash
-        jsr     $78f5       ; flash screen
-@a176:  jsr     $a0b1
-        jsr     $a065
+        jsr     _c178f5       ; flash screen
+@a176:  jsr     _c1a0b1
+        jsr     _c1a065
         bcs     @a182
         lda     #$49
         bra     @a185
 @a182:  lda     $f583       ; animation sound effect
-@a185:  jsr     $fbe4       ; play animation sound effect
+@a185:  jsr     _c1fbe4       ; play animation sound effect
         lda     ($eb)
         bpl     @a1a2
-        jsr     $a0d6
+        jsr     _c1a0d6
         lda     #$40
         sta     $d1a8
         sta     $d1b6
@@ -21985,15 +22073,15 @@ _c1a112:
         beq     @a1ed
         inc     $d1c9
         bra     @a1ed
-@a1a2:  jsr     $a0d6
-        jsr     $8d2f       ; get attacker id
+@a1a2:  jsr     _c1a0d6
+        jsr     _c18d2f       ; get attacker id
         and     #$03
         sta     $70
         tay
         lda     #$02
         sta     $d1c1,y
-        jsr     $8d35       ; get target id
-        jsr     $fc7a
+        jsr     _c18d35       ; get target id
+        jsr     _c1fc7a
         sta     $72
         lda     ($eb)
         and     #$40
@@ -22019,11 +22107,11 @@ _c1a112:
         tay
         lda     #$01
         sta     $d1c1,y
-@a1ed:  jsr     $9fed
+@a1ed:  jsr     _c19fed
         pha
         lda     $d1bc
         bmi     @a1fb
-        jsr     $8d53       ; get graphics script parameter 4
+        jsr     _c18d53       ; get graphics script parameter 4
         bpl     @a207
 @a1fb:  lda     #$05
         sta     $73
@@ -22053,7 +22141,7 @@ _c1a112:
         sta     $cf48,x
         lda     $73
         sta     $cf58,x
-@a236:  jsr     $a01d
+@a236:  jsr     _c1a01d
         lda     #$08
         sta     $d1af
         stz     $d1a2
@@ -22135,14 +22223,14 @@ _c1a112:
         lda     #$01
         sta     $d1a0
         bra     @a327
-@a301:  jsr     $a3d3
+@a301:  jsr     _c1a3d3
         iny
         bra     @a2d5
 @a307:  lda     $d18c
         beq     @a31d
         dec     $d18c
         beq     @a31d
-        jsr     $9fed
+        jsr     _c19fed
         ldy     #$0002
         tya
         sta     $d18b
@@ -22165,7 +22253,7 @@ _c1a112:
         lda     $d197
         sta     $d198
         inc     $d1ba
-@a348:  jsr     $a065
+@a348:  jsr     _c1a065
         bcc     @a392
         lda     #$0e
         sta     $7e
@@ -22187,14 +22275,14 @@ _c1a112:
         lda     #$01
         sta     $d1ae
         bra     @a39c
-@a376:  jsr     $a3d3
+@a376:  jsr     _c1a3d3
         iny
         bra     @a348
 @a37c:  lda     $d19a
         beq     @a392
         dec     $d19a
         beq     @a392
-        jsr     $a01d
+        jsr     _c1a01d
         ldy     #$0002
         tya
         sta     $d199
@@ -22208,7 +22296,7 @@ _c1a112:
         lda     $7c
         cmp     #$02
         beq     @a3ac
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         jmp     @a28c
 @a3ac:  plx
         clr_a
@@ -22224,7 +22312,7 @@ _c1a112:
         sta     $cf58,x
         lda     #$04
         sta     $cf48,x
-@a3cd:  jsr     $a073
+@a3cd:  jsr     _c1a073
         jmp     _c102f2       ; wait one frame
 
 ; ---------------------------------------------------------------------------
@@ -22244,9 +22332,9 @@ _c1a3d3:
 ; ---------------------------------------------------------------------------
 
 _c1a3e6:
-        .addr   $a7a5,$a7b3,$a7c4,$a7ac,$a4e7,$a6ad,$a67b,$a4de
-        .addr   $a70f,$a7bd,$a6df,$a4d1,$a01d,$a737,$a4cb,$a4be
-        .addr   $a4b5,$a4ae,$a497,$a480,$a442,$a461,$a431,$a416
+        .addr   _c1a7a5,_c1a7b3,_c1a7c4,_c1a7ac,_c1a4e7,_c1a6ad,_c1a67b,_c1a4de
+        .addr   _c1a70f,_c1a7bd,_c1a6df,_c1a4d1,_c1a01d,_c1a737,_c1a4cb,_c1a4be
+        .addr   _c1a4b5,_c1a4ae,_c1a497,_c1a480,_c1a442,_c1a461,_c1a431,_c1a416
 
 ; ---------------------------------------------------------------------------
 
@@ -22257,8 +22345,8 @@ _c1a416:
         lda     $d1b6
         and     #$40
         sta     $d1b6
-        jsr     $8d35       ; get target id
-        jsr     $fc7a
+        jsr     _c18d35       ; get target id
+        jsr     _c1fc7a
         and     #$03
         ora     #$80
         ora     $d1b6
@@ -22288,9 +22376,9 @@ _c1a431:
 
 _c1a442:
         phy
-        jsr     $8d35       ; get target id
+        jsr     _c18d35       ; get target id
         phx
-        jsr     $fc7a
+        jsr     _c1fc7a
         plx
         ply
         asl5
@@ -22310,9 +22398,9 @@ _c1a442:
 
 _c1a461:
         phy
-        jsr     $8d35       ; get target id
+        jsr     _c18d35       ; get target id
         phx
-        jsr     $fc7a
+        jsr     _c1fc7a
         plx
         ply
         asl5
@@ -22332,9 +22420,9 @@ _c1a461:
 
 _c1a480:
         phy
-        jsr     $8d35       ; get target id
+        jsr     _c18d35       ; get target id
         phx
-        jsr     $fc7a
+        jsr     _c1fc7a
         plx
         ply
         asl5
@@ -22350,9 +22438,9 @@ _c1a480:
 
 _c1a497:
         phy
-        jsr     $8d35       ; get target id
+        jsr     _c18d35       ; get target id
         phx
-        jsr     $fc7a
+        jsr     _c1fc7a
         plx
         ply
         asl5
@@ -22442,7 +22530,7 @@ _c1a4e7:
 ; ---------------------------------------------------------------------------
 
 _c1a4fb:
-        .addr   $a57e,$a519,$a513,$a503
+        .addr   _c1a57e,_c1a519,_c1a513,_c1a503
 
 ; ---------------------------------------------------------------------------
 
@@ -22450,13 +22538,11 @@ _c1a503:
         lda     #$0e
         sta     $af
         lda     #$08
-        jsr     $a51d
+        jsr     _a51d
         ldx     $af
         dex2
         stx     $af
         rts
-
-; ---------------------------------------------------------------------------
 
 _c1a513:
         stz     $af
@@ -22498,8 +22584,8 @@ _a51d:  sta     $ae
         stz     $d1a7
         stz     $d1b4
         stz     $d1b5
-        jsr     $0a6e
-        jsr     $a570
+        jsr     _c10a6e
+        jsr     _c1a570
         ldx     $d1a9
         stx     $d1b7
         rts
@@ -22541,7 +22627,7 @@ _c1a57e:
         stz     $d1a7
         stz     $d1b4
         stz     $d1b5
-        jsr     $0a6e
+        jsr     _c10a6e
         jmp     _c1a570
 
 ; ---------------------------------------------------------------------------
@@ -22588,7 +22674,7 @@ _c1a5eb:
         lda     $ae
         clc
         adc     #$40
-        jsr     $0b59
+        jsr     _c10b59
         lda     a:$00a6
         longa
         clc
@@ -22604,7 +22690,7 @@ _c1a5eb:
         tax
         stx     $80
         lda     $ae
-        jsr     $0b59
+        jsr     _c10b59
         lda     a:$00a7
         longa
         clc
@@ -22629,7 +22715,7 @@ _c1a633:
         lda     $ae
         clc
         adc     #$40
-        jsr     $0b59
+        jsr     _c10b59
         lda     a:$00a6
         longa
         clc
@@ -22645,7 +22731,7 @@ _c1a633:
         tax
         stx     $80
         lda     $ae
-        jsr     $0b59
+        jsr     _c10b59
         lda     a:$00a7
         longa
         clc
@@ -22670,8 +22756,8 @@ _c1a67b:
         lsr
         and     #$03
         sta     $d1ab
-        jsr     $a633
-        jsr     $a5b6
+        jsr     _c1a633
+        jsr     _c1a5b6
         sta     $80
         lda     $af
         clc
@@ -22700,8 +22786,8 @@ _c1a6ad:
         lsr
         and     #$03
         sta     $d1ab
-        jsr     $a633
-        jsr     $a5b6
+        jsr     _c1a633
+        jsr     _c1a5b6
         sta     $80
         lda     $af
         sec
@@ -22729,7 +22815,7 @@ _c1a6df:
         lda     $d1ac
         and     #$01
         sta     $d1ab
-        jsr     $a633
+        jsr     _c1a633
         lda     #$0a
         sta     $80
         lda     $af
@@ -22755,7 +22841,7 @@ _c1a70f:
         phx
         ldx     $84
         phx
-        jsr     $a5eb
+        jsr     _c1a5eb
         lda     #$0a
         sta     $80
         lda     $af
@@ -22785,8 +22871,8 @@ _c1a737:
         and     #$04
         lsr2
         sta     $d1b9
-        jsr     $a4be
-        jsr     $a5eb
+        jsr     _c1a4be
+        jsr     _c1a5eb
         lda     #$04
         sta     $80
         lda     $af
@@ -22803,7 +22889,7 @@ _c1a737:
         sta     $80
         lda     $d1ba
         asl4
-        jsr     $0a00
+        jsr     _c10a00
         clc
         adc     $d1b8
         sta     $d1b8
@@ -22813,7 +22899,7 @@ _c1a737:
         clc
         adc     #$40
         asl4
-        jsr     $0a00
+        jsr     _c10a00
         clc
         adc     $d1b7
         plx
@@ -22826,7 +22912,7 @@ _c1a737:
 
 _c1a796:
 @a796:  phy
-        jsr     $8d2f       ; get attacker id
+        jsr     _c18d2f       ; get attacker id
         ply
         asl5
         tax
@@ -22837,14 +22923,14 @@ _c1a796:
 ; ---------------------------------------------------------------------------
 
 _c1a7a5:
-        jsr     $a796
+        jsr     _c1a796
         sta     $cf58,x
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c1a7ac:
-        jsr     $a796
+        jsr     _c1a796
         sta     $cf57,x
         rts
 
@@ -22891,12 +22977,12 @@ _c1a7c4:
 ; ---------------------------------------------------------------------------
 
 _c1a7e7:
-        .addr   $a7f7,$a7fd,$a800,$a806,$a809,$a80c,$a812,$a815
+        .addr   _c1a7f7,_c1a7fd,_c1a800,_c1a806,_c1a809,_c1a80c,_c1a812,_c1a815
 
 ; ---------------------------------------------------------------------------
 
 _c1a7f7:
-        jsr     $a825
+        jsr     _c1a825
         jmp     _c1a82f
 
 ; ---------------------------------------------------------------------------
@@ -22907,7 +22993,7 @@ _c1a7fd:
 ; ---------------------------------------------------------------------------
 
 _c1a800:
-        jsr     $a81b
+        jsr     _c1a81b
         jmp     _c1a82f
 
 ; ---------------------------------------------------------------------------
@@ -22923,7 +23009,7 @@ _c1a809:
 ; ---------------------------------------------------------------------------
 
 _c1a80c:
-        jsr     $a825
+        jsr     _c1a825
         jmp     _c1a839
 
 ; ---------------------------------------------------------------------------
@@ -22934,7 +23020,7 @@ _c1a812:
 ; ---------------------------------------------------------------------------
 
 _c1a815:
-        jsr     $a81b
+        jsr     _c1a81b
         jmp     _c1a839
 
 ; ---------------------------------------------------------------------------
@@ -22995,7 +23081,7 @@ _c1a847:
         bne     @a866
         and     #$1f
         lda     f:_d838ec,x   ; graphics index
-        jsr     $aabe       ; load spell 1 graphics
+        jsr     _c1aabe       ; load spell 1 graphics
         bra     @a8ba
 
 ; type 1: spell 2
@@ -23003,7 +23089,7 @@ _c1a847:
         bne     @a875
         lda     f:_d838ec,x
         and     #$1f
-        jsr     $aace       ; load spell 2 graphics
+        jsr     _c1aace       ; load spell 2 graphics
         bra     @a8ba
 
 ; type 2: spell 3
@@ -23011,7 +23097,7 @@ _c1a847:
         bne     @a884
         lda     f:_d838ec,x
         and     #$1f
-        jsr     $aade       ; load spell 3 graphics
+        jsr     _c1aade       ; load spell 3 graphics
         bra     @a8ba
 
 ; type 3: weapon hit
@@ -23019,7 +23105,7 @@ _c1a847:
         bne     @a893
         lda     f:_d838ec,x
         and     #$1f
-        jsr     $aa9e       ; load weapon hit graphics
+        jsr     _c1aa9e       ; load weapon hit graphics
         bra     @a8ba
 
 ; type 4: animals
@@ -23027,7 +23113,7 @@ _c1a847:
         bne     @a8ba
         lda     f:_d838ec,x
         and     #$1f
-        jsr     $aaee       ; load animals graphics
+        jsr     _c1aaee       ; load animals graphics
         lda     f:_d838ec+1,x   ; palette index
         and     #$7f
         ldy     #$0140
@@ -23086,7 +23172,7 @@ _c1a8fc:
         lda     ($eb)
         and     #$fe
         sta     ($eb)
-        jsr     $8d53       ; get graphics script parameter 4
+        jsr     _c18d53       ; get graphics script parameter 4
         and     #$80
         sta     ($e7),y
         lda     ($eb)
@@ -23104,7 +23190,7 @@ _c1a8fc:
         beq     @a94f
         plx
         jmp     _c1a8fc
-@a94f:  jsr     $8d53       ; get graphics script parameter 4
+@a94f:  jsr     _c18d53       ; get graphics script parameter 4
         and     #$7f
         beq     @a96b
         clc
@@ -23115,7 +23201,7 @@ _c1a8fc:
         phx
         jsr     _c1feba       ; +$82 = $7e * $80
         ldx     $82
-        jsr     $a9d5
+        jsr     _c1a9d5
         plx
         bra     @a987
 @a96b:  lda     ($f0)       ; block type
@@ -23128,11 +23214,11 @@ _c1a8fc:
         phx
         jsr     _c1feba       ; +$82 = $7e * $80
         ldx     $82
-        jsr     $a9b5       ; load alt. weapon graphics
+        jsr     _c1a9b5       ; load alt. weapon graphics
         plx
         bra     @a987
-@a984:  jsr     $a9d5
-@a987:  jsr     $a992       ; load weapon graphics
+@a984:  jsr     _c1a9d5
+@a987:  jsr     _c1a992       ; load weapon graphics
         plx
         stz     $db3c
         stz     $db3d
@@ -23144,7 +23230,7 @@ _c1a8fc:
 
 _c1a992:
 @a992:  lda     f:WeaponAnimProp,x
-        jsr     $aa8e       ; load weapon graphics
+        jsr     _c1aa8e       ; load weapon graphics
         lda     f:WeaponAnimProp+1,x
         ldy     #$0140
         jsr     _c1aa1d       ; load attack palette (8-colors)
@@ -23161,7 +23247,7 @@ _c1a992:
 
 _c1a9b5:
 @a9b5:  lda     f:WeaponAnimProp+3,x
-        jsr     $aaae       ; load alt. weapon graphics
+        jsr     _c1aaae       ; load alt. weapon graphics
         lda     f:WeaponAnimProp+4,x
         ldy     #$0160
         jsr     _c1aa1d       ; load attack palette (8-colors)
@@ -23179,7 +23265,7 @@ _c1a9d5:
 @a9d5:  lda     $7bfd
         beq     @a9fd       ; branch if no sword slap
         lda     f:WeaponAnimProp+3
-        jsr     $aa9e       ; load weapon hit graphics
+        jsr     _c1aa9e       ; load weapon hit graphics
         lda     f:WeaponAnimProp+4
         ldy     #$0160
         jsr     _c1aa1d       ; load attack palette (8-colors)
@@ -23190,7 +23276,7 @@ _c1a9d5:
         stz     $7bfd
         rts
 @a9fd:  lda     f:WeaponAnimProp+3,x
-        jsr     $aa9e       ; load weapon hit graphics
+        jsr     _c1aa9e       ; load weapon hit graphics
         lda     f:WeaponAnimProp+4,x
         ldy     #$0160
         jsr     _c1aa1d       ; load attack palette (8-colors)
@@ -23290,7 +23376,7 @@ _c1aa8e:
         jsr     _c1aafe       ; load attack graphics pointers (weapons)
         jsr     _c1aa5c       ; init tile pointers (3bpp)
         pla
-        jsr     $ab1a
+        jsr     _c1ab1a
         plx
         rts
 
@@ -23305,7 +23391,7 @@ _c1aa9e:
         jsr     _c1aafe       ; load attack graphics pointers (weapon hits)
         jsr     _c1aa5c       ; init tile pointers (3bpp)
         pla
-        jsr     $ab1a
+        jsr     _c1ab1a
         plx
         rts
 
@@ -23320,7 +23406,7 @@ _c1aaae:
         jsr     _c1aafe       ; load attack graphics pointers (weapons alt.)
         jsr     _c1aa5c       ; init tile pointers (3bpp)
         pla
-        jsr     $ab1a
+        jsr     _c1ab1a
         plx
         rts
 
@@ -23335,7 +23421,7 @@ _c1aabe:
         jsr     _c1aafe       ; load attack graphics pointers (spells 1)
         jsr     _c1aa5c       ; init tile pointers (3bpp)
         pla
-        jsr     $ab1a
+        jsr     _c1ab1a
         plx
         rts
 
@@ -23350,7 +23436,7 @@ _c1aace:
         jsr     _c1aafe       ; load attack graphics pointers (spells 2)
         jsr     _c1aa5c       ; init tile pointers (3bpp)
         pla
-        jsr     $ab1a
+        jsr     _c1ab1a
         plx
         rts
 
@@ -23365,7 +23451,7 @@ _c1aade:
         jsr     _c1aafe       ; load attack graphics pointers (spells 3)
         jsr     _c1aa5c       ; init tile pointers (3bpp)
         pla
-        jsr     $ab1a
+        jsr     _c1ab1a
         plx
         rts
 
@@ -23380,7 +23466,7 @@ _c1aaee:
         jsr     _c1aafe       ; load attack graphics pointers (animals)
         jsr     _c1aa75       ; init tile pointers (4bpp)
         pla
-        jsr     $abd7
+        jsr     _c1abd7
         plx
         rts
 
@@ -23446,7 +23532,7 @@ _c1ab1a:
 ; no v-flip
         clr_ay
 @ab5c:  lda     [$7e]       ; get word (first 2 bitplanes)
-        jsr     $ac91       ; flip horizontally
+        jsr     _c1ac91       ; flip horizontally
         sta     [$82],y     ; copy to ram buffer
         inc     $7e
         inc     $7e
@@ -23454,7 +23540,7 @@ _c1ab1a:
         cpy     #$0010
         bne     @ab5c
 @ab6e:  lda     [$7e]       ; get byte (3rd bitplane)
-        jsr     $ac91       ; flip horizontally
+        jsr     _c1ac91       ; flip horizontally
         and     #$00ff
         sta     [$82],y
         inc     $7e
@@ -23466,7 +23552,7 @@ _c1ab1a:
 ; v-flip
 @ab84:  ldy     #$000e
 @ab87:  lda     [$7e]
-        jsr     $ac91       ; flip horizontally
+        jsr     _c1ac91       ; flip horizontally
         sta     [$82],y
         inc     $7e
         inc     $7e
@@ -23475,7 +23561,7 @@ _c1ab1a:
         bne     @ab87
         ldy     #$001e
 @ab9c:  lda     [$7e]
-        jsr     $ac91       ; flip horizontally
+        jsr     _c1ac91       ; flip horizontally
         and     #$00ff
         sta     [$82],y
         inc     $7e
@@ -23537,7 +23623,7 @@ _c1abd7:
         bne     @ac3f
         tay
 @ac18:  lda     [$7e]
-        jsr     $ac91       ; flip horizontally
+        jsr     _c1ac91       ; flip horizontally
         sta     [$82],y
         inc     $7e
         inc     $7e
@@ -23545,7 +23631,7 @@ _c1abd7:
         cpy     #$0010
         bne     @ac18
 @ac2a:  lda     [$7e]
-        jsr     $ac91       ; flip horizontally
+        jsr     _c1ac91       ; flip horizontally
         sta     [$82],y
         inc     $7e
         inc     $7e
@@ -23555,7 +23641,7 @@ _c1abd7:
         jmp     @ac69
 @ac3f:  ldy     #$000e
 @ac42:  lda     [$7e]
-        jsr     $ac91       ; flip horizontally
+        jsr     _c1ac91       ; flip horizontally
         sta     [$82],y
         inc     $7e
         inc     $7e
@@ -23564,7 +23650,7 @@ _c1abd7:
         bne     @ac42
         ldy     #$001e
 @ac57:  lda     [$7e]
-        jsr     $ac91       ; flip horizontally
+        jsr     _c1ac91       ; flip horizontally
         sta     [$82],y
         inc     $7e
         inc     $7e
@@ -23623,7 +23709,7 @@ _c1aca8:
         tay
         longa
         lda     $db88,y
-        sta     f:$002116
+        sta     f:hVMADDL
         lda     $f87c,y
         bne     @acc2
         bra     @acde
@@ -23631,12 +23717,12 @@ _c1aca8:
         and     #$00ff
         inc
         ora     #$3c00
-        sta     f:$002118
+        sta     f:hVMDATAL
         lda     $f87d,y
         and     #$00ff
         inc
         ora     #$3c00
-        sta     f:$002118
+        sta     f:hVMDATAL
 @acde:  shorta0
 @ace1:  inx
         cpx     #$0008
@@ -23701,8 +23787,8 @@ _c1ad2d:
         lda     $7ba1,x
         and     #$10
         beq     @ad55
-        jsr     $afe0
-        jsr     $ace8
+        jsr     _c1afe0
+        jsr     _c1ace8
         lda     #$01
         sta     $db80,y
         bra     @ad59
@@ -23738,7 +23824,7 @@ _c1ad64:
         and     $de
         beq     @ad93
         sta     $70
-        jsr     $768d
+        jsr     _c1768d
 @ad93:  pla
         eor     #$ff
         sta     $70
@@ -23747,7 +23833,7 @@ _c1ad64:
         and     $70
         beq     @ada5
         sta     $70
-        jsr     $75d7
+        jsr     _c175d7
 @ada5:  clr_ax
 @ada7:  lda     $7b9e,x
         and     #$30
@@ -23798,7 +23884,7 @@ _c1ad64:
         iny4
         cpx     #$0008
         bne     @ade5
-        jsr     $1cb8
+        jsr     _c11cb8
 @ae22:  clr_axy
 @ae25:  lda     $7b9e,y
         and     #$30
@@ -23814,8 +23900,10 @@ _c1ad64:
         inx
         cpx     #$0008
         bne     @ae25
-        jmp     @ae49
-@ae49:  clr_ax
+        jmp     _c1ae49
+
+_c1ae49:
+        clr_ax
 @ae4b:  lda     $7b9e,x
         sta     $7bbe,x
         inx
@@ -23829,7 +23917,7 @@ _c1ae58:
 @ae58:  phy
         phx
 @ae5a:  phx
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         plx
         dex
         bne     @ae5a
@@ -23849,19 +23937,19 @@ _c1ae65:
         lda     #$01
         sta     $cf61,y
         ldx     #$0010
-        jsr     $ae58
+        jsr     _c1ae58
         clr_a
         sta     $cf58,y
         sta     $cf57,y
         plx
         txa
         sta     $7a
-        jsr     $b09f
+        jsr     _c1b09f
         txa
-        jsr     $af05
-        jsr     $aed7
+        jsr     _c1af05
+        jsr     _c1aed7
         ldx     #$0010
-        jsr     $ae58
+        jsr     _c1ae58
         clr_a
         sta     $cf61,y
         ply
@@ -23882,18 +23970,18 @@ _c1ae9c:
         bmi     @aeb9
         lda     $7b8e,y
         bpl     @aec3
-        jsr     $ae65
+        jsr     _c1ae65
         bra     @aecd
 @aeb9:  lda     $7b8e,y
         bmi     @aec3
-        jsr     $ae65
+        jsr     _c1ae65
         bra     @aecd
 @aec3:  txa
         sta     $7a
-        jsr     $b09f
+        jsr     _c1b09f
         txa
-        jsr     $af05
-@aecd:  jsr     $aed7
+        jsr     _c1af05
+@aecd:  jsr     _c1aed7
         inx
         cpx     #$0004
         bne     @ae9e
@@ -23939,7 +24027,7 @@ _c1aef9:
 _c1af05:
 @af05:  phx
         phy
-        jsr     $aef9
+        jsr     _c1aef9
         lda     $cf43,y
         bne     @af1e
         lda     $cf53,y
@@ -23947,8 +24035,8 @@ _c1af05:
         txa
         asl2
         tax
-        jsr     $af21       ; update character status animation
-        jsr     $b01a       ; update character status sprite
+        jsr     _c1af21       ; update character status animation
+        jsr     _c1b01a       ; update character status sprite
 @af1e:  ply
         plx
         rts
@@ -23996,7 +24084,7 @@ _c1af21:
         sta     $cf4d,y
         bra     @af83
 @af72:  pha
-        jsr     $b087       ; check if character is selected
+        jsr     _c1b087       ; check if character is selected
         bcc     @af7b
         pla
         bra     @af6c
@@ -24054,7 +24142,7 @@ _c1afe0:
         clc
         adc     #$10
         tax
-        jsr     $afeb
+        jsr     _c1afeb
         plx
         rts
 
@@ -24105,7 +24193,7 @@ _c1b01a:
         lda     $7b81,x
         and     #$10
         beq     @b034       ; branch if not condemned
-        jsr     $afeb       ;
+        jsr     _c1afeb       ;
         lda     #$08
         bra     @b077
 @b034:  lda     $7b7e,x
@@ -24140,7 +24228,7 @@ _c1b01a:
         bra     @b077
 @b076:  clr_a
 @b077:  sta     $d1cf,y
-        jsr     $b087       ; check if character is selected
+        jsr     _c1b087       ; check if character is selected
         bcc     @b084
         lda     #$07        ; show selected indicator
         sta     $d1cf,y
@@ -24197,7 +24285,7 @@ _c1b09f:
         and     #$10
         bne     @b103
         stz     $d1bd,x
-        jsr     $b106
+        jsr     _c1b106
         ora     #$80
         sta     $cf54,y
         lda     #$02
@@ -24209,7 +24297,7 @@ _c1b09f:
         and     #$10
         beq     @b103
         inc     $d1bd,x
-        jsr     $b106
+        jsr     _c1b106
         sta     $cf54,y
         lda     #$02
         sta     $cf4d,y
@@ -24261,12 +24349,12 @@ _c1b12a:
         txa
         asl2
         tax
-        jsr     $b1ac
+        jsr     _c1b1ac
 @b140:  plx
         inx
         cpx     #$0004
         bne     @b12c
-        jsr     $b181
+        jsr     _c1b181
         lda     $f8c3
         and     #$01
         beq     @b169
@@ -24345,64 +24433,64 @@ _c1b1ac:
         beq     @b1f5
         and     #$40
         beq     @b1ea
-        jsr     $b266
+        jsr     _c1b266
         bra     @b216
 @b1ea:  lda     $8a
         and     #$02
         beq     @b1f5
-        jsr     $b2c1
+        jsr     _c1b2c1
         bra     @b216
 @b1f5:  lda     $8a
         and     #$04
         beq     @b200
-        jsr     $b282
+        jsr     _c1b282
         bra     @b216
 @b200:  lda     $8b
         beq     @b216
         and     #$80
         beq     @b20d
-        jsr     $b294
+        jsr     _c1b294
         bra     @b216
 @b20d:  lda     $8b
         and     #$08
         beq     @b216
-        jsr     $b2af
+        jsr     _c1b2af
 @b216:  lda     $8c
         beq     @b265
         and     #$80
         beq     @b224
         clr_a
-        jsr     $b2d9
+        jsr     _c1b2d9
         bra     @b265
 @b224:  lda     $8c
         and     #$40
         beq     @b231
         lda     #$01
-        jsr     $b2d9
+        jsr     _c1b2d9
         bra     @b265
 @b231:  lda     $8c
         and     #$20
         beq     @b23e
         lda     #$02
-        jsr     $b2d9
+        jsr     _c1b2d9
         bra     @b265
 @b23e:  lda     $8c
         and     #$10
         beq     @b24b
         lda     #$03
-        jsr     $b2d9
+        jsr     _c1b2d9
         bra     @b265
 @b24b:  lda     $8c
         and     #$08
         beq     @b258
         lda     #$04
-        jsr     $b2d9
+        jsr     _c1b2d9
         bra     @b265
 @b258:  lda     $8c
         and     #$04
         beq     @b265
         lda     #$05
-        jsr     $b2d9
+        jsr     _c1b2d9
         bra     @b265
 @b265:  rts
 
@@ -24503,7 +24591,7 @@ _c1b2f4:
 ; [  ]
 
 _c1b300:
-@b300:  jsr     $1cb8
+@b300:  jsr     _c11cb8
         stz     $db55
         stz     $db56
         stz     $db57
@@ -24634,10 +24722,10 @@ _c1b40a:
         sta     $bc85
         lda     #$1f
         sta     $f86c
-        jsr     $b3fe
-@b417:  jsr     $02f2       ; wait one frame
+        jsr     _c1b3fe
+@b417:  jsr     _c102f2       ; wait one frame
         lda     $f86c
-        jsr     $b3fe
+        jsr     _c1b3fe
         dec     $f86c
         bpl     @b417
         rts
@@ -24648,9 +24736,9 @@ _c1b426:
 @b426:  lda     #$10
         sta     $bc85
         stz     $f86c
-@b42e:  jsr     $02f2       ; wait one frame
+@b42e:  jsr     _c102f2       ; wait one frame
         lda     $f86c
-        jsr     $b3fe
+        jsr     _c1b3fe
         inc     $f86c
         lda     $f86c
         cmp     #$20
@@ -24664,15 +24752,15 @@ _c1b442:
         lda     #$dd
         sta     $dbb6
         lda     #$93
-        jsr     $fbd9       ; play sound effect
-        jsr     $b426
+        jsr     _c1fbd9       ; play sound effect
+        jsr     _c1b426
         lda     #$80
         sta     $db60
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         lda     $7c4b
         tax
-        jsr     $2736
-        jsr     $26fb
+        jsr     _c12736
+        jsr     _c126fb
         clr_ax
         stx     $78
         lda     $dbd3
@@ -24699,7 +24787,7 @@ _c1b442:
         lda     #$01
         sta     $db60
         sta     $db61
-        jsr     $b40a
+        jsr     _c1b40a
         plx
         rts
 
@@ -24709,23 +24797,23 @@ _c1b442:
 
 _c1b4a2:
 @b4a2:  phx
-        jsr     $8d47       ; get graphics script parameter 3
+        jsr     _c18d47       ; get graphics script parameter 3
         cmp     #$60
         beq     @b4b1
         cmp     #$61
         jne     @b4b4
 @b4b1:  jmp     @b534
-@b4b4:  jsr     $8d3b
+@b4b4:  jsr     _c18d3b
         beq     @b4b1
-        jsr     $b426
+        jsr     _c1b426
         lda     #$05
         sta     $7e
         clr_a
-        jsr     $7b43
+        jsr     _c17b43
         lda     #$80
         sta     $db60
-        jsr     $02f2       ; wait one frame
-        jsr     $8d47       ; get graphics script parameter 3
+        jsr     _c102f2       ; wait one frame
+        jsr     _c18d47       ; get graphics script parameter 3
         longa
         sec
         sbc     #$005f
@@ -24737,8 +24825,8 @@ _c1b4a2:
         shorta0
         lda     $70
         pha
-        jsr     $2736
-        jsr     $26fb
+        jsr     _c12736
+        jsr     _c126fb
         pla
         pha
         asl2
@@ -24766,10 +24854,10 @@ _c1b4a2:
         tax
         lda     f:_c1b3e9,x
         bne     @b530
-        jsr     $b40a
+        jsr     _c1b40a
         bra     @b534
 @b530:  clr_a
-        jsr     $b3fe
+        jsr     _c1b3fe
 @b534:  plx
         rts
 
@@ -24783,7 +24871,7 @@ _c1b536:
         jne     _c1b442
         lda     ($eb)
         jmi     @b573
-        jsr     $8d47       ; get graphics script parameter 3
+        jsr     _c18d47       ; get graphics script parameter 3
         ldx     #$0100
         cmp     #$12
         bcc     @b574
@@ -24824,27 +24912,27 @@ _c1b536:
 
 _c1b58b:
 @b58b:  stz     $f86d
-        jsr     $a847       ; load attack animation properties
+        jsr     _c1a847       ; load attack animation properties
         lda     $f582
         sta     $d1bc
-        jsr     $8d2f       ; get attacker id
+        jsr     _c18d2f       ; get attacker id
         asl5
         tax
         phx
         lda     #$0b
         sta     $cf58,x
-        jsr     $8d2f       ; get attacker id
-        jsr     $fc74
+        jsr     _c18d2f       ; get attacker id
+        jsr     _c1fc74
         sta     $db53
         sta     $db52
         stz     $db50
         stz     $db51
         stz     $db54
-        jsr     $c0d5
+        jsr     _c1c0d5
         lda     $d1bc
         and     #$3f
         beq     @b5c8
-        jsr     $b633
+        jsr     _c1b633
 @b5c8:  lda     $d1bc
         and     #$3f
         cmp     #$02
@@ -24875,22 +24963,22 @@ _c1b58b:
         tay
         cmp     #$80
         bne     @b5f1
-@b602:  jsr     $e810
-        jsr     $e81e
+@b602:  jsr     _c1e810
+        jsr     _c1e81e
         inc     $d110
 @b60b:  lda     #$01
         sta     $db38
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         clr_ax
         lda     #$08
-        jsr     $c409
+        jsr     _c1c409
         lda     $74
         cmp     #$08
         bne     @b60b
         stz     $d110
         stz     $db38
-        jsr     $67d3
-        jsr     $02f2       ; wait one frame
+        jsr     _c167d3
+        jsr     _c102f2       ; wait one frame
         plx
         stz     $cf58,x
         jmp     _c1fc6d
@@ -24898,7 +24986,7 @@ _c1b58b:
 ; ---------------------------------------------------------------------------
 
 _c1b633:
-@b633:  jsr     $8d2f       ; get attacker id
+@b633:  jsr     _c18d2f       ; get attacker id
         asl4
         tax
         stx     $70
@@ -24940,17 +25028,19 @@ _c1b660:
 ; [  ]
 
 _c1b677:
-        jsr     $b660
+        jsr     _c1b660
         stz     $db6b
         stz     $db77
         stz     $dbdf
-        jsr     $9d93       ; wait for damage numerals
-        jsr     $8d47       ; get graphics script parameter 3
-        jsr     $b536
+        jsr     _c19d93       ; wait for damage numerals
+        jsr     _c18d47       ; get graphics script parameter 3
+        jsr     _c1b536
+
+_c1b68c:
         stz     $db6b
         stz     $db77
-        jsr     $9d93       ; wait for damage numerals
-        jsr     $8d47       ; get graphics script parameter 3
+        jsr     _c19d93       ; wait for damage numerals
+        jsr     _c18d47       ; get graphics script parameter 3
         tax
         stz     $db6a
 ; fallthrough
@@ -24965,8 +25055,8 @@ _c1b69c:
 @b6a8:  inc     $db77
         stz     $f86a
         stz     $f86b
-        jsr     $a847       ; load attack animation properties
-        jsr     $b300
+        jsr     _c1a847       ; load attack animation properties
+        jsr     _c1b300
         lda     $f582
         sta     $d1bc
         and     #$3f
@@ -24976,7 +25066,7 @@ _c1b69c:
         sta     $70
         lda     f:_c1b746+1,x
         sta     $71
-        jsr     $b742
+        jsr     _c1b742
         ldx     $f86a
         bne     @b69c
         lda     $db61
@@ -24984,18 +25074,18 @@ _c1b69c:
         stz     $f8b4
         lda     #$80
         sta     $db60
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         lda     #$10
         sta     $bc85
         lda     #$1f
         sta     $f86c
-        jsr     $b3fe
-        jsr     $24d5
-        jsr     $b40a
+        jsr     _c1b3fe
+        jsr     _c124d5
+        jsr     _c1b40a
         clr_a
         stz     $7e
-        jsr     $7b43
-@b6fe:  jsr     $02f2       ; wait one frame
+        jsr     _c17b43
+@b6fe:  jsr     _c102f2       ; wait one frame
         lda     $d0ee
         bne     @b6fe
         stz     $db60
@@ -25011,27 +25101,30 @@ _c1b69c:
         bne     @b733
         inc     $f86d
         ldx     $f86e
-        jsr     $8d41
+        jsr     _c18d41
         jne     @b6a8
 @b733:  stz     $dbdf
         stz     $bc85
-        jsr     $ad2d
-        jsr     $1cb8
+        jsr     _c1ad2d
+        jsr     _c11cb8
         jmp     _c13cbb
-@b742:  jmp     ($0070)
+
+_c1b742:
+        jmp     ($0070)
+_c1b745:
         rts
 
 ; ---------------------------------------------------------------------------
 
 _c1b746:
-        .addr   $e82f,$e82f,$e82f,$e82f,$e82f,$e82f,$e82f,$e82f ; $00
-        .addr   $e82f,$e82f,$e82f,$e82f,$e82f,$e92c,$e82f,$e92c
-        .addr   $e82f,$e82f,$e82f,$e82f,$e82f,$e82f,$e82f,$e82f ; $10
-        .addr   $e962,$e82f,$e82f,$e92c,$e82f,$e82f,$e82f,$e92c
-        .addr   $e92c,$e92c,$e92c,$d2d0,$e82f,$e92c,$e92c,$e82f ; $20
-        .addr   $e82f,$e82f,$e82f,$e82f,$e92c,$e92c,$e82f,$e82f
-        .addr   $e92c,$e82f,$e82f,$e82f,$e82f,$e82f,$e82f,$e92c ; $30
-        .addr   $e82f,$b745,$b745
+        .addr   _c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f ; $00
+        .addr   _c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e92c,_c1e82f,_c1e92c
+        .addr   _c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f ; $10
+        .addr   _c1e962,_c1e82f,_c1e82f,_c1e92c,_c1e82f,_c1e82f,_c1e82f,_c1e92c
+        .addr   _c1e92c,_c1e92c,_c1e92c,_c1d2d0,_c1e82f,_c1e92c,_c1e92c,_c1e82f ; $20
+        .addr   _c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e92c,_c1e92c,_c1e82f,_c1e82f
+        .addr   _c1e92c,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e82f,_c1e92c ; $30
+        .addr   _c1e82f,_c1b745,_c1b745
 
 ; ---------------------------------------------------------------------------
 
@@ -25064,7 +25157,7 @@ _c1b7bc:
         and     #$7f
         ora     $70
         sta     $db50
-        jsr     $8d41
+        jsr     _c18d41
         sta     $db53
         stz     $db54
 @b801:  lda     $d1bc
@@ -25084,7 +25177,7 @@ _c1b7bc:
         beq     @b827
         lda     #$80
 @b827:  sta     $db53
-@b82a:  jsr     $c0d5
+@b82a:  jsr     _c1c0d5
         jmp     _c1b830
 
 ; ---------------------------------------------------------------------------
@@ -25110,14 +25203,14 @@ _c1b846:
 ; ---------------------------------------------------------------------------
 
 _c1b847:
-        .addr   $b846,$bf29,$bf3f,$bf5b,$bf85,$c035,$c050,$c031 ; $00
-        .addr   $bf3f,$bee8,$bebd,$bea7,$be5a,$bdec,$c02c,$bdbc
-        .addr   $be42,$bcde,$bcdb,$bf39,$bfa2,$bec9,$bf1d,$bcbd ; $10
-        .addr   $bd23,$bc97,$bc75,$bc2d,$bcbd,$bbef,$bc0f,$bbda
-        .addr   $bbb8,$bb8e,$bb59,$d2d0,$bb2b,$baf6,$ba65,$ba3d ; $20
-        .addr   $ba22,$ba12,$b846,$b846,$b9f6,$b9cb,$b9af,$b961
-        .addr   $b9f0,$b989,$bfcb,$bfe1,$c019,$bff7,$c008,$b8bc ; $30
-        .addr   $b8b9
+        .addr   _c1b846,_c1bf29,_c1bf3f,_c1bf5b,_c1bf85,_c1c035,_c1c050,_c1c031 ; $00
+        .addr   _c1bf3f,_c1bee8,_c1bebd,_c1bea7,_c1be5a,_c1bdec,_c1c02c,_c1bdbc
+        .addr   _c1be42,_c1bcde,_c1bcdb,_c1bf39,_c1bfa2,_c1bec9,_c1bf1d,_c1bcbd ; $10
+        .addr   _c1bd23,_c1bc97,_c1bc75,_c1bc2d,_c1bcbd,_c1bbef,_c1bc0f,_c1bbda
+        .addr   _c1bbb8,_c1bb8e,_c1bb59,_c1d2d0,_c1bb2b,_c1baf6,_c1ba65,_c1ba3d ; $20
+        .addr   _c1ba22,_c1ba12,_c1b846,_c1b846,_c1b9f6,_c1b9cb,_c1b9af,_c1b961
+        .addr   _c1b9f0,_c1b989,_c1bfcb,_c1bfe1,_c1c019,_c1bff7,_c1c008,_c1b8bc ; $30
+        .addr   _c1b8b9
 
 ; ---------------------------------------------------------------------------
 
@@ -25127,11 +25220,11 @@ _c1b8b9:
 ; ---------------------------------------------------------------------------
 
 _c1b8bc:
-        jsr     $c099
+        jsr     _c1c099
         jsr     _c1bf0d
-        jsr     $bdbf
+        jsr     _c1bdbf
         clr_ax
-@b8c7:  jsr     $fc96       ; generate random number
+@b8c7:  jsr     _c1fc96       ; generate random number
         sta     $ce7b,x
         inx
         cpx     #$0040
@@ -25247,9 +25340,9 @@ _c1b989:
 ; ---------------------------------------------------------------------------
 
 _c1b9af:
-        jsr     $c099
+        jsr     _c1c099
         ldy     #$0040
-        jsr     $c077
+        jsr     _c1c077
         lda     #$21
         sta     $d3de
         lda     #$01
@@ -25261,11 +25354,11 @@ _c1b9af:
 ; ---------------------------------------------------------------------------
 
 _c1b9cb:
-        jsr     $c099
+        jsr     _c1c099
         jsr     _c1bf10
-        jsr     $bdbf
+        jsr     _c1bdbf
 _b9d4:  clr_ax
-@b9d6:  jsr     $fc96       ; generate random number
+@b9d6:  jsr     _c1fc96       ; generate random number
         and     #$07
         inc
         sta     $d3de,x
@@ -25282,13 +25375,13 @@ _b9d4:  clr_ax
 ; ---------------------------------------------------------------------------
 
 _c1b9f0:
-        jsr     $b9f6
+        jsr     _c1b9f6
         jmp     _b9d4
 
 ; ---------------------------------------------------------------------------
 
 _c1b9f6:
-@b9f6:  jsr     $bdbf
+@b9f6:  jsr     _c1bdbf
         clr_ax
 @b9fb:  stz     $d467,x
         stz     $d567,x
@@ -25305,7 +25398,7 @@ _c1b9f6:
 ; ---------------------------------------------------------------------------
 
 _c1ba12:
-        jsr     $c099
+        jsr     _c1c099
         jsr     _c1bf0a
         lda     $d3de
         clc
@@ -25318,7 +25411,7 @@ _c1ba12:
 _c1ba22:
         lda     ($eb)
         bmi     @ba3c
-        jsr     $c099
+        jsr     _c1c099
         jsr     _c1bf07
         lda     #$f8
         longa
@@ -25332,7 +25425,7 @@ _c1ba22:
 ; ---------------------------------------------------------------------------
 
 _c1ba3d:
-        jsr     $c099
+        jsr     _c1c099
         jsr     _c1bf0d
         lda     #$00
         sta     $ce8b
@@ -25354,8 +25447,8 @@ _c1ba3d:
 ; ---------------------------------------------------------------------------
 
 _c1ba65:
-        jsr     $c099
-        jsr     $bdbf
+        jsr     _c1c099
+        jsr     _c1bdbf
         clr_ax
         stz     $70
 @ba6f:  lda     $70
@@ -25407,7 +25500,7 @@ _c1ba9a:
         lda     $d5de,x
         sta     $a9
         phx
-        jsr     $0a6e
+        jsr     _c10a6e
         plx
         lda     $ae
         sta     $d3e3,x
@@ -25428,9 +25521,9 @@ _c1ba9a:
 ; ---------------------------------------------------------------------------
 
 _c1baf6:
-        jsr     $c099
-        jsr     $ba9a
-        jsr     $bdbf
+        jsr     _c1c099
+        jsr     _c1ba9a
+        jsr     _c1bdbf
         clr_ax
         stz     $70
 @bb03:  lda     $70
@@ -25456,9 +25549,9 @@ _c1baf6:
 ; ---------------------------------------------------------------------------
 
 _c1bb2b:
-        jsr     $c099
+        jsr     _c1c099
         ldy     #$0080
-        jsr     $c077
+        jsr     _c1c077
         clr_ax
         stz     $70
 @bb38:  lda     $70
@@ -25466,7 +25559,7 @@ _c1bb2b:
         adc     #$02
         sta     $d3de,x
         sta     $70
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $d5e1,x
         longa
         txa
@@ -25481,8 +25574,8 @@ _c1bb2b:
 ; ---------------------------------------------------------------------------
 
 _c1bb59:
-        jsr     $c099
-        jsr     $bdbf
+        jsr     _c1c099
+        jsr     _c1bdbf
         clr_ax
 @bb61:  stz     $d467,x
         stz     $d567,x
@@ -25511,7 +25604,7 @@ _c1bb59:
 ; ---------------------------------------------------------------------------
 
 _c1bb8e:
-        jsr     $bdbf
+        jsr     _c1bdbf
         clr_ax
 @bb93:  lda     #$02
         sta     $d3de,x
@@ -25535,10 +25628,10 @@ _c1bb8e:
 ; ---------------------------------------------------------------------------
 
 _c1bbb8:
-        jsr     $c099
-        jsr     $bdbf
+        jsr     _c1c099
+        jsr     _c1bdbf
         clr_ax
-@bbc0:  jsr     $fc96       ; generate random number
+@bbc0:  jsr     _c1fc96       ; generate random number
         and     #$07
         inc
         sta     $d3de,x
@@ -25555,15 +25648,15 @@ _c1bbb8:
 ; ---------------------------------------------------------------------------
 
 _c1bbda:
-        jsr     $c099
-        jsr     $bbe6
+        jsr     _c1c099
+        jsr     _c1bbe6
         jsr     _c1bf10
         jmp     _c1bdbf
 
 ; ---------------------------------------------------------------------------
 
 _c1bbe6:
-@bbe6:  jsr     $8d3b
+@bbe6:  jsr     _c18d3b
         bne     @bbee
         jsr     _c1bf04
 @bbee:  rts
@@ -25571,7 +25664,7 @@ _c1bbe6:
 ; ---------------------------------------------------------------------------
 
 _c1bbef:
-        jsr     $bf39
+        jsr     _c1bf39
         longa
         lda     $f586
         inc
@@ -25598,17 +25691,17 @@ _c1bc0f:
         sta     $d43a
         shorta0
         stz     $d440
-        jsr     $bbe6
+        jsr     _c1bbe6
         jmp     _c1bf19
 
 ; ---------------------------------------------------------------------------
 
 _c1bc2d:
-        jsr     $c099
+        jsr     _c1c099
         jsr     _c1bf04
-        jsr     $8d3b
+        jsr     _c18d3b
         beq     @bc74
-        jsr     $bdbf
+        jsr     _c1bdbf
         inc     $d3e7
         lda     #$01
         sta     $d3de
@@ -25622,7 +25715,7 @@ _c1bc2d:
         shorta0
         ldx     #$0080
 @bc58:  inc     $d3e7,x
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$0f
         inc
         sta     $d3de,x
@@ -25639,9 +25732,9 @@ _c1bc2d:
 ; ---------------------------------------------------------------------------
 
 _c1bc75:
-        jsr     $bf29
-        jsr     $c035
-        jsr     $bbe6
+        jsr     _c1bf29
+        jsr     _c1c035
+        jsr     _c1bbe6
         longa
         lda     $f586
         inc
@@ -25657,7 +25750,7 @@ _c1bc75:
 ; ---------------------------------------------------------------------------
 
 _c1bc97:
-        jsr     $c099
+        jsr     _c1c099
         longa
         lda     $f586
         inc
@@ -25679,7 +25772,7 @@ _c1bc97:
 ; ---------------------------------------------------------------------------
 
 _c1bcbd:
-        jsr     $c099
+        jsr     _c1c099
         longa
         lda     $f586
         inc
@@ -25700,12 +25793,12 @@ _c1bcdb:
 ; ---------------------------------------------------------------------------
 
 _c1bcde:
-        jsr     $bd5f
-        jsr     $014c
+        jsr     _c1bd5f
+        jsr     _c1014c
         ldx     $e9
         stx     $70
         clr_axy
-@bceb:  jsr     $bda1
+@bceb:  jsr     _c1bda1
         cmp     #$08
         bcc     @bcf7
         sec
@@ -25726,22 +25819,22 @@ _c1bcde:
         inx
         cpx     #$0008
         bne     @bceb
-        jsr     $8d3b
+        jsr     _c18d3b
         beq     @bd22
         lda     #$ef
         sta     $7e
         clr_a
-        jsr     $7b02
+        jsr     _c17b02
 @bd22:  rts
 
 ; ---------------------------------------------------------------------------
 
 _c1bd23:
-        jsr     $c02c
+        jsr     _c1c02c
         jsr     _c1bf04
-        jsr     $8d3b
+        jsr     _c18d3b
         beq     @bd5e
-        jsr     $bdbf
+        jsr     _c1bdbf
         inc     $d3e7
         inc     $d3f7
         longa
@@ -25787,7 +25880,7 @@ _c1bd5f:
         bne     @bd76
         shorta0
         lda     #$10
-        jsr     $fc57
+        jsr     _c1fc57
 @bd90:  lda     $d1e7
         ora     #$20
         sta     $d1e7
@@ -25846,7 +25939,7 @@ _c1bdbf:
 ; ---------------------------------------------------------------------------
 
 _c1bdec:
-        jsr     $bdbf
+        jsr     _c1bdbf
         clr_ax
 @bdf1:  lda     $d3de,x
         inc2
@@ -25888,7 +25981,7 @@ _c1bdec:
 ; ---------------------------------------------------------------------------
 
 _c1be42:
-        jsr     $c099
+        jsr     _c1c099
         longa
         lda     $f586
         inc
@@ -25940,9 +26033,9 @@ _c1be5a:
 ; ---------------------------------------------------------------------------
 
 _c1bea7:
-        jsr     $c099
+        jsr     _c1c099
         ldy     #$0040
-        jsr     $c077
+        jsr     _c1c077
         lda     #$08
         sta     $d3de
         lda     #$10
@@ -25952,15 +26045,15 @@ _c1bea7:
 ; ---------------------------------------------------------------------------
 
 _c1bebd:
-        jsr     $c099
+        jsr     _c1c099
         ldy     #$0020
-        jsr     $c077
+        jsr     _c1c077
         jmp     _c1bf07
 
 ; ---------------------------------------------------------------------------
 
 _c1bec9:
-        jsr     $c099
+        jsr     _c1c099
         jsr     _c1bf04
         lda     #$08
         sta     $d3de
@@ -25976,9 +26069,9 @@ _c1bec9:
 ; ---------------------------------------------------------------------------
 
 _c1bee8:
-        jsr     $c099
+        jsr     _c1c099
         ldy     #$0060
-        jsr     $c077
+        jsr     _c1c077
         jsr     _c1bf0d
         lda     #$08
         sta     $d3de
@@ -26016,15 +26109,15 @@ _c1bf19:
 ; ---------------------------------------------------------------------------
 
 _c1bf1d:
-        jsr     $c099
+        jsr     _c1c099
         ldy     #$0080
-        jsr     $c077
+        jsr     _c1c077
         jmp     _bf2c
 
 ; ---------------------------------------------------------------------------
 
 _c1bf29:
-@bf29:  jsr     $c099
+@bf29:  jsr     _c1c099
 _bf2c:  stz     $d3e7
         stz     $d407
         stz     $d427
@@ -26040,10 +26133,10 @@ _c1bf39:
 ; ---------------------------------------------------------------------------
 
 _c1bf3f:
-@bf3f:  jsr     $c099
+@bf3f:  jsr     _c1c099
         clr_ax
 @bf44:  phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$1f
         bne     @bf4d
         inc
@@ -26060,7 +26153,7 @@ _c1bf3f:
 ; ---------------------------------------------------------------------------
 
 _c1bf5b:
-        jsr     $bf29
+        jsr     _c1bf29
         longa
         lda     $f586
         asl
@@ -26079,7 +26172,7 @@ _c1bf5b:
 ; ---------------------------------------------------------------------------
 
 _c1bf85:
-        jsr     $c099
+        jsr     _c1c099
         clr_ax
         lda     #$10
 @bf8c:  sta     $d3de,x
@@ -26098,8 +26191,8 @@ _c1bf85:
 ; ---------------------------------------------------------------------------
 
 _c1bfa2:
-        jsr     $c099
-        jsr     $bbe6
+        jsr     _c1c099
+        jsr     _c1bbe6
         jmp     _c1bf10
 
 ; ---------------------------------------------------------------------------
@@ -26127,9 +26220,9 @@ _c1bfcb:
         beq     @bfdb
         longa
         lda     #$0033
-        jsr     $bfab
+        jsr     _c1bfab
         shorta
-@bfdb:  jsr     $c099
+@bfdb:  jsr     _c1c099
         jmp     _c1bf10
 
 ; ---------------------------------------------------------------------------
@@ -26140,9 +26233,9 @@ _c1bfe1:
         beq     @bff1
         longa
         lda     #$00fe
-        jsr     $bfab
+        jsr     _c1bfab
         shorta
-@bff1:  jsr     $c099
+@bff1:  jsr     _c1c099
         jmp     _c1bf10
 
 ; ---------------------------------------------------------------------------
@@ -26153,7 +26246,7 @@ _c1bff7:
         beq     @c007
         longa
         lda     #$00ff
-        jsr     $bfab
+        jsr     _c1bfab
         shorta
 @c007:  rts
 
@@ -26165,7 +26258,7 @@ _c1c008:
         beq     @c018
         longa
         lda     #$0100
-        jsr     $bfab
+        jsr     _c1bfab
         shorta
 @c018:  rts
 
@@ -26177,14 +26270,14 @@ _c1c019:
         beq     @c029
         longa
         lda     #$0038
-        jsr     $bfab
+        jsr     _c1bfab
         shorta
 @c029:  jmp     _c1c02c
 
 ; ---------------------------------------------------------------------------
 
 _c1c02c:
-@c02c:  jsr     $c099
+@c02c:  jsr     _c1c099
         bra     _c035
 
 _c1c031:
@@ -26206,10 +26299,10 @@ _c037:  sta     $d3de
 ; ---------------------------------------------------------------------------
 
 _c1c050:
-        jsr     $c099
+        jsr     _c1c099
         ldy     #$0040
-        jsr     $c077
-        jsr     $bf10
+        jsr     _c1c077
+        jsr     _c1bf10
         jmp     _c1c05f
 
 ; ---------------------------------------------------------------------------
@@ -26256,7 +26349,7 @@ _c1c077:
 
 _c1c099:
 @c099:  lda     $db53
-        jsr     $fc7a
+        jsr     _c1fc7a
         asl4
         tax
         stx     $70
@@ -26330,7 +26423,7 @@ _c1c0d5:
         lsr4
         inc
         sta     $d3dd,x     ; set frame duration
-        jsr     $c266
+        jsr     _c1c266
         sta     $d3de,x
         lda     [$74],y
         and     #$0f
@@ -26361,7 +26454,7 @@ _c1c0d5:
         bne     @c184
         plx
         jmp     @c1c0
-@c184:  jsr     $fc7a
+@c184:  jsr     _c1fc7a
         plx
         sta     $72
         lda     $d3e2,x
@@ -26380,8 +26473,8 @@ _c1c0d5:
         sta     $d1e5,x
         lda     $d3d9,x
         sta     $d1e6,x
-        jsr     $c35d
-        jsr     $c296
+        jsr     _c1c35d
+        jsr     _c1c296
         bra     @c1c3
 @c1c0:  stz     $d3e7,x
 @c1c3:  txa
@@ -26392,7 +26485,7 @@ _c1c0d5:
         lda     $71
         cmp     #$08
         jne     @c0de
-        jsr     $c20d
+        jsr     _c1c20d
         jmp     _c1c1d9
 
 ; ---------------------------------------------------------------------------
@@ -26454,7 +26547,7 @@ _c1c20d:
         sta     $dad9,x
         lda     $d042,y
         sta     $dada,x
-        jsr     $c266
+        jsr     _c1c266
         sta     $dadc,x
         lda     #$3c
         sta     $dadd,x
@@ -26583,7 +26676,7 @@ _c1c296:
         sbc     #$00
         sta     $d5df,x
 @c348:  phx
-        jsr     $0a6e
+        jsr     _c10a6e
         plx
         lda     $ae
         sta     $d3e3,x
@@ -26710,12 +26803,12 @@ _c1c409:
         ldy     $f586
         cpy     #$0094
         bne     @c469
-        jsr     $8d3b
+        jsr     _c18d3b
         bne     @c461
         lda     #$49
         bra     @c464
 @c461:  lda     $f583       ; animation sound effect
-@c464:  jsr     $fbe4       ; play animation sound effect
+@c464:  jsr     _c1fbe4       ; play animation sound effect
         bra     @c488
 @c469:  lda     $dbdf
         beq     @c472
@@ -26729,7 +26822,7 @@ _c1c409:
 @c47d:  lda     #$dd
 @c47f:  sta     $dbb6
         lda     $f583
-        jsr     $fbd9       ; play sound effect
+        jsr     _c1fbd9       ; play sound effect
 @c488:  ply
         iny
 @c48a:  lda     [$70],y
@@ -26751,7 +26844,7 @@ _c1c409:
         sta     $d3df,x     ; save animation script offset
         stz     $db5f
         bra     @c4dc
-@c4b2:  jsr     $c4fd       ; execute animation command
+@c4b2:  jsr     _c1c4fd       ; execute animation command
         iny
         bra     @c48a
 @c4b8:  tya
@@ -26779,7 +26872,7 @@ _c1c409:
         jne     @c40d
         lda     $dba4
         beq     @c4fc
-        jsr     $1d65
+        jsr     _c11d65
         inc     $db42
         stz     $dba4
 @c4fc:  rts
@@ -26804,22 +26897,22 @@ _c1c4fd:
 
 ; animation command jump table (commands $80-$fe)
 _c1c512:
-        .addr   $df24,$deb3,$deb9,$dc04,$debf,$dec5,$decb,$e64f ; $80
-        .addr   $e76a,$e774,$e77b,$e791,$da13,$e80f,$e635,$e80f
-        .addr   $e2aa,$e27b,$e30a,$e59a,$e425,$e46a,$e2db,$e5cf ; $90
-        .addr   $e612,$e61d,$e09c,$e108,$e0ff,$e1cb,$e0ff,$e145
-        .addr   $e326,$e51b,$fc64,$fc6d,$e096,$e3ec,$e086,$e3a4 ; $a0
-        .addr   $e4de,$e058,$e022,$dfe0,$e203,$e184,$de8d,$de62
-        .addr   $de08,$dd98,$ddb4,$ddd0,$ddec,$de3b,$dd48,$dd72 ; $b0
-        .addr   $dcdf,$dd15,$dca7,$dc74,$d2d0,$dc4d,$dc3b,$e372
-        .addr   $dbf0,$dbd6,$dbe3,$dba9,$d2d0,$db9c,$e340,$e551 ; $c0
-        .addr   $db7d,$db8d,$db54,$db67,$db2b,$dae4,$da59,$dac2
-        .addr   $da2c,$da04,$d9ed,$d9b5,$d99a,$d990,$d903,$d8bf ; $d0
-        .addr   $d8d1,$d895,$d83b,$d7e6,$d7d0,$d7ad,$d789,$d777
-        .addr   $d780,$d742,$d723,$d6f3,$d6c1,$d665,$d62b,$d610 ; $e0
-        .addr   $d589,$d5b1,$d536,$d4f1,$d4d0,$d476,$d41d,$d3e2
-        .addr   $d34a,$d2d0,$d281,$d272,$d5e9,$d1b9,$d1cf,$df9e ; $f0
-        .addr   $c75b,$c740,$c6e3,$c625,$c616,$c610,$b745
+        .addr   _c1df24,_c1deb3,_c1deb9,_c1dc04,_c1debf,_c1dec5,_c1decb,_c1e64f ; $80
+        .addr   _c1e76a,_c1e774,_c1e77b,_c1e791,_c1da13,_c1e80f,_c1e635,_c1e80f
+        .addr   _c1e2aa,_c1e27b,_c1e30a,_c1e59a,_c1e425,_c1e46a,_c1e2db,_c1e5cf ; $90
+        .addr   _c1e612,_c1e61d,_c1e09c,_c1e108,_c1e0ff,_c1e1cb,_c1e0ff,_c1e145
+        .addr   _c1e326,_c1e51b,_c1fc64,_c1fc6d,_c1e096,_c1e3ec,_c1e086,_c1e3a4 ; $a0
+        .addr   _c1e4de,_c1e058,_c1e022,_c1dfe0,_c1e203,_c1e184,_c1de8d,_c1de62
+        .addr   _c1de08,_c1dd98,_c1ddb4,_c1ddd0,_c1ddec,_c1de3b,_c1dd48,_c1dd72 ; $b0
+        .addr   _c1dcdf,_c1dd15,_c1dca7,_c1dc74,_c1d2d0,_c1dc4d,_c1dc3b,_c1e372
+        .addr   _c1dbf0,_c1dbd6,_c1dbe3,_c1dba9,_c1d2d0,_c1db9c,_c1e340,_c1e551 ; $c0
+        .addr   _c1db7d,_c1db8d,_c1db54,_c1db67,_c1db2b,_c1dae4,_c1da59,_c1dac2
+        .addr   _c1da2c,_c1da04,_c1d9ed,_c1d9b5,_c1d99a,_c1d990,_c1d903,_c1d8bf ; $d0
+        .addr   _c1d8d1,_c1d895,_c1d83b,_c1d7e6,_c1d7d0,_c1d7ad,_c1d789,_c1d777
+        .addr   _c1d780,_c1d742,_c1d723,_c1d6f3,_c1d6c1,_c1d665,_c1d62b,_c1d610 ; $e0
+        .addr   _c1d589,_c1d5b1,_c1d536,_c1d4f1,_c1d4d0,_c1d476,_c1d41d,_c1d3e2
+        .addr   _c1d34a,_c1d2d0,_c1d281,_c1d272,_c1d5e9,_c1d1b9,_c1d1cf,_c1df9e ; $f0
+        .addr   _c1c75b,_c1c740,_c1c6e3,_c1c625,_c1c616,_c1c610,_c1b745
 
 ; ---------------------------------------------------------------------------
 
@@ -26829,6 +26922,10 @@ _c1c610:
         iny
         lda     [$70],y
         jmp     _c1fbd9       ; play sound effect
+
+; ---------------------------------------------------------------------------
+
+_c1c616:
         phx
         lda     $d3e2,x
         and     #$03
@@ -26998,7 +27095,7 @@ _c1c740:
         iny
         lda     [$70],y
         ora     #$58
-        sta     f:$002107
+        sta     f:hBG1SC
         rts
 
 ; ---------------------------------------------------------------------------
@@ -27030,11 +27127,11 @@ _c1c75b:
 ; ---------------------------------------------------------------------------
 
 _c1c76b:
-        .addr   $e0fc,$d1ed,$d195,$d1a7,$caa4,$d2d0,$ca9b,$ca55
-        .addr   $c9fd,$ca0a,$c9f4,$c9dc,$c9b9,$c9a3,$c9a0,$c997
-        .addr   $c98b,$c984,$c959,$c83d,$c907,$c8d3,$c891,$c867
-        .addr   $c830,$c7f8,$c7e8,$c7c1,$c7b5,$c6a1,$c6ce,$de78
-        .addr   $c7af,$dcbc
+        .addr   _c1e0fc,_c1d1ed,_c1d195,_c1d1a7,_c1caa4,_c1d2d0,_c1ca9b,_c1ca55
+        .addr   _c1c9fd,_c1ca0a,_c1c9f4,_c1c9dc,_c1c9b9,_c1c9a3,_c1c9a0,_c1c997
+        .addr   _c1c98b,_c1c984,_c1c959,_c1c83d,_c1c907,_c1c8d3,_c1c891,_c1c867
+        .addr   _c1c830,_c1c7f8,_c1c7e8,_c1c7c1,_c1c7b5,_c1c6a1,_c1c6ce,_c1de78
+        .addr   _c1c7af,_c1dcbc
 
 ; ---------------------------------------------------------------------------
 
@@ -27066,7 +27163,7 @@ _c1c7c1:
         lsr4
         tax
         shorta0
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$07
         clc
         adc     #$04
@@ -27105,7 +27202,7 @@ _c1c7f8:
         lda     $db9c,x
         eor     #$03
         sta     $db9c,x
-        jsr     $1cb8
+        jsr     _c11cb8
         longa
         ldy     #$000c
 @c822:  pla
@@ -27188,7 +27285,7 @@ _c1c891:
         lda     $d5de,x
         sta     $a9
         phx
-        jsr     $0a6e
+        jsr     _c10a6e
         plx
         lda     $ae
         sta     $d3e3,x
@@ -27247,7 +27344,7 @@ _c1c907:
 @c921:  sta     $d1df,x
         sta     $a8
         stz     $d1e0,x
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$7f
         clc
         adc     #$18
@@ -27257,7 +27354,7 @@ _c1c907:
         stz     $d1dc,x
         stz     $d1dd,x
         phx
-        jsr     $0a6e
+        jsr     _c10a6e
         plx
         lda     $ae
         sta     $d3e3,x
@@ -27273,7 +27370,7 @@ _c1c907:
 
 _c1c959:
         phx
-        jsr     $db18
+        jsr     _c1db18
         phx
         ldx     $78
         cpx     #$0100
@@ -27312,7 +27409,7 @@ _c1c98b:
 ; ---------------------------------------------------------------------------
 
 _c1c997:
-        jsr     $d7e6
+        jsr     _c1d7e6
         lda     #$10
         sta     $d1df,x
         rts
@@ -27326,7 +27423,7 @@ _c1c9a0:
 
 _c1c9a3:
         phx
-        jsr     $e0ff
+        jsr     _c1e0ff
         txa
         lsr4
         tax
@@ -27339,7 +27436,7 @@ _c1c9a3:
 ; ---------------------------------------------------------------------------
 
 _c1c9b9:
-        jsr     $cfc9
+        jsr     _c1cfc9
         jmp     _c1e0ff
 
 ; ---------------------------------------------------------------------------
@@ -27364,19 +27461,19 @@ _c1c9bf:
 ; ---------------------------------------------------------------------------
 
 _c1c9dc:
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $d5e1,x
-        jsr     $c9bf
+        jsr     _c1c9bf
         sta     $d3e6,x
         lda     $d3e3,x
         sta     $d7e1,x
-        jsr     $cfec
+        jsr     _c1cfec
         jmp     _c1e0ff
 
 ; ---------------------------------------------------------------------------
 
 _c1c9f4:
-        jsr     $c9fd
+        jsr     _c1c9fd
         lda     #$08
         sta     $d3e6,x
         rts
@@ -27384,7 +27481,7 @@ _c1c9f4:
 ; ---------------------------------------------------------------------------
 
 _c1c9fd:
-@c9fd:  jsr     $ca81
+@c9fd:  jsr     _c1ca81
         inc     $d7e1,x
         lda     $d3e3,x
         sta     $d7e2,x
@@ -27416,7 +27513,7 @@ _c1ca0a:
         sta     $d64e
         shorta0
         lda     #$20
-        jsr     $ca66
+        jsr     _c1ca66
         lda     #$08
         sta     $d3e6,x
         rts
@@ -27426,12 +27523,14 @@ _c1ca0a:
 _c1ca55:
         lda     #$10
         sta     $f8b2
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$0f
         sec
         sbc     #$88
         clc
         adc     $d3e3,x
+
+_c1ca66:
 @ca66:  sta     $d3e3,x
         sta     $d7e2,x
         sta     $d3f3
@@ -27441,6 +27540,8 @@ _c1ca55:
         sta     $d433
         sta     $d443
         sta     $d453
+
+_c1ca81:
 @ca81:  lda     #$08
         sta     $d3e6,x
         longa
@@ -27455,7 +27556,7 @@ _c1ca55:
 ; ---------------------------------------------------------------------------
 
 _c1ca9b:
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$0f
         sta     $d5e4
         rts
@@ -27464,7 +27565,7 @@ _c1ca9b:
 
 _c1caa4:
         phx
-        jsr     $cadb
+        jsr     _c1cadb
         cpx     #$0010
         bcc     @cac2
         lda     #$40
@@ -27502,10 +27603,10 @@ _c1cadb:
 
 _c1caeb:
 @caeb:  ldx     $84
-        jsr     $09ca
+        jsr     _c109ca
         sta     $86
         ldx     $84
-        jsr     $09e5
+        jsr     _c109e5
         sta     $87
         ldx     $78
         lda     $86
@@ -27517,10 +27618,10 @@ _c1caeb:
 ; ---------------------------------------------------------------------------
 
 _c1cb06:
-        .addr   $d217,$d15a,$d2d0,$d147,$d0d5,$d0c3,$d0bf,$d02a
-        .addr   $d01d,$cfd9,$cf56,$cf07,$cef6,$ceda,$dbf7,$c74a
-        .addr   $d2d0,$ceb9,$cde9,$cd92,$cd53,$cd34,$ccfd,$ccf6
-        .addr   $cce2,$cb88,$cb6a,$cb62,$cb5a,$cb56,$cb4f,$cb46
+        .addr   _c1d217,_c1d15a,_c1d2d0,_c1d147,_c1d0d5,_c1d0c3,_c1d0bf,_c1d02a
+        .addr   _c1d01d,_c1cfd9,_c1cf56,_c1cf07,_c1cef6,_c1ceda,_c1dbf7,_c1c74a
+        .addr   _c1d2d0,_c1ceb9,_c1cde9,_c1cd92,_c1cd53,_c1cd34,_c1ccfd,_c1ccf6
+        .addr   _c1cce2,_c1cb88,_c1cb6a,_c1cb62,_c1cb5a,_c1cb56,_c1cb4f,_c1cb46
 
 ; ---------------------------------------------------------------------------
 
@@ -27529,7 +27630,7 @@ _c1cb06:
 _c1cb46:
 @cb46:  lda     $f8c7
         bne     @cb4e
-        jsr     $78f5       ; flash screen
+        jsr     _c178f5       ; flash screen
 @cb4e:  rts
 
 ; ---------------------------------------------------------------------------
@@ -27570,7 +27671,7 @@ _c1cb6a:
         phx
         lda     $ee56
         beq     @cb76
-        jsr     $cb98
+        jsr     _c1cb98
         dec     $ee56
 @cb76:  plx
         rts
@@ -27582,7 +27683,7 @@ _c1cb78:
         lda     $ee56
         cmp     #$20
         beq     @cb86
-        jsr     $cbc9
+        jsr     _c1cbc9
         inc     $ee56
 @cb86:  plx
         rts
@@ -27594,7 +27695,7 @@ _c1cb88:
         lda     $ee56
         cmp     #$20
         beq     @cb96
-        jsr     $cb98
+        jsr     _c1cb98
         inc     $ee56
 @cb96:  plx
         rts
@@ -27608,13 +27709,13 @@ _c1cb98:
         and     #$00ff
         sta     $7e
         lda     $edf8,x
-        jsr     $cbe9
+        jsr     _c1cbe9
         sta     $7e8b,x
         lda     $ee56
         and     #$00ff
         sta     $7e
         lda     $ee18,x
-        jsr     $cbe9
+        jsr     _c1cbe9
         sta     $7eab,x
         inx2
         cpx     #$001e
@@ -27631,7 +27732,7 @@ _c1cbc9:
         and     #$00ff
         sta     $7e
         lda     $ee38,x
-        jsr     $cbe9
+        jsr     _c1cbe9
         sta     $7ecb,x
         inx2
         cpx     #$001e
@@ -27727,10 +27828,10 @@ _c1cc81:
         sec
         sbc     $cefb,x
         sta     $cebb,x
-        jsr     $09ca
+        jsr     _c109ca
         sta     $82
         ldx     $84
-        jsr     $09e5
+        jsr     _c109e5
         sta     $83
         ldx     $84
         lda     $ce7b,x
@@ -27757,11 +27858,11 @@ _c1cc81:
 ; ---------------------------------------------------------------------------
 
 _c1cce2:
-        jsr     $cc81
+        jsr     _c1cc81
         lda     $dbd0
         beq     @ccf5
         dey8
-        jsr     $cb46
+        jsr     _c1cb46
 @ccf5:  rts
 
 ; ---------------------------------------------------------------------------
@@ -27787,7 +27888,7 @@ _c1ccfd:
         bmi     @cd2d
         shorta0
         dey3
-        jsr     $e23b
+        jsr     _c1e23b
         inc     $d5e1,x
         lda     $d5e1,x
         and     #$06
@@ -27809,7 +27910,7 @@ _c1cd34:
         bne     @cd4b
         lda     $d3e2,x
         bpl     @cd51
-        jsr     $da89
+        jsr     _c1da89
         bcc     @cd51
 @cd4b:  dey4
         plx
@@ -27833,7 +27934,7 @@ _c1cd53:
         bmi     @cd8b
         shorta0
         dey3
-        jsr     $e0bc
+        jsr     _c1e0bc
         inc     $d5e1,x
         lda     $d5e1,x
         and     #$03
@@ -27863,19 +27964,19 @@ _c1cd92:
         bmi     @cdd6
         shorta0
         dey3
-        jsr     $e23b
+        jsr     _c1e23b
         inc     $d5e1,x
         lda     #$10
         sta     $80
         lda     $d5e1,x
         asl3
         phx
-        jsr     $0a00
+        jsr     _c10a00
         plx
         clc
         adc     $d5e3,x
         sta     $d1dd,x
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$03
         sta     $d1e3,x
 @cdd6:  shorta0
@@ -27905,7 +28006,7 @@ _c1cde9:
         cpy     #$000c
         bne     @cdf2
         shorta0
-        jsr     $cdda
+        jsr     _c1cdda
         lda     $cf45,y
         sta     $a6
         lda     $cf46,y
@@ -27914,20 +28015,20 @@ _c1cde9:
         sta     $a8
         lda     #$50
         sta     $a9
-        jsr     $0a6e
-        jsr     $09a7
+        jsr     _c10a6e
+        jsr     _c109a7
         clr_ax
         lda     $ae
-        jsr     $0996
+        jsr     _c10996
         stz     $cdfb
         stz     $ce3b
-@ce28:  jsr     $02f2       ; wait one frame
+@ce28:  jsr     _c102f2       ; wait one frame
         lda     $ce3b
         tax
         stx     $80
         lda     $cebb
-        jsr     $0b59
-        jsr     $cdda
+        jsr     _c10b59
+        jsr     _c1cdda
         longa
         lda     $84
         sta     $cf5d,y
@@ -27936,15 +28037,15 @@ _c1cde9:
         tax
         stx     $80
         lda     $ce7b
-        jsr     $0b59
-        jsr     $cdda
+        jsr     _c10b59
+        jsr     _c1cdda
         longa
         lda     $84
         sta     $cf5f,y
         shorta0
         clr_ax
         inc
-        jsr     $09b9
+        jsr     _c109b9
         longa
         lda     $af
         sec
@@ -27955,15 +28056,15 @@ _c1cde9:
         bpl     @ce28
         ldx     #$0020
 @ce77:  phx
-        jsr     $02f2       ; wait one frame
-        jsr     $cdda
+        jsr     _c102f2       ; wait one frame
+        jsr     _c1cdda
         lda     $cf62,y
         eor     #$80
         sta     $cf62,y
         plx
         dex
         bne     @ce77
-        jsr     $cdda
+        jsr     _c1cdda
         lda     $cf62,y
         ora     #$80
         sta     $cf62,y
@@ -28010,11 +28111,11 @@ _c1ceb9:
 
 _c1ceda:
         phx
-        jsr     $db18
-        jsr     $e45b
+        jsr     _c1db18
+        jsr     _c1e45b
         ldx     $84
         lda     #$20
-        jsr     $0996
+        jsr     _c10996
         ldx     $78
         lda     $86
         sta     $d1dc,x
@@ -28026,7 +28127,7 @@ _c1ceda:
 ; ---------------------------------------------------------------------------
 
 _c1cef6:
-        jsr     $d02a
+        jsr     _c1d02a
         inc     $d5e1,x
         lda     $d5e1,x
         and     #$0c
@@ -28050,7 +28151,7 @@ _c1cf07:
         bmi     @cf2b
         shorta0
         dey4
-        jsr     $e23b
+        jsr     _c1e23b
 @cf2b:  shorta0
         rts
 
@@ -28065,11 +28166,11 @@ _c1cf2f:
         tax
         phx
         lda     #$0c
-        jsr     $0996
-        jsr     $09ca
+        jsr     _c10996
+        jsr     _c109ca
         sta     $74
         plx
-        jsr     $09e5
+        jsr     _c109e5
         sta     $75
         plx
         lda     $74
@@ -28127,8 +28228,8 @@ _c1cf56:
         bmi     @cfc2
         shorta0
         dey3
-        jsr     $cf2f
-        jsr     $e23b
+        jsr     _c1cf2f
+        jsr     _c1e23b
         bra     @cfc5
 @cfc2:  stz     $d1e3,x
 @cfc5:  shorta0
@@ -28155,7 +28256,7 @@ _c1cfd9:
         clc
         adc     #$0c
         sta     $d3e6,x
-@cfe6:  jsr     $cfc9
+@cfe6:  jsr     _c1cfc9
         jmp     _c1e23b
 
 ; ---------------------------------------------------------------------------
@@ -28172,7 +28273,7 @@ _c1cfec:
         clc
         adc     $d7e3,x
         phx
-        jsr     $0a00
+        jsr     _c10a00
         plx
         sta     $7e
         lda     $d7e1,x
@@ -28188,9 +28289,9 @@ _c1cfec:
 ; ---------------------------------------------------------------------------
 
 _c1d01d:
-        jsr     $e23b
-        jsr     $cfec
-        jsr     $c9bf
+        jsr     _c1e23b
+        jsr     _c1cfec
+        jsr     _c1c9bf
         sta     $d3e6,x
         rts
 
@@ -28212,12 +28313,12 @@ _c1d02a:
         lda     $d5de,x
         sta     $a9
         phx
-        jsr     $0a6e
+        jsr     _c10a6e
         plx
         lda     $d5dd,x
         ora     $d5df,x
         bne     @d0a2
-        jsr     $d0a6
+        jsr     _c1d0a6
         lda     $ae
         sec
         sbc     $d7e2,x
@@ -28244,7 +28345,7 @@ _c1d02a:
         lda     $af
         cmp     #$0c
         bcc     @d0a2
-@d09b:  jsr     $e23b
+@d09b:  jsr     _c1e23b
         dey3
         rts
 @d0a2:  stz     $d1e3,x
@@ -28291,7 +28392,7 @@ _c1d0d5:
         lda     $d5e3
         and     #$0f
         bne     @d100
-        jsr     $d104
+        jsr     _c1d104
         stz     $7e
         lda     $db50
         and     #$40
@@ -28300,7 +28401,7 @@ _c1d0d5:
         sta     $7e
 @d0ef:  lda     $db53
         phx
-        jsr     $fc7a
+        jsr     _c1fc7a
         clc
         adc     $7e
         plx
@@ -28339,7 +28440,7 @@ _c1d104:
         sta     $cd6b
         lda     #$01
         sta     $cd68
-        jsr     $fbad       ; play system sound effect $10
+        jsr     _c1fbad       ; play system sound effect $10
         plx
         rts
 
@@ -28353,14 +28454,14 @@ _c1d147:
         lda     $d5e3
         and     $7e
         bne     @d159
-        jsr     $d104
+        jsr     _c1d104
 @d159:  rts
 
 ; ---------------------------------------------------------------------------
 
 _c1d15a:
 @d15a:  phx
-        jsr     $cadb
+        jsr     _c1cadb
         ldx     $84
         lda     $ce5b,x
         beq     @d177
@@ -28378,11 +28479,11 @@ _c1d15a:
         sta     $ce3b,x
         bne     @d185
         inc     $ce5b,x
-@d185:  jsr     $caeb
+@d185:  jsr     _c1caeb
         ldx     $84
         dec     $cdfb,x
         lda     $cefb,x
-        jsr     $0996
+        jsr     _c10996
         plx
         rts
 
@@ -28489,14 +28590,14 @@ _c1d217:
         bmi     @d26b
         shorta0
         dey6
-        jsr     $e23b
+        jsr     _c1e23b
         inc     $d5e1,x
         lda     #$10
         sta     $80
         lda     $d5e1,x
         asl5
         phx
-        jsr     $0a00
+        jsr     _c10a00
         plx
         clc
         adc     $d5e3,x
@@ -28566,12 +28667,12 @@ _c1d281:
 
 ; ---------------------------------------------------------------------------
 
-_c1d2cf:
+_c1d2d0:
         iny
         lda     [$70],y
         bne     @d2ec
         phx
-        jsr     $e391
+        jsr     _c1e391
         clc
         adc     #$40
         sta     $cebb,x
@@ -28581,11 +28682,11 @@ _c1d2cf:
         sta     $ce3b,x
         jmp     _c1e3c0
 @d2ec:  phx
-        jsr     $e589
-        jsr     $e45b
+        jsr     _c1e589
+        jsr     _c1e45b
         ldx     $84
         lda     #$08
-        jsr     $0996
+        jsr     _c10996
         lda     [$70],y
         cmp     #$02
         bne     @d320
@@ -28636,7 +28737,7 @@ _c1d34a:
         sta     $bc84
         stz     $ce7b
         stz     $ce7c
-@d36c:  jsr     $02f2       ; wait one frame
+@d36c:  jsr     _c102f2       ; wait one frame
         inc     $ce7b
         lda     $ce7b
         and     #$03
@@ -28666,7 +28767,7 @@ _c1d34a:
         lda     $de
         sta     $70
         lda     #$02
-        jsr     $7602
+        jsr     _c17602
         longa
         clr_ax
 @d3bc:  stz     $a937,x
@@ -28697,7 +28798,7 @@ _c1d3e2:
         lda     [$70],y
         bne     @d3f7
         stz     $cdfb,x
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $ce7b,x
 @d3f7:  lda     $cdfb,x
         cmp     #$80
@@ -28709,10 +28810,10 @@ _c1d3e2:
         clc
         adc     #$10
         sta     $ce7b,x
-        jsr     $09ca
+        jsr     _c109ca
         plx
         sta     $d1dd,x
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$03
         sta     $d1e3,x
         rts
@@ -28728,11 +28829,11 @@ _c1d41d:
         clr_ax
 @d427:  txa
         stx     $80
-        jsr     $df09
+        jsr     _c1df09
         bcc     @d435
         phx
         clr_a
-        jsr     $1aa6
+        jsr     _c11aa6
         plx
 @d435:  inx
         cpx     #$0008
@@ -28742,11 +28843,11 @@ _c1d41d:
 @d43d:  clr_ax
 @d43f:  stx     $80
         txa
-        jsr     $df09
+        jsr     _c1df09
         bcc     @d44e
         phx
         lda     #$0c
-        jsr     $1aa6
+        jsr     _c11aa6
         plx
 @d44e:  inx
         cpx     #$0008
@@ -28758,7 +28859,7 @@ _c1d41d:
         lsr3
         and     #$0f
         ldx     #$0000
-        jsr     $ded1
+        jsr     _c1ded1
         inc     $db56
         plx
         rts
@@ -28811,7 +28912,7 @@ _c1d476:
         lda     $ce7b,x
         clc
         adc     #$40
-        jsr     $0a00
+        jsr     _c10a00
         plx
         sta     $d1dc,x
         rts
@@ -28830,7 +28931,7 @@ _c1d4d0:
 
 _c1d4e2:
 @d4e2:  lda     $f86c
-        jsr     $b3fe
+        jsr     _c1b3fe
         lda     $f86c
         beq     @d4f0
         dec     $f86c
@@ -28857,7 +28958,7 @@ _c1d4f1:
         stx     $80
         lda     $ce7b
         ora     #$80
-        jsr     $0b59
+        jsr     _c10b59
         longa
         lda     $84
         clc
@@ -28950,7 +29051,7 @@ _c1d5b1:
         bmi     @d5e2
         shorta0
         dey3
-        jsr     $e0bc
+        jsr     _c1e0bc
         inc     $d5e1,x
         lda     $d5e1,x
         and     #$04
@@ -28977,7 +29078,7 @@ _c1d5e9:
         bmi     @d60c
         shorta0
         dey2
-        jsr     $e0bc
+        jsr     _c1e0bc
         rts
 @d60c:  shorta0
         rts
@@ -28995,13 +29096,15 @@ _c1d610:
         lda     $d1e1,x
         sta     $d5da,x
         shorta0
+
+_c1d62b:
         phy
         phx
         stz     $81
         lda     $d5e4,x
         sta     $80
         lda     $d5e5,x
-        jsr     $0b59
+        jsr     _c10b59
         plx
         longa
         lda     $84
@@ -29028,7 +29131,7 @@ _c1d610:
 
 _c1d665:
         phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$0f
         sta     $84
         stz     $85
@@ -29085,7 +29188,7 @@ _c1d6c1:
         adc     #$08
         ora     #$80
         sta     $ce7b,x
-        jsr     $09ca
+        jsr     _c109ca
         plx
         sta     $d1dd,x
         lda     $d1dc,x
@@ -29136,8 +29239,8 @@ _c1d723:
         lsr5
         tax
         lda     #$08
-        jsr     $0996
-        jsr     $09ca
+        jsr     _c10996
+        jsr     _c109ca
         plx
         sta     $d1dc,x
         ply
@@ -29161,7 +29264,7 @@ _c1d742:
         tax
         lda     #$08
         sta     $cdfb,x
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $ce7b,x
         lda     f:_c1d73a,x
         sta     $80
@@ -29204,8 +29307,8 @@ _c1d789:
         lda     $ce7b,x
         pha
         lda     #$08
-        jsr     $0996
-        jsr     $09ca
+        jsr     _c10996
+        jsr     _c109ca
         sta     $7e
         pla
         clc
@@ -29248,8 +29351,8 @@ _c1d7d0:
         lsr4
         tax
         lda     #$20
-        jsr     $0996
-        jsr     $09ca
+        jsr     _c10996
+        jsr     _c109ca
         plx
         sta     $d1dc,x
         ply
@@ -29449,7 +29552,7 @@ _c1d903:
         stz     $d1dc,x
         stz     $d1dd,x
         phx
-        jsr     $0a6e
+        jsr     _c10a6e
         plx
         lda     $ae
         sta     $d3e3,x
@@ -29458,14 +29561,14 @@ _c1d903:
         lda     $b0
         sta     $d3e5,x
         stz     $d3e6,x
-        jsr     $e23b
+        jsr     _c1e23b
         inc     $d5e1,x
         lda     #$10
         sta     $80
         lda     $d5e1,x
         asl3
         phx
-@d97c:  jsr     $0a00
+@d97c:  jsr     _c10a00
         plx
         clc
         adc     $d5e3,x
@@ -29474,6 +29577,10 @@ _c1d903:
         lsr4
         sta     $d1e3,x
         rts
+
+; ---------------------------------------------------------------------------
+
+_c1d990:
         lda     $d7e3,x
         bne     @d997
         iny
@@ -29495,6 +29602,10 @@ _c1d99a:
         rts
 @d9af:  inc     $d7e3,x
         jmp     _c1df24
+
+; ---------------------------------------------------------------------------
+
+_c1d9b5:
         lda     $d7e3,x
         bne     @d9bb
         rts
@@ -29511,7 +29622,7 @@ _c1d99a:
         cpy     #$000c
         bne     @d9c9
         shorta0
-        jsr     $0158
+        jsr     _c10158
         longa
         ldy     #$000c
 @d9df:  pla
@@ -29576,11 +29687,11 @@ _c1da2c:
         sta     $80
         lda     #$08
         sta     $82
-@da36:  jsr     $fc96       ; generate random number
+@da36:  jsr     _c1fc96       ; generate random number
         and     $80
         sta     $d9d8,x
         stz     $d9d9,x
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     $80
         sta     $da58,x
         stz     $da59,x
@@ -29596,7 +29707,7 @@ _c1da2c:
 
 _c1da59:
         phx
-        jsr     $fc64
+        jsr     _c1fc64
         lda     $d3e2,x
         bmi     @da65
         clr_a
@@ -29633,7 +29744,7 @@ _c1da89:
         beq     @daa6
         inc     $d026,x
         lda     $de
-        jsr     $1a77
+        jsr     _c11a77
         inc     $dba4
         sec
         rts
@@ -29641,13 +29752,13 @@ _c1da89:
         ldx     $78
         lda     $d3e2,x
         and     #$07
-        jsr     $fc74
+        jsr     _c1fc74
         eor     #$ff
         sta     $74
         lda     $de
         and     $74
         sta     $de
-        jsr     $1a77
+        jsr     _c11a77
         clc
         rts
 
@@ -29662,7 +29773,7 @@ _c1dac2:
         bne     @dad9
         lda     $d3e2,x
         bpl     @dadd
-        jsr     $da89
+        jsr     _c1da89
         bcc     @dadd
 @dad9:  dey2
         plx
@@ -29676,11 +29787,11 @@ _c1dac2:
 
 _c1dae4:
         phx
-        jsr     $db18
-        jsr     $e45b
+        jsr     _c1db18
+        jsr     _c1e45b
         ldx     $84
         lda     $cefb,x
-        jsr     $0996
+        jsr     _c10996
         ldx     $78
         inc     $d5e1,x
         lda     $d5e1,x
@@ -29719,7 +29830,7 @@ _c1db18:
 
 _c1db2b:
         phx
-        jsr     $db18
+        jsr     _c1db18
         phx
         longa
         lda     $78
@@ -29765,6 +29876,10 @@ _c1db67:
         rts
 @db79:  stz     $d7de,x
         rts
+
+; ---------------------------------------------------------------------------
+
+_c1db7d:
         iny
         lda     [$70],y
         sta     $d7da,x
@@ -29884,7 +29999,7 @@ _dc09:  lda     $7e
         phx
         phy
         ldy     #$0140
-        jsr     $aa1d       ; load attack palette (8-colors)
+        jsr     _c1aa1d       ; load attack palette (8-colors)
         ply
         plx
         pla
@@ -29928,7 +30043,7 @@ _c1dc4d:
         bmi     @dc70
         shorta0
         dey3
-        jsr     $e23b
+        jsr     _c1e23b
 @dc70:  shorta0
         rts
 
@@ -29957,6 +30072,10 @@ _c1dc74:
         rts
 @dca3:  stz     $d1e3,x
         rts
+
+; ---------------------------------------------------------------------------
+
+_c1dca7:
         phx
         iny
         lda     [$70],y
@@ -29969,11 +30088,13 @@ _c1dc74:
         plx
         rts
 
+; ---------------------------------------------------------------------------
+
 _c1dcbc:
         phx
         iny
         lda     [$70],y
-        jsr     $fc74
+        jsr     _c1fc74
         sta     $7e
         lda     $db53
         and     $7e
@@ -30253,31 +30374,31 @@ _c1dea6:
 ; ---------------------------------------------------------------------------
 
 _c1deb3:
-        jsr     $dea6
+        jsr     _c1dea6
         jmp     _c17b43
 
 ; ---------------------------------------------------------------------------
 
 _c1deb9:
-@deb9:  jsr     $dea6
+@deb9:  jsr     _c1dea6
         jmp     _c17b02
 
 ; ---------------------------------------------------------------------------
 
 _c1debf:
-        jsr     $dea6
+        jsr     _c1dea6
         jmp     _c17a93
 
 ; ---------------------------------------------------------------------------
 
 _c1dec5:
-        jsr     $dea6
+        jsr     _c1dea6
         jmp     _c179a5
 
 ; ---------------------------------------------------------------------------
 
 _c1decb:
-        jsr     $dea6
+        jsr     _c1dea6
         jmp     _c17a2a
 
 ; ---------------------------------------------------------------------------
@@ -30317,7 +30438,7 @@ _c1ded1:
 
 _c1df09:
 @df09:  phx
-        jsr     $fc74
+        jsr     _c1fc74
         sta     $82
         lda     $de
         and     $82
@@ -30363,43 +30484,43 @@ _c1df24:
 @df39:  lda     $d3e2,x
         and     #$07
         sta     $80
-        jsr     $df09
+        jsr     _c1df09
         bcc     @df5d
-        jsr     $df1b
+        jsr     _c1df1b
         bcc     @df59
         stz     $80
         clr_a
-        jsr     $1aa6
+        jsr     _c11aa6
         lda     #$01
         sta     $80
         clr_a
-        jsr     $1aa6
+        jsr     _c11aa6
         rts
 @df59:  clr_a
-        jsr     $1aa6
+        jsr     _c11aa6
 @df5d:  rts
 @df5e:  lda     [$70],y
         lsr3
         and     #$0f
-        jsr     $ded1
+        jsr     _c1ded1
         lda     $d3e2,x
         bpl     @df92
         and     #$07
         sta     $80
-        jsr     $df09
+        jsr     _c1df09
         bcc     @df9d
-        jsr     $df1b
+        jsr     _c1df1b
         bcc     @df8d
         stz     $80
         lda     #$0c
-        jsr     $1aa6
+        jsr     _c11aa6
         lda     #$01
         sta     $80
         lda     #$0c
-        jsr     $1aa6
+        jsr     _c11aa6
         bra     @df92
 @df8d:  lda     #$0c
-        jsr     $1aa6
+        jsr     _c11aa6
 @df92:  lda     [$70],y
         and     #$07
         cmp     #$02
@@ -30430,10 +30551,10 @@ _c1df9e:
         lda     $d3e1,x
         bpl     @dfcc
         and     #$07
-        jsr     $fc74       ; get bit mask
+        jsr     _c1fc74       ; get bit mask
         sta     $70
         lda     $72
-        jsr     $7613
+        jsr     _c17613
 @dfcc:  longa
         ldy     #$000c
 @dfd1:  pla
@@ -30469,10 +30590,10 @@ _c1dfe0:
         lda     $d3e2,x
         bpl     @e00e
         and     #$07
-        jsr     $fc74       ; get bit mask
+        jsr     _c1fc74       ; get bit mask
         sta     $70
         lda     $72
-        jsr     $7613
+        jsr     _c17613
 @e00e:  longa
         ldy     #$000c
 @e013:  pla
@@ -30503,7 +30624,7 @@ _c1e022:
         bmi     @e051
         shorta0
         dey2
-        jsr     $e0bc
+        jsr     _c1e0bc
         inc     $d5e1,x
         lda     $d5e1,x
         and     #$02
@@ -30528,7 +30649,7 @@ _c1e058:
 
 _c1e06c:
 @e06c:  phx
-        jsr     $0a6e
+        jsr     _c10a6e
         plx
         lda     $ae
         sta     $d3e3,x
@@ -30549,7 +30670,7 @@ _c1e086:
         lsr4
         tax
         lda     f:_c1e3d4,x
-        jsr     $fc57
+        jsr     _c1fc57
         plx
         rts
 
@@ -30592,7 +30713,7 @@ _c1e0bc:
         lda     $d3e3,x
         clc
         adc     #$40
-        jsr     $0b59
+        jsr     _c10b59
         plx
         longa
         lda     $84
@@ -30605,7 +30726,7 @@ _c1e0bc:
         lda     $d3e6,x
         sta     $80
         lda     $d3e3,x
-        jsr     $0b59
+        jsr     _c10b59
         plx
         longa
         lda     $84
@@ -30644,7 +30765,7 @@ _c1e108:
         sta     $80
         lda     $d5e1,x
         asl4
-        jsr     $0a00
+        jsr     _c10a00
         plx
         clc
         adc     $d5e3,x
@@ -30672,14 +30793,14 @@ _c1e145:
         bmi     @e180
         shorta0
         dey2
-        jsr     $e23b
+        jsr     _c1e23b
         inc     $d5e1,x
         lda     #$10
         sta     $80
         lda     $d5e1,x
         asl3
         phx
-        jsr     $0a00
+        jsr     _c10a00
         plx
         clc
         adc     $d5e3,x
@@ -30703,14 +30824,14 @@ _c1e184:
         bmi     @e1c7
         shorta0
         dey2
-        jsr     $e23b
+        jsr     _c1e23b
         inc     $d5e1,x
         lda     #$10
         sta     $80
         lda     $d5e1,x
         asl3
         phx
-        jsr     $0a00
+        jsr     _c10a00
         plx
         clc
         adc     $d5e3,x
@@ -30737,7 +30858,7 @@ _c1e1cb:
         bmi     @e1fc
         shorta0
         dey3
-        jsr     $e23b
+        jsr     _c1e23b
         inc     $d5e1,x
         lda     $d5e1,x
         and     #$0c
@@ -30764,7 +30885,7 @@ _c1e203:
         bmi     @e234
         shorta0
         dey3
-        jsr     $e23b
+        jsr     _c1e23b
         inc     $d5e1,x
         lda     $d5e1,x
         and     #$04
@@ -30786,7 +30907,7 @@ _c1e23b:
         lda     $d3e3,x
         clc
         adc     #$40
-        jsr     $0b59
+        jsr     _c10b59
         plx
         longa
         lda     $84
@@ -30799,7 +30920,7 @@ _c1e23b:
         lda     $d3e6,x
         sta     $80
         lda     $d3e3,x
-        jsr     $0b59
+        jsr     _c10b59
         plx
         longa
         lda     $84
@@ -30873,7 +30994,7 @@ _c1e2aa:
 
 _c1e2db:
         phx
-        jsr     $e589
+        jsr     _c1e589
         lda     $80
         sta     $ce7b,x
         clc
@@ -30885,7 +31006,7 @@ _c1e2db:
         sta     $ce3b,x
         lda     #$20
         sta     $cefb,x
-        jsr     $e45b
+        jsr     _c1e45b
         ldx     $78
         lda     $86
         sta     $d1dc,x
@@ -30898,7 +31019,7 @@ _c1e2db:
 
 _c1e30a:
         phx
-        jsr     $e589
+        jsr     _c1e589
         lda     $80
         sta     $ce7b,x
         clc
@@ -30915,7 +31036,7 @@ _c1e30a:
 
 _c1e326:
         phx
-        jsr     $e391
+        jsr     _c1e391
         clc
         adc     #$40
         sta     $cebb,x
@@ -30930,7 +31051,7 @@ _c1e326:
 
 _c1e340:
         phx
-        jsr     $e589
+        jsr     _c1e589
         lda     $80
         sta     $ce7b,x
         clc
@@ -30941,7 +31062,7 @@ _c1e340:
         sta     $ce3b,x
         lda     #$10
         sta     $cefb,x
-        jsr     $e45b
+        jsr     _c1e45b
         ldx     $78
         lda     $86
         sta     $d1dc,x
@@ -30956,7 +31077,7 @@ _c1e340:
 
 _c1e372:
         phx
-        jsr     $e589
+        jsr     _c1e589
         lda     $80
         sta     $ce7b,x
         clc
@@ -30978,7 +31099,7 @@ _c1e391:
         sta     $84
         stz     $85
         tax
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $ce7b,x
         rts
 
@@ -30986,7 +31107,7 @@ _c1e391:
 
 _c1e3a4:
         phx
-        jsr     $e589
+        jsr     _c1e589
         lda     $80
         sta     $ce7b,x
         clc
@@ -30999,7 +31120,7 @@ _c1e3a4:
         sta     $cefb,x
 
 _c1e3c0:
-@e3c0:  jsr     $e45b
+@e3c0:  jsr     _c1e45b
         ldx     $78
         lda     $86
         sta     $d1dc,x
@@ -31024,7 +31145,7 @@ _c1e3e4:
 
 _c1e3ec:
         phx
-        jsr     $e589
+        jsr     _c1e589
         phx
         lda     f:_c1e3dc,x
         plx
@@ -31040,7 +31161,7 @@ _c1e3ec:
         sta     $ce3b,x
         lda     #$02
         sta     $cefb,x
-        jsr     $e45b
+        jsr     _c1e45b
         ldx     $78
         lda     $86
         sta     $d1dc,x
@@ -31056,7 +31177,7 @@ _c1e3ec:
 
 _c1e425:
         phx
-        jsr     $e589
+        jsr     _c1e589
         lda     $80
         sta     $ce7b,x
         clc
@@ -31067,7 +31188,7 @@ _c1e425:
         sta     $ce3b,x
         lda     #$02
         sta     $cefb,x
-        jsr     $e45b
+        jsr     _c1e45b
         ldx     $78
         lda     $86
         sec
@@ -31087,10 +31208,10 @@ _c1e425:
 
 _c1e45b:
 @e45b:  ldx     $84
-        jsr     $09ca
+        jsr     _c109ca
         sta     $86
         ldx     $84
-        jsr     $09e5
+        jsr     _c109e5
         sta     $87
         rts
 
@@ -31100,14 +31221,14 @@ _c1e45b:
 
 _c1e46a:
         phx
-        jsr     $e589
-        jsr     $e45b
+        jsr     _c1e589
+        jsr     _c1e45b
         ldx     $84
         lda     #$fc
-        jsr     $0996
+        jsr     _c10996
         ldx     $84
         lda     $cefb,x
-        jsr     $09b9
+        jsr     _c109b9
         cmp     #$20
         bcs     @e4ac
         and     #$07
@@ -31168,18 +31289,18 @@ _c1e4b3:
 
 _c1e4de:
         phx
-        jsr     $e589
-        jsr     $e45b
+        jsr     _c1e589
+        jsr     _c1e45b
         ldx     $84
         lda     #$fc
-        jsr     $0996
+        jsr     _c10996
         ldx     $84
         lda     $cdfb,x
         beq     @e514
         lda     $cefb,x
-        jsr     $09b9
+        jsr     _c109b9
         lda     $cdfb,x
-        jsr     $e4b3
+        jsr     _c1e4b3
         ldx     $78
         sta     $d1e3,x
         ldx     $78
@@ -31199,15 +31320,15 @@ _c1e4de:
 
 _c1e51b:
         phx
-        jsr     $e589
-        jsr     $e45b
+        jsr     _c1e589
+        jsr     _c1e45b
         ldx     $84
         lda     $cdfb,x
         beq     @e54a
         lda     $cefb,x
-        jsr     $09b9
+        jsr     _c109b9
         lda     $cdfb,x
-        jsr     $e4b3
+        jsr     _c1e4b3
         ldx     $78
         sta     $d1e3,x
         ldx     $78
@@ -31227,16 +31348,16 @@ _c1e51b:
 
 _c1e551:
         phx
-        jsr     $e589
-        jsr     $e45b
+        jsr     _c1e589
+        jsr     _c1e45b
         ldx     $84
         lda     $cdfb,x
         cmp     #$70
         beq     @e582
         lda     $cefb,x
-        jsr     $09b9
+        jsr     _c109b9
         lda     $cdfb,x
-        jsr     $e4b3
+        jsr     _c1e4b3
         ldx     $78
         sta     $d1e3,x
         ldx     $78
@@ -31270,11 +31391,11 @@ _c1e589:
 
 _c1e59a:
         phx
-        jsr     $e589
-        jsr     $e45b
+        jsr     _c1e589
+        jsr     _c1e45b
         ldx     $84
         lda     $cefb,x
-        jsr     $09b9
+        jsr     _c109b9
         cmp     #$20
         bcs     @e5c8
         lsr3
@@ -31299,11 +31420,11 @@ _c1e59a:
 
 _c1e5cf:
         phx
-        jsr     $e589
-        jsr     $e45b
+        jsr     _c1e589
+        jsr     _c1e45b
         ldx     $84
         lda     #$04
-        jsr     $0996
+        jsr     _c10996
         dec     $cefb,x
         beq     @e60b
         ldx     $78
@@ -31357,7 +31478,7 @@ _c1e635:
         lda     [$70],y
         sta     $7e
         phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $80
         jsr     _c1feba       ; +$82 = $7e * $80
         plx
@@ -31367,6 +31488,10 @@ _c1e635:
         sbc     $7e
         sta     $d1dc,x
         rts
+
+; ---------------------------------------------------------------------------
+
+_c1e64f:
         iny
         lda     [$70],y
         asl
@@ -31382,7 +31507,7 @@ _c1e635:
 ; ---------------------------------------------------------------------------
 
 _c1e665:
-        .addr   $e6d5,$e699,$e6a6,$e66f,$e67c
+        .addr   _c1e6d5,_c1e699,_c1e6a6,_c1e66f,_c1e67c
 
 ; ---------------------------------------------------------------------------
 
@@ -31472,7 +31597,7 @@ _c1e6e4:
 @e6e4:  lda     $84
         sta     $7e
         phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $80
         jsr     _c1feba       ; +$82 = $7e * $80
         plx
@@ -31486,7 +31611,7 @@ _c1e6e4:
         lda     $86
         sta     $7e
         phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $80
         jsr     _c1feba       ; +$82 = $7e * $80
         plx
@@ -31505,7 +31630,7 @@ _c1e721:
 @e721:  lda     $84
         sta     $7e
         phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $80
         jsr     _c1feba       ; +$82 = $7e * $80
         plx
@@ -31522,7 +31647,7 @@ _c1e721:
         lda     $86
         sta     $7e
         phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $80
         jsr     _c1feba       ; +$82 = $7e * $80
         plx
@@ -31558,11 +31683,15 @@ _c1e774:
         lda     [$70],y
         sta     $d3de,x
         rts
+
+; ---------------------------------------------------------------------------
+
+_c1e77b:
         iny
         lda     [$70],y
         sta     $80
         phx
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $7e
         jsr     _c1feba       ; +$82 = $7e * $80
         lda     $83
@@ -31594,12 +31723,12 @@ _c1e791:
 ; ---------------------------------------------------------------------------
 
 _c1e7b3:
-        .addr   $e7c3,$e7c9,$e7cc,$e7d2,$e7d5,$e7d8,$e7de,$e7e1
+        .addr   _c1e7c3,_c1e7c9,_c1e7cc,_c1e7d2,_c1e7d5,_c1e7d8,_c1e7de,_c1e7e1
 
 ; ---------------------------------------------------------------------------
 
 _c1e7c3:
-        jsr     $e7fb
+        jsr     _c1e7fb
         jmp     _c1e7f1
 
 ; ---------------------------------------------------------------------------
@@ -31610,12 +31739,12 @@ _c1e7c9:
 ; ---------------------------------------------------------------------------
 
 _c1e7cc:
-        jsr     $e7e7
+        jsr     _c1e7e7
         jmp     _c1e7f1
 
 ; ---------------------------------------------------------------------------
 
-_c1ecd2:
+_c1e7d2:
         jmp     _c1e7fb
 
 ; ---------------------------------------------------------------------------
@@ -31626,7 +31755,7 @@ _c1e7d5:
 ; ---------------------------------------------------------------------------
 
 _c1e7d8:
-        jsr     $e7fb
+        jsr     _c1e7fb
         jmp     _c1e805
 
 ; ---------------------------------------------------------------------------
@@ -31637,7 +31766,7 @@ _c1e7de:
 ; ---------------------------------------------------------------------------
 
 _c1e7e1:
-        jsr     $e7e7
+        jsr     _c1e7e7
         jmp     _c1e805
 
 ; ---------------------------------------------------------------------------
@@ -31708,49 +31837,49 @@ _c1e81e:
 ; [  ]
 
 _c1e82f:
-        jsr     $b7bc
-        jsr     $e810
-        jsr     $e81e
+        jsr     _c1b7bc
+        jsr     _c1e810
+        jsr     _c1e81e
         inc     $d110
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         lda     #$01
         sta     $db69
         lda     $db75
         sta     $db74
 @e849:  lda     #$01
         sta     $db38
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         lda     $d1bc
         and     #$80
         beq     @e867
         clr_ax
         lda     #$08
-        jsr     $c409
+        jsr     _c1c409
         lda     $74
         cmp     #$08
         bne     @e849
         bra     @e884
 @e867:  clr_ax
         lda     #$04
-        jsr     $c409
+        jsr     _c1c409
         lda     $74
         pha
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         ldx     #$0040
         lda     #$04
-        jsr     $c409
+        jsr     _c1c409
         pla
         clc
         adc     $74
         cmp     #$08
         bne     @e849
-@e884:  jsr     $02f2       ; wait one frame
+@e884:  jsr     _c102f2       ; wait one frame
         lda     $db69
         ora     $db74
         bne     @e884
         stz     $db38
         stz     $d110
-        jsr     $67d3
+        jsr     _c167d3
         jsr     _c1fc6d
         stz     $db3c
         lda     $d1bc
@@ -31769,7 +31898,7 @@ _c1e82f:
         shorta0
         lda     $db53
         beq     @e8d1
-@e8c1:  jsr     $e8d8
+@e8c1:  jsr     _c1e8d8
 @e8c4:  lda     $d1bc
         and     #$3f
         cmp     #$2a
@@ -31783,7 +31912,7 @@ _c1e82f:
 ; ---------------------------------------------------------------------------
 
 _c1e8d8:
-@e8d8:  jsr     $02f2       ; wait one frame
+@e8d8:  jsr     _c102f2       ; wait one frame
         lda     $d111
         and     #$1f
         sta     $7e
@@ -31801,7 +31930,7 @@ _c1e8d8:
         clr_a
         sta     $7e
         txa
-        jsr     $7b02
+        jsr     _c17b02
         plx
         inx
         cpx     #$0008
@@ -31813,11 +31942,11 @@ _c1e8d8:
 ; [  ]
 
 _c1e908:
-@e908:  jsr     $b7bc
-        jsr     $e810
-        jsr     $e81e
+@e908:  jsr     _c1b7bc
+        jsr     _c1e810
+        jsr     _c1e81e
         inc     $d110
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         stz     $db5f
         stz     $db39
         stz     $f869
@@ -31832,23 +31961,23 @@ _c1e908:
 ; [  ]
 
 _c1e92c:
-        jsr     $e908
+        jsr     _c1e908
 @e92f:  lda     #$02
         sta     $db38
         ldx     #$0000
         lda     #$10
-        jsr     $c409
+        jsr     _c1c409
         lda     $74
         sta     $f869
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         ldx     #$0100
         lda     #$10
-        jsr     $c409
+        jsr     _c1c409
         lda     $f869
         clc
         adc     $74
         sta     $f869
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         lda     $f869
         cmp     #$20
         bne     @e92f
@@ -31857,24 +31986,24 @@ _c1e92c:
 ; ---------------------------------------------------------------------------
 
 _c1e962:
-        jsr     $e908
-@e965:  jsr     $02f2       ; wait one frame
+        jsr     _c1e908
+@e965:  jsr     _c102f2       ; wait one frame
         lda     #$02
         sta     $db38
         ldx     #$0000
         lda     #$20
-        jsr     $c409
+        jsr     _c1c409
         lda     $74
         cmp     #$20
         bne     @e965
-_e97b:  jsr     $02f2       ; wait one frame
+_e97b:  jsr     _c102f2       ; wait one frame
         lda     $db69
         ora     $db74
         bne     _e97b
         stz     $db38
         stz     $d110
         stz     $db5d
-        jsr     $67d3
+        jsr     _c167d3
         jsr     _c1fc6d
         stz     $db3c
         rts
@@ -31886,9 +32015,9 @@ _e97b:  jsr     $02f2       ; wait one frame
 _c1e999:
         longi
         shorta
-        jsr     $0888       ; init hardware registers
-        jsr     $f88c
-        jsr     $eafb
+        jsr     _c10888       ; init hardware registers
+        jsr     _c1f88c
+        jsr     _c1eafb
         lda     #$53
         sta     $ce
         clr_ax
@@ -31913,7 +32042,7 @@ _c1e999:
         inx
         cpx     #$0800
         bne     @e9ca
-        jsr     $3ed3
+        jsr     _c13ed3
         ldx     #$dbf6
         stx     $bca0
         ldx     #$8093
@@ -31921,7 +32050,7 @@ _c1e999:
         lda     #$20
         sta     $bca4
         stz     $bca5
-        jsr     $2dac
+        jsr     _c12dac
         clr_axy
         lda     #$20
         sta     $70
@@ -31946,7 +32075,7 @@ _c1e999:
         ldx     #$8000
         clr_ay
         lda     #$7f
-        jsr     $fdca       ; copy data to vram
+        jsr     _c1fdca       ; copy data to vram
         clr_ay
         lda     #$03
         jsr     _c1aa3e       ; load attack palette (16-colors)
@@ -31969,16 +32098,16 @@ _c1e999:
         sta     $db4b
         lda     #$01
         sta     $fefb
-        sta     f:$00212c
-        sta     f:$00212e
-@ea68:  lda     f:$004210
+        sta     f:hTM
+        sta     f:hTMW
+@ea68:  lda     f:hRDNMI
         bpl     @ea68
         lda     #$81
-        sta     f:$004200
+        sta     f:hNMITIMEN
         cli
         lda     #$0f
         sta     $bc7f
-@ea7a:  jsr     $fd1d       ; wait for vblank
+@ea7a:  jsr     _c1fd1d       ; wait for vblank
         longa
         lda     $f9e7
         clc
@@ -31988,20 +32117,20 @@ _c1e999:
         shorta0
         cpx     #$0200
         bne     @ea7a
-@ea92:  jsr     $fd1d       ; wait for vblank
+@ea92:  jsr     _c1fd1d       ; wait for vblank
         lda     $db4c
         beq     @eaac
 @ea9a:  lda     $f9eb
         cmp     $db4a
         bcs     @eaa7
-        jsr     $eae8
+        jsr     _c1eae8
         bra     @eaac
 @eaa7:  dec     $f9eb
         bra     @eac2
 @eaac:  lda     $f9eb
         cmp     $db4b
         bcc     @eabf
-        jsr     $eae8
+        jsr     _c1eae8
         dec     $db4b
         inc     $db4a
         bra     @ea9a
@@ -32011,14 +32140,14 @@ _c1e999:
         bne     @ea92
         lda     #$1e        ; 30 * 2 = 60 frames (1 second)
 @eacb:  pha
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         inc     $f9eb
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         dec     $f9eb
         pla
         dec
         bne     @eacb
-@eadc:  jsr     $fd1d       ; wait for vblank
+@eadc:  jsr     _c1fd1d       ; wait for vblank
         lda     $00
         ora     $01
         beq     @eadc       ; wait for keypress
@@ -32087,7 +32216,7 @@ _c1eb38:
         plx
         lda     #$7f
         phy
-        jsr     $ed01
+        jsr     _c1ed01
         ply
         longa
         tya
@@ -32103,13 +32232,13 @@ _c1eb38:
 
 _c1eb52:
 @eb52:  clr_ayx
-        jsr     $eb38
+        jsr     _c1eb38
         ldx     #$2000
-        jsr     $eb38
+        jsr     _c1eb38
         ldx     #$2000
-        jsr     $eb38
+        jsr     _c1eb38
         ldx     #$2000
-        jsr     $eb38
+        jsr     _c1eb38
         clr_ax
 @eb6c:  lda     $ed76,x
         sta     $7e29,x
@@ -32148,10 +32277,10 @@ _c1eb52:
         inx
         cpx     #$0100
         bne     @ebc4
-@ebcd:  jsr     $fd1d       ; wait for vblank
-        jsr     $f5f6
-        jsr     $fd1d       ; wait for vblank
-        jsr     $f5f6
+@ebcd:  jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1f5f6
+        jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1f5f6
         ldx     $bc8e
         inx
         stx     $bc8e
@@ -32176,9 +32305,9 @@ _c1ebe9:
         shorta0
         cpx     #$0200
         bne     @ebec
-        jsr     $24e2       ; load character graphics
+        jsr     _c124e2       ; load character graphics
         inc     $ff2b
-        jsr     $2607       ; load character palettes
+        jsr     _c12607       ; load character palettes
         clr_ax
 @ec16:  lda     $7f09,x
         sta     $ed76,x
@@ -32201,7 +32330,7 @@ _c1ebe9:
         bne     @ec30
         ldx     #$0300
         stx     $7e
-        jsr     $95bf
+        jsr     _c195bf
         clr_ax
 @ec58:  lda     $7fe000,x
         sta     $7f0000,x
@@ -32230,19 +32359,19 @@ _c1ebe9:
         sta     $70
         stz     $73
         clr_a
-        jsr     $ecc1
+        jsr     _c1ecc1
         lda     #$0f
         sta     $70
         lda     #$08
         sta     $73
         lda     #$01
-        jsr     $ecc1
+        jsr     _c1ecc1
         lda     #$0a
         sta     $70
         lda     #$04
         sta     $73
         lda     #$02
-        jsr     $ecc1
+        jsr     _c1ecc1
         lda     #$14
         sta     $70
         lda     #$04
@@ -32296,8 +32425,8 @@ _c1ed01:
         phx
 @ed07:  lda     $d0d6
         beq     @ed14
-        jsr     $fd1d       ; wait for vblank
-        jsr     $f5f6
+        jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1f5f6
         bra     @ed07
 @ed14:  plx
         stx     $d0de
@@ -32320,8 +32449,8 @@ _c1ed01:
         inc     $d0e0
 @ed41:  shorta0
         inc     $d0d6
-        jsr     $fd1d       ; wait for vblank
-        jsr     $f5f6
+        jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1f5f6
         longa
         lda     $d0d7
         clc
@@ -32349,7 +32478,7 @@ _c1ed76:
         sta     $74
         ldx     #near TheEndGfx
         stx     $72
-        jsr     $fb77       ; decompress
+        jsr     _c1fb77       ; decompress
         phb
         lda     #$7f
         pha
@@ -32441,7 +32570,7 @@ _c1ee06:
 ; [  ]
 
 _c1ee24:
-@ee24:  jsr     $fd1d       ; wait for vblank
+@ee24:  jsr     _c1fd1d       ; wait for vblank
         jmp     _c1f5f6
 
 ; ---------------------------------------------------------------------------
@@ -32454,11 +32583,11 @@ _c1ee2a:
         ldx     #near _d0e220
         ldy     #$7000
         lda     #^_d0e220
-        jsr     $fd27
-        jsr     $f3ba
+        jsr     _c1fd27
+        jsr     _c1f3ba
         jsr     _c1fc6d
-        jsr     $ebe9
-        jsr     $ed76
+        jsr     _c1ebe9
+        jsr     _c1ed76
         clr_ax
 @ee48:  lda     $7fa9,x
         sta     $7f09,x
@@ -32479,8 +32608,8 @@ _c1ee2a:
         bne     @ee69
         ldx     #$0100
 @ee75:  phx
-        jsr     $ee24
-        jsr     $ef50
+        jsr     _c1ee24
+        jsr     _c1ef50
         plx
         dex
         bne     @ee75
@@ -32488,19 +32617,19 @@ _c1ee2a:
         sta     $fefb
         ldx     #$0070
 @ee88:  phx
-        jsr     $ee24
-        jsr     $ee06
+        jsr     _c1ee24
+        jsr     _c1ee06
         plx
         dex
         bne     @ee88
         stz     $bc84
-        jsr     $eb52
+        jsr     _c1eb52
         lda     #$78
-        jsr     $ef26
+        jsr     _c1ef26
         ldx     #$0100
 @eea1:  phx
-        jsr     $ee24
-        jsr     $ef30
+        jsr     _c1ee24
+        jsr     _c1ef30
         plx
         dex
         bne     @eea1
@@ -32519,21 +32648,21 @@ _c1ee2a:
         ldx     #$d000
         clr_ay
         lda     #$7f
-        jsr     $ed01
+        jsr     _c1ed01
         ldx     #$0800
         stx     $70
         ldx     #$c800
         ldy     #$6000
         lda     #$7f
-        jsr     $ed01
+        jsr     _c1ed01
         ldx     #$1f80
         stx     $70
         ldx     #$2000
         ldy     #$1040
         lda     #$7f
-        jsr     $ed01
-        jsr     $f54d
-        jsr     $f4da
+        jsr     _c1ed01
+        jsr     _c1f54d
+        jsr     _c1f4da
         ldx     #$0000
         stx     $bc77
         stx     $bc79
@@ -32541,7 +32670,7 @@ _c1ee2a:
         stx     $bc96
         ldx     #$0070
         stx     $bc98
-        jsr     $f0b4
+        jsr     _c1f0b4
         lda     #$ff
         sta     $dbf5
         lda     #$07        ; mode 7
@@ -32557,7 +32686,7 @@ _c1ee2a:
 _c1ef26:
 @ef26:  tax
 @ef27:  phx
-        jsr     $ee24
+        jsr     _c1ee24
         plx
         dex
         bne     @ef27
@@ -32574,7 +32703,7 @@ _c1ef30:
         clr_ax
         longa
 @ef3a:  lda     $7e09,x
-        jsr     $ef70
+        jsr     _c1ef70
         lda     $70
         sta     $7e09,x
         inx2
@@ -32594,7 +32723,7 @@ _c1ef50:
         clr_ax
         longa
 @ef5a:  lda     $7e29,x
-        jsr     $ef70
+        jsr     _c1ef70
         lda     $70
         sta     $7e29,x
         inx2
@@ -32703,31 +32832,31 @@ _c1f01d:
         bra     @f0a7
 @f031:  stx     $74
         lda     $9989,y
-        sta     f:$004202
+        sta     f:hWRMPYA
         ldx     $9889,y
         lda     f:SineTbl8,x   ; sine table
         bmi     @f052
-        sta     f:$004203
+        sta     f:hWRMPYB
         nop4
-        lda     f:$004217
+        lda     f:hRDMPYH
         jmp     @f062
 @f052:  eor     #$ff
-        sta     f:$004203
+        sta     f:hWRMPYB
         nop4
-        lda     f:$004217
+        lda     f:hRDMPYH
         eor     #$ff
 @f062:  sta     $70
         ldx     $9909,y
         lda     f:SineTbl8,x   ; sine table
         bmi     @f07c
-        sta     f:$004203
+        sta     f:hWRMPYB
         nop4
-        lda     f:$004217
+        lda     f:hRDMPYH
         jmp     @f08c
 @f07c:  eor     #$ff
-        sta     f:$004203
+        sta     f:hWRMPYB
         nop4
-        lda     f:$004217
+        lda     f:hRDMPYH
         eor     #$ff
 @f08c:  ldx     $74
         adc     $9e09,y
@@ -32762,7 +32891,7 @@ _c1f0b4:
         shorta0
         lda     f:_d0ddcd+12
         sta     $f9eb
-        jsr     $f0ff
+        jsr     _c1f0ff
         clr_ax
         stx     $ff06
         sta     $ff28
@@ -32813,10 +32942,10 @@ _c1f0ff:
         lda     $f9e9
         sec
         sbc     $f9e7
-        sta     f:$004204
+        sta     f:hWRDIVL
         shorta0
         lda     #$70
-        sta     f:$004206
+        sta     f:hWRDIVB
         phb
         lda     #$00
         tay
@@ -32825,48 +32954,48 @@ _c1f0ff:
         longa
         shorti
         lda     $7ef9e3
-        sta     $4204
-        lda     $4214
+        sta     hWRDIVL
+        lda     hRDDIVL
         sta     $76
 @f174:  sty     $1c
         shorta
         lda     $71
         asl
-        sta     $4206
+        sta     hWRDIVB
         longa
         lda     $70
         clc
         adc     $76
         sta     $70
         ldx     $7a
-        stx     $4202
-        lda     $4214
+        stx     hWRMPYA
+        lda     hRDDIVL
         tax
-        stx     $4203
+        stx     hWRMPYB
         sta     $7e
         stz     $82
         ldx     $7f
-        ldy     $4217
-        stx     $4203
+        ldy     hRDMPYH
+        stx     hWRMPYB
         sty     $82
         ldx     $7c
         stz     $84
-        lda     $4216
-        stx     $4202
+        lda     hRDMPYL
+        stx     hWRMPYA
         ldx     $7e
-        stx     $4203
+        stx     hWRMPYB
         clc
         adc     $82
         eor     $18
         adc     $1e
-        ldx     $4217
+        ldx     hRDMPYH
         stx     $84
         ldx     $7f
-        stx     $4203
+        stx     hWRMPYB
         ldy     $1c
         sta     $0ca0,y
         sta     $0f40,y
-        lda     $4216
+        lda     hRDMPYL
         clc
         adc     $84
         eor     $1a
@@ -32888,10 +33017,10 @@ _c1f0ff:
         lda     $f9e7
         sec
         sbc     $f9e9
-        sta     f:$004204
+        sta     f:hWRDIVL
         shorta0
         lda     #$70
-        sta     f:$004206
+        sta     f:hWRDIVB
         phb
         lda     #$00
         tay
@@ -32899,51 +33028,51 @@ _c1f0ff:
         plb
         longa
         nop2
-        lda     $4214
+        lda     hRDDIVL
         asl
         sta     $76
         shorti
         lda     $7ef9e3
-        sta     $4204
+        sta     hWRDIVL
 @f21e:  sty     $1c
         shorta
         lda     $71
         asl
-        sta     $4206
+        sta     hWRDIVB
         longa
         lda     $70
         sec
         sbc     $76
         sta     $70
         ldx     $7a
-        stx     $4202
-        lda     $4214
+        stx     hWRMPYA
+        lda     hRDDIVL
         tax
-        stx     $4203
+        stx     hWRMPYB
         sta     $7e
         stz     $82
         ldx     $7f
-        ldy     $4217
-        stx     $4203
+        ldy     hRDMPYH
+        stx     hWRMPYB
         sty     $82
         ldx     $7c
         stz     $84
-        lda     $4216
-        stx     $4202
+        lda     hRDMPYL
+        stx     hWRMPYA
         ldx     $7e
-        stx     $4203
+        stx     hWRMPYB
         clc
         adc     $82
         eor     $18
         adc     $1e
-        ldx     $4217
+        ldx     hRDMPYH
         stx     $84
         ldx     $7f
-        stx     $4203
+        stx     hWRMPYB
         ldy     $1c
         sta     $0ca0,y
         sta     $0f40,y
-        lda     $4216
+        lda     hRDMPYL
         clc
         adc     $84
         eor     $1a
@@ -32963,9 +33092,9 @@ _c1f0ff:
 ; ---------------------------------------------------------------------------
 
 _c1f294:
-        .addr   $f2bc,$f2c0,$f2c4,$f2cb,$f2f4,$f2fc,$f304,$f30c
-        .addr   $f314,$f31c,$f324,$f32c,$f334,$f33c,$f344,$f34c
-        .addr   $f2d2,$f2df,$f2ec,$f2f0
+        .addr   _c1f2bc,_c1f2c0,_c1f2c4,_c1f2cb,_c1f2f4,_c1f2fc,_c1f304,_c1f30c
+        .addr   _c1f314,_c1f31c,_c1f324,_c1f32c,_c1f334,_c1f33c,_c1f344,_c1f34c
+        .addr   _c1f2d2,_c1f2df,_c1f2ec,_c1f2f0
 
 ; ---------------------------------------------------------------------------
 
@@ -33013,7 +33142,7 @@ _c1f2df:
 
 ; ---------------------------------------------------------------------------
 
-_c1f2ce:
+_c1f2ec:
         inc     $f9e6
         rts
 
@@ -33168,7 +33297,7 @@ _c1f392:
         sta     $74
         lda     f:_c1f294+1,x
         sta     $75
-        jsr     $f3b7
+        jsr     @f3b7
         plx
 @f3b0:  inx
         cpx     #$0020
@@ -33225,9 +33354,9 @@ _c1f3ba:
 ; [  ]
 
 _c1f413:
-@f413:  jsr     $ee24
-        jsr     $f0ff
-        jsr     $f354
+@f413:  jsr     _c1ee24
+        jsr     _c1f0ff
+        jsr     _c1f354
         bcs     @f413
         clr_ax
         longa
@@ -33244,23 +33373,23 @@ _c1f413:
         sta     $bc88
         sta     $bc89
         sta     $bc8a
-        sta     f:$002132
+        sta     f:hCOLDATA
         lda     #$01
-        sta     f:$00212d
+        sta     f:hTS
         lda     #$02
-        sta     f:$002130
+        sta     f:hCGSWSEL
         lda     #$10
-        sta     f:$002131
-        jsr     $f4bd
+        sta     f:hCGADSUB
+        jsr     _c1f4bd
         ldx     #$0e10
 @f462:  phx
-        jsr     $f475
+        jsr     _c1f475
         plx
         dex
         bne     @f462
         lda     #$08
         sta     $ff04
-@f46f:  jsr     $f475
+@f46f:  jsr     _c1f475
         jmp     @f46f
 
 ; ---------------------------------------------------------------------------
@@ -33268,18 +33397,18 @@ _c1f413:
 ; [  ]
 
 _c1f475:
-@f475:  jsr     $fd1d       ; wait for vblank
-        jsr     $f5f6
-        jsr     $fc96       ; generate random number
+@f475:  jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1f5f6
+        jsr     _c1fc96       ; generate random number
         and     #$7f
         jeq     @f486
         rts
 @f486:  lda     #$02
         sta     $d111
-@f48b:  jsr     $fd1d       ; wait for vblank
-        jsr     $f5f6
-        jsr     $fd1d       ; wait for vblank
-        jsr     $f5f6
+@f48b:  jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1f5f6
+        jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1f5f6
         clr_ax
 @f499:  sta     $7f89,x
         inx
@@ -33327,42 +33456,42 @@ _c1f4da:
         pha
         plb
         lda     #$42
-        sta     $4300
-        sta     $4310
-        sta     $4330
-        sta     $4370
-        lda     #$1b        ; hdma to m7a through m7d
-        sta     $4301
-        lda     #$1c
-        sta     $4311
-        lda     #$1d
-        sta     $4331
-        lda     #$1e
-        sta     $4371
+        sta     hDMA0::CTRL
+        sta     hDMA1::CTRL
+        sta     hDMA3::CTRL
+        sta     hDMA7::CTRL
+        lda     #<hM7A        ; hdma to m7a through m7d
+        sta     hDMA0::HREG
+        lda     #<hM7B
+        sta     hDMA1::HREG
+        lda     #<hM7C
+        sta     hDMA3::HREG
+        lda     #<hM7D
+        sta     hDMA7::HREG
         ldx     #$bcb1
-        stx     $4302
+        stx     hDMA0::ADDR
         ldx     #$bf52
-        stx     $4312
+        stx     hDMA1::ADDR
         ldx     #$c1f3
-        stx     $4332
+        stx     hDMA3::ADDR
         ldx     #$c494
-        stx     $4372
+        stx     hDMA7::ADDR
         lda     #$7e
-        sta     $4304
+        sta     hDMA0::ADDR_B
         lda     #$7e
-        sta     $4314
+        sta     hDMA1::ADDR_B
         lda     #$7e
-        sta     $4334
+        sta     hDMA3::ADDR_B
         lda     #$7e
-        sta     $4374
+        sta     hDMA7::ADDR_B
         lda     #$00
-        sta     $4307
+        sta     hDMA0::HDMA_B
         lda     #$00
-        sta     $4317
+        sta     hDMA1::HDMA_B
         lda     #$00
-        sta     $4337
+        sta     hDMA3::HDMA_B
         lda     #$00
-        sta     $4377
+        sta     hDMA7::HDMA_B
         lda     $7ebc84
         ora     #$8b
         sta     $7ebc84
@@ -33457,7 +33586,7 @@ _c1f54d:
 ; [  ]
 
 _c1f5f6:
-@f5f6:  jsr     $f01d
+@f5f6:  jsr     _c1f01d
         jmp     _c1ef9e
 
 ; ---------------------------------------------------------------------------
@@ -33473,12 +33602,12 @@ _c1f5fc:
         bra     @f686
 @f60a:  lda     $9809,y
         bne     @f644
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         sta     $9889,y
         clc
         adc     #$40
         sta     $9909,y
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$7f
         clc
         adc     #$08
@@ -33489,7 +33618,7 @@ _c1f5fc:
         sta     $9809,y
         lda     #$03
         sta     $9b89,y
-        jsr     $fc96       ; generate random number
+        jsr     _c1fc96       ; generate random number
         and     #$3f
         sta     $9c09,y
         clr_a
@@ -33568,21 +33697,21 @@ _c1f6b5:
         sta     $89
         plx
         lda     $9989,x
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $998a,x
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $88
-        sta     f:$00211c
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         clc
         adc     $9e09,x
         sta     $a009,x
         shorta0
         lda     $89
-        sta     f:$00211c
+        sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         clc
         adc     $9d09,x
         sta     $9f09,x
@@ -33623,22 +33752,22 @@ _c1f6b5:
 _c1f75f:
         longi
         shorta
-        jsr     $0888       ; init hardware registers
-        jsr     $f88c
-        jsr     $f8f9
+        jsr     _c10888       ; init hardware registers
+        jsr     _c1f88c
+        jsr     _c1f8f9
         lda     #$14
-        sta     f:$00212c
-        sta     f:$00212e
-@f776:  lda     f:$004210
+        sta     f:hTM
+        sta     f:hTMW
+@f776:  lda     f:hRDNMI
         bpl     @f776
         lda     #$81
-        sta     f:$004200
+        sta     f:hNMITIMEN
         cli
         lda     #$0f
         sta     $bc7f
         lda     #$b4        ; 180 frames (3 seconds)
-        jsr     $f883       ; wait
-        jsr     $f82b
+        jsr     _c1f883       ; wait
+        jsr     _c1f82b
 ; fallthrough
 
 ; ---------------------------------------------------------------------------
@@ -33646,18 +33775,18 @@ _c1f75f:
 ; [ fade out and return ]
 
 _c1f790:
-@f790:  jsr     $fd1d       ; wait for vblank
-        jsr     $fd1d       ; wait for vblank
-        jsr     $fd1d       ; wait for vblank
-        jsr     $fd1d       ; wait for vblank
+@f790:  jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1fd1d       ; wait for vblank
+        jsr     _c1fd1d       ; wait for vblank
         dec     $bc7f       ; decrement screen brightness
         lda     $bc7f
         bne     @f790
         clr_a
-        sta     f:$00420c
-        sta     f:$004200
+        sta     f:hHDMAEN
+        sta     f:hNMITIMEN
         lda     #$80
-        sta     f:$002100
+        sta     f:hINIDISP
         stz     $bc84
         rtl
 
@@ -33671,20 +33800,20 @@ _c1f7b7:
         stz     $f9dc
         longa
         lda     $f9dd
-        sta     f:$002116
+        sta     f:hVMADDL
         lda     #$a937
-        sta     f:$004342
+        sta     f:hDMA4::ADDR
         lda     #$0200
-        sta     f:$004345
+        sta     f:hDMA4::SIZE
         shorta0
         lda     #$7e
-        sta     f:$004344
+        sta     f:hDMA4::ADDR_B
         clr_a
-        sta     f:$004340
-        lda     #$19
-        sta     f:$004341
+        sta     f:hDMA4::CTRL
+        lda     #<hVMDATAH
+        sta     f:hDMA4::HREG
         lda     #$10
-        sta     f:$00420b
+        sta     f:hMDMAEN
 @f7f0:  rts
 
 ; ---------------------------------------------------------------------------
@@ -33757,8 +33886,8 @@ _c1f82b:
         stx     $bca0
         lda     #$e7
         sta     $bca2
-        jsr     $f7f1
-        jsr     $2971       ; draw big text string
+        jsr     _c1f7f1
+        jsr     _c12971       ; draw big text string
         jsl     _e031f7
 .else
         sta     $a937,x
@@ -33769,15 +33898,15 @@ _c1f82b:
         stx     $bca0
         lda     #^_d0e340
         sta     $bca2
-        jsr     $f7f1
-        jsr     $2971       ; draw big text string
+        jsr     _c1f7f1
+        jsr     _c12971       ; draw big text string
         ldx     a:$00b8
         inx
 .endif
         stx     $f9df
         inc     $f9dc
         lda     #$3f        ; 63 frames
-        jsr     $f883       ; wait
+        jsr     _c1f883       ; wait
         longa
         lda     $f9dd
         clc
@@ -33798,7 +33927,7 @@ _c1f82b:
 
 _c1f883:
 @f883:  pha
-        jsr     $fd1d       ; wait for vblank
+        jsr     _c1fd1d       ; wait for vblank
         pla
         dec
         bne     @f883
@@ -33827,7 +33956,7 @@ _c1f88c:
         bne     @f8ac
         clr_ax
         ldy     #$4000
-        jsr     $fdbb
+        jsr     _c1fdbb
         clr_axy
         stz     $70
 @f8c2:  stz     $9809,x
@@ -33849,8 +33978,8 @@ _c1f88c:
         cpx     #$0060
         bne     @f8c2
         stz     $f9dc
-        jsr     $f9e3
-        jsr     $f9f3
+        jsr     _c1f9e3
+        jsr     _c1f9f3
         jmp     _c1fd22       ; clear sprite data
 
 ; ---------------------------------------------------------------------------
@@ -33858,36 +33987,36 @@ _c1f88c:
 ; [  ]
 
 _c1f8f9:
-@f8f9:  jsr     $f953
+@f8f9:  jsr     _c1f953
         stz     $ff05
         clr_a
-        sta     f:$00210c
+        sta     f:hBG34NBA
         stz     $dbf4
         lda     #$48
-        sta     f:$002109
+        sta     f:hBG3SC
         ldx     #$0010
         stx     $fefe
         ldx     #$ffe8
         stx     $fefc
         lda     #$09
-        sta     f:$002105
-        jsr     $f9ab
+        sta     f:hBGMODE
+        jsr     _c1f9ab
         lda     #$84
-        sta     f:$002131
+        sta     f:hCGADSUB
         phb
         lda     #$00
         pha
         plb
         lda     #$40
-        sta     $4320
-        lda     #$32
-        sta     $4321
+        sta     hDMA2::CTRL
+        lda     #<hCOLDATA
+        sta     hDMA2::HREG
         ldx     #near _d0dd7a
-        stx     $4322
+        stx     hDMA2::ADDR
         lda     #^_d0dd7a
-        sta     $4324
+        sta     hDMA2::ADDR_B
         lda     #$7e
-        sta     $4327
+        sta     hDMA2::HDMA_B
         lda     $7ebc84
         ora     #$04
         sta     $7ebc84
@@ -34016,9 +34145,9 @@ _c1fa0e:
         stx     $88
         stx     $8a
         lda     $f9e7
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $f9e8
-        sta     f:$00211b
+        sta     f:hM7A
         lda     $f9eb
         clc
         adc     $f9ec
@@ -34031,9 +34160,9 @@ _c1fa0e:
         ldx     #$ffff
         stx     $88
         eor     #$ff
-@fa3c:  sta     f:$00211c
+@fa3c:  sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         eor     $88
         sta     $bc8e
         sta     $bc94
@@ -34045,17 +34174,17 @@ _c1fa0e:
         ldx     #$ffff
         stx     $8a
         eor     #$ff
-@fa61:  sta     f:$00211c
+@fa61:  sta     f:hM7B
         longa
-        lda     f:$002135
+        lda     f:hMPYM
         eor     $8a
         sta     $bc90
         eor     #$ffff
         inc
         sta     $bc92
         shorta0
-        jsr     $fa87
-        jsr     $fff4
+        jsr     _c1fa87
+        jsr     _c1fff4
         inc     $a2
         stz     $a5
         stz     $a4
@@ -34067,19 +34196,19 @@ _c1fa0e:
 
 _c1fa87:
 @fa87:  lda     $bc81
-        sta     f:$002105
+        sta     f:hBGMODE
         lda     $fefb
-        sta     f:$00212c
+        sta     f:hTM
         lda     $bc84
-        sta     f:$00420c
+        sta     f:hHDMAEN
         lda     $bc77
-        sta     f:$00210d
+        sta     f:hBG1HOFS
         lda     $bc78
-        sta     f:$00210d
+        sta     f:hBG1HOFS
         lda     $bc79
-        sta     f:$00210e
+        sta     f:hBG1VOFS
         lda     $bc7a
-        sta     f:$00210e
+        sta     f:hBG1VOFS
         longa
         lda     $bc77
         clc
@@ -34090,9 +34219,9 @@ _c1fa87:
         adc     #$0070
         sta     $bc98
         shorta0
-        jsr     $12e8
+        jsr     _c112e8
         lda     $bc7f
-        sta     f:$002100
+        sta     f:hINIDISP
         rts
 
 ; ---------------------------------------------------------------------------
@@ -34100,11 +34229,11 @@ _c1fa87:
 ; [  ]
 
 _c1fadc:
-        jsr     $fd9c
-        jsr     $fa87
-        jsr     $f392
+        jsr     _c1fd9c
+        jsr     _c1fa87
+        jsr     _c1f392
         inc     $a2
-        jsr     $0b81       ; play queued song
+        jsr     _c10b81       ; play queued song
         stz     $a5
         stz     $a4
         rts
@@ -34125,7 +34254,7 @@ _c1faef:
         phx
         pld
         shorta0
-        lda     f:$004210
+        lda     f:hRDNMI
         lda     #$7e
         pha
         plb
@@ -34133,28 +34262,28 @@ _c1faef:
         bne     @fb6e
         inc     $a4
         clr_a
-        sta     f:$002100
-        jsr     $fdc0
-        jsr     $fdc5
+        sta     f:hINIDISP
+        jsr     _c1fdc0
+        jsr     _c1fdc5
         lda     $ff05
         beq     @fb23
-        jsr     $fa0e
+        jsr     _c1fa0e
         jmp     @fb68
-@fb23:  jsr     $f7b7
+@fb23:  jsr     _c1f7b7
         lda     $bc84
-        sta     f:$00420c
+        sta     f:hHDMAEN
         lda     $fefc
-        sta     f:$002111
+        sta     f:hBG3HOFS
         lda     $fefd
-        sta     f:$002111
+        sta     f:hBG3HOFS
         lda     $fefe
-        sta     f:$002112
+        sta     f:hBG3VOFS
         lda     $feff
-        sta     f:$002112
+        sta     f:hBG3VOFS
         lda     $bc7f
-        sta     f:$002100
-        jsr     $f6b5
-        jsr     $f5fc
+        sta     f:hINIDISP
+        jsr     _c1f6b5
+        jsr     _c1f5fc
         lda     $dbf4
         beq     @fb68
         lda     $a2
@@ -34392,7 +34521,7 @@ _c1fc7a:
 _c1fc8c:
 @fc8c:  lda     $00
         bmi     @fc95
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         bra     @fc8c
 @fc95:  rts
 
@@ -34417,20 +34546,20 @@ _c1fca2:
         clr_a
         pha
         plb
-        sty     $2116
+        sty     hVMADDL
         stx     $72
         ldy     #$0000
 @fcb0:  longa
         ldx     #$0008
 @fcb5:  lda     [$72],y
-        sta     $2118
+        sta     hVMDATAL
         iny2
         dex
         bne     @fcb5
         ldx     #$0008
 @fcc2:  lda     [$72],y
         and     #$00ff
-        sta     $2118
+        sta     hVMDATAL
         iny
         dex
         bne     @fcc2
@@ -34538,7 +34667,7 @@ _c1fd27:
         phx
 @fd30:  lda     $d0d6
         beq     @fd3a
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         bra     @fd30
 @fd3a:  plx
         stx     $d0de
@@ -34561,7 +34690,7 @@ _c1fd27:
         inc     $d0e0
 @fd67:  shorta0
         inc     $d0d6
-        jsr     $02f2       ; wait one frame
+        jsr     _c102f2       ; wait one frame
         longa
         lda     $d0d7
         clc
@@ -34593,7 +34722,7 @@ _c1fd9c:
         ldx     $d0d7
         ldy     $d0da
         lda     $d0d9
-        jsr     $fdb6       ; copy data to vram
+        jsr     _c1fdb6       ; copy data to vram
         stz     $d0d6
 @fdb5:  rts
 
@@ -34837,12 +34966,12 @@ _c1fe90:
 
 _c1feba:
 @feba:  lda     $7e
-        sta     f:$004202
+        sta     f:hWRMPYA
         lda     $80
-        sta     f:$004203
+        sta     f:hWRMPYB
         longa
         nop3
-        lda     f:$004216
+        lda     f:hRDMPYL
         sta     $82
         shorta0
         rts
@@ -34853,20 +34982,20 @@ _c1feba:
 
 _c1fed5:
 @fed5:  lda     $7e
-        sta     f:$004204
+        sta     f:hWRDIVL
         lda     $7f
-        sta     f:$004205
+        sta     f:hWRDIVH
         lda     $80
-        sta     f:$004206
+        sta     f:hWRDIVB
         longa
         pha
         nop
         pha
         nop
         pla
-        lda     f:$004214
+        lda     f:hRDDIVL
         sta     $82
-        lda     f:$004216
+        lda     f:hRDMPYL
         sta     $84
         pla
         shorta
@@ -34919,26 +35048,26 @@ _c1ff2e:
         stz     $84
         txa
 @ff39:  sec
-        sbc     #$03e8
+        sbc     #1000
         bcc     @ff44
         inc     $7e
         jmp     @ff39
 @ff44:  clc
-        adc     #$03e8
+        adc     #1000
 @ff48:  sec
-        sbc     #$0064
+        sbc     #100
         bcc     @ff53
         inc     $80
         jmp     @ff48
 @ff53:  clc
-        adc     #$0064
+        adc     #100
 @ff57:  sec
-        sbc     #$000a
+        sbc     #10
         bcc     @ff62
         inc     $82
         jmp     @ff57
 @ff62:  clc
-        adc     #$000a
+        adc     #10
         sta     $84
         shorta0
         lda     $7e
@@ -34980,7 +35109,7 @@ _c1ff88:
         sta     $75
         lda     f:HexToDecTbl+2,x
         sta     $76
-        jsr     $ffc5
+        jsr     _c1ffc5
         plx
         lda     $78
         clc
@@ -35373,44 +35502,44 @@ _d0dc2a:
         cmp     #$01
         beq     @dc5f
         lda     #$41
-        sta     $4330
-        lda     #$26        ; window position
-        sta     $4331
+        sta     hDMA3::CTRL
+        lda     #<hWH0
+        sta     hDMA3::HREG
         ldx     #near _d0dd81
-        stx     $4332
+        stx     hDMA3::ADDR
         lda     #^_d0dd81
-        sta     $4334
+        sta     hDMA3::ADDR_B
         lda     #$7e
-        sta     $4337
+        sta     hDMA3::HDMA_B
         lda     $7ebc84
         ora     #$08
         sta     $7ebc84
         bra     @dca0
 @dc5f:  lda     #$40
-        sta     $4360
-        lda     #$31
-        sta     $4361
+        sta     hDMA6::CTRL
+        lda     #<hCGADSUB
+        sta     hDMA6::HREG
         lda     $7edbd3
         beq     @dc74
         ldx     #near _d0dd9f
         bra     @dc77
 @dc74:  ldx     #near _d0ddac
-@dc77:  stx     $4362
+@dc77:  stx     hDMA6::ADDR
         lda     #^_d0dd9f
-        sta     $4364
+        sta     hDMA6::ADDR_B
         lda     #$7e
-        sta     $4367
+        sta     hDMA6::HDMA_B
         bra     @dca0
         lda     #$40
-        sta     $4360
-        lda     #$00
-        sta     $4361
+        sta     hDMA6::CTRL
+        lda     #<hINIDISP
+        sta     hDMA6::HREG
         ldx     #near _d0dd7a
-        stx     $4362
+        stx     hDMA6::ADDR
         lda     #^_d0dd7a
-        sta     $4364
+        sta     hDMA6::ADDR_B
         lda     #$7e
-        sta     $4367
+        sta     hDMA6::HDMA_B
 @dca0:  plb
         stz     $f9a1
         rtl
@@ -35425,78 +35554,78 @@ _d0dca5:
         pha
         plb
         lda     #$43        ; 2-address, write twice, indirect
-        sta     $4300
-        sta     $4310
-        sta     $4320
-        lda     #$0d        ; dma channel 0: bg1 scroll
-        sta     $4301
-        lda     #$0f        ; dma channel 1: bg2 scroll
-        sta     $4311
-        lda     #$11        ; dma channel 2: bg3 scroll
-        sta     $4321
+        sta     hDMA0::CTRL
+        sta     hDMA1::CTRL
+        sta     hDMA2::CTRL
+        lda     #<hBG1HOFS        ; dma channel 0: bg1 scroll
+        sta     hDMA0::HREG
+        lda     #<hBG2HOFS        ; dma channel 1: bg2 scroll
+        sta     hDMA1::HREG
+        lda     #<hBG3HOFS        ; dma channel 2: bg3 scroll
+        sta     hDMA2::HREG
         ldx     #$a897
-        stx     $4302
+        stx     hDMA0::ADDR
         ldx     #$a8b0
-        stx     $4312
+        stx     hDMA1::ADDR
         ldx     #$a930
-        stx     $4322
+        stx     hDMA2::ADDR
         lda     #$7e
-        sta     $4304
-        sta     $4314
-        sta     $4324
-        sta     $4307
-        sta     $4317
-        sta     $4327
+        sta     hDMA0::ADDR_B
+        sta     hDMA1::ADDR_B
+        sta     hDMA2::ADDR_B
+        sta     hDMA0::HDMA_B
+        sta     hDMA1::HDMA_B
+        sta     hDMA2::HDMA_B
         lda     $7edbd3
         beq     @dd0a
         lda     #$40
-        sta     $4320
-        lda     #$32        ; dma channel 2: fixed color
-        sta     $4321
+        sta     hDMA2::CTRL
+        lda     #<hCOLDATA        ; dma channel 2: fixed color
+        sta     hDMA2::HREG
         ldx     #near _d0dd7a
-        stx     $4322
+        stx     hDMA2::ADDR
         lda     #^_d0dd7a
-        sta     $4324
+        sta     hDMA2::ADDR_B
         lda     #$7e
-        sta     $4327
+        sta     hDMA2::HDMA_B
 @dd0a:  lda     #$40
-        sta     $4330
-        lda     #$05        ; dma channel 3: bg mode
-        sta     $4331
+        sta     hDMA3::CTRL
+        lda     #<hBGMODE        ; dma channel 3: bg mode
+        sta     hDMA3::HREG
         lda     $7edbd3
         beq     @dd1f
         ldx     #near _d0dd92
         bra     @dd22
 @dd1f:  ldx     #near _d0dd88
-@dd22:  stx     $4332
+@dd22:  stx     hDMA3::ADDR
         lda     #^_d0dd88
-        sta     $4334
+        sta     hDMA3::ADDR_B
         lda     #$7e
-        sta     $4337
+        sta     hDMA3::HDMA_B
         lda     #$40
-        sta     $4360
-        lda     #$00        ; dma channel 6: screen brightness
-        sta     $4361
+        sta     hDMA6::CTRL
+        lda     #<hINIDISP        ; dma channel 6: screen brightness
+        sta     hDMA6::HREG
         ldx     #near _d0dd7a
-        stx     $4362
+        stx     hDMA6::ADDR
         lda     #^_d0dd7a
-        sta     $4364
+        sta     hDMA6::ADDR_B
         lda     #$7e
-        sta     $4367
+        sta     hDMA6::HDMA_B
         lda     #$40
-        sta     $4370
-        lda     #$08        ; dma channel 7: bg2 base address
-        sta     $4371
+        sta     hDMA7::CTRL
+        lda     #<hBG2SC        ; dma channel 7: bg2 base address
+        sta     hDMA7::HREG
         lda     $7edbd3
         beq     @dd5e
         ldx     #near _d0ddc0
         bra     @dd61
 @dd5e:  ldx     #near _d0ddb6
-@dd61:  stx     $4372
+@dd61:  stx     hDMA7::ADDR
         lda     #^_d0ddb6
-        sta     $4374
+        sta     hDMA7::ADDR_B
         lda     #$7e
-        sta     $4377
+        sta     hDMA7::HDMA_B
         lda     $7ebc84     ; enable hdma channels 2,3,4,6,7
         ora     #$ce
         sta     $7ebc84
@@ -35599,17 +35728,17 @@ _d0de1a:
         pha
         plb
         pla
-        sty     $2116
-        stx     $4352
-        sta     $4354
+        sty     hVMADDL
+        stx     hDMA5::ADDR
+        sta     hDMA5::ADDR_B
         lda     #$01
-        sta     $4350
-        lda     #$18
-        sta     $4351
+        sta     hDMA5::CTRL
+        lda     #<hVMDATAL
+        sta     hDMA5::HREG
         ldx     $70
-        stx     $4355
+        stx     hDMA5::SIZE
         lda     #$20
-        sta     $420b
+        sta     hMDMAEN
         plb
         rtl
 
@@ -35629,17 +35758,17 @@ _d0de40:
         pha
         plb
         pla
-        sty     $2116
-        stx     $4342
-        sta     $4344
+        sty     hVMADDL
+        stx     hDMA4::ADDR
+        sta     hDMA4::ADDR_B
         lda     #$01
-        sta     $4340
-        lda     #$18
-        sta     $4341
+        sta     hDMA4::CTRL
+        lda     #<hVMDATAL
+        sta     hDMA4::HREG
         ldx     $88
-        stx     $4345
+        stx     hDMA4::SIZE
         lda     #$10
-        sta     $420b
+        sta     hMDMAEN
         plb
         rtl
 
@@ -35652,17 +35781,17 @@ _d0de66:
         lda     #$00
         pha
         plb
-        sta     $2121
+        sta     hCGADD
         ldx     #$2202
-        stx     $4340
+        stx     hDMA4::CTRL
         ldx     #$7e09      ; color palettes
-        stx     $4342
+        stx     hDMA4::ADDR
         lda     #$7e
-        sta     $4344
+        sta     hDMA4::ADDR_B
         ldx     #$0200
-        stx     $4345
+        stx     hDMA4::SIZE
         lda     #$10
-        sta     $420b
+        sta     hMDMAEN
         plb
         rtl
 
@@ -35678,24 +35807,24 @@ _d0de8c:
         pha
         plb
         ldx     #$0000
-        stx     $2102
+        stx     hOAMADDL
         ldx     #$0400
-        stx     $4340
+        stx     hDMA4::CTRL
         ldx     #$0200
-        stx     $4342
+        stx     hDMA4::ADDR
         lda     #$00
-        sta     $4344
-        sta     $4347
+        sta     hDMA4::ADDR_B
+        sta     hDMA4::HDMA_B
         ldx     #$0220
-        stx     $4345
+        stx     hDMA4::SIZE
         lda     #$10
-        sta     $420b
+        sta     hMDMAEN
         lda     $7ecd46
         bpl     @decf
         lda     $7ecd45
-        sta     $2102
+        sta     hOAMADDL
         lda     $7ecd46
-        sta     $2103
+        sta     hOAMADDH
 @decf:  plb
 @ded0:  rtl
 
@@ -35711,18 +35840,18 @@ _d0ded1:
         lda     #$00
         pha
         plb
-        stx     $2116
+        stx     hVMADDL
         ldx     #near @ZeroConst
-        stx     $4352
+        stx     hDMA5::ADDR
         lda     #$09
-        sta     $4350
-        lda     #$18
-        sta     $4351
+        sta     hDMA5::CTRL
+        lda     #<hVMDATAL
+        sta     hDMA5::HREG
         lda     #^@ZeroConst
-        sta     $4354
-        sty     $4355
+        sta     hDMA5::ADDR_B
+        sty     hDMA5::SIZE
         lda     #$20
-        sta     $420b
+        sta     hMDMAEN
         plb
         rtl
 

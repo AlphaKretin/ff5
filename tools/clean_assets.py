@@ -2,7 +2,7 @@
 
 import json
 import glob
-import os
+import os, sys
 import romtools as rt
 
 def clean_assets(rip_list):
@@ -24,11 +24,6 @@ def clean_assets(rip_list):
         asset_json = json.dumps(text_def, ensure_ascii=False, indent=2)
         with open(json_path, 'w', encoding='utf8') as f:
             f.write(asset_json)
-
-        # # delete the binary text file
-        # asset_root, _ = os.path.splitext(json_path)
-        # if os.path.exists(asset_root + '.dat'):
-        #     os.remove(asset_root + '.dat')
 
     # remove data assets
     for data_def in rip_list['data'] + rip_list['array']:
@@ -55,6 +50,16 @@ def clean_assets(rip_list):
                 if os.path.exists(asset_path):
                     # remove trimmed monster graphics files
                     os.remove(asset_path)
+        elif file_path.endswith('.bgt'):
+            for asset_path in glob.glob(file_path[:-4]):
+                if os.path.exists(asset_path):
+                    # remove trimmed monster graphics files
+                    os.remove(asset_path)
+        elif file_path.endswith('.bgf'):
+            for asset_path in glob.glob(file_path[:-4]):
+                if os.path.exists(asset_path):
+                    # remove trimmed monster graphics files
+                    os.remove(asset_path)
 
         # clear out automatically generated code from include files
         if 'inc_path' in data_def:
@@ -63,9 +68,9 @@ def clean_assets(rip_list):
 
 if __name__ == '__main__':
 
-    # read both rip lists
-    for rip_list_path in ['tools/rip_list_en.json', 'tools/rip_list_jp.json']:
-        with open(rip_list_path, 'r', encoding='utf8') as f:
-            rip_list = json.load(f)
-        clean_assets(rip_list)
+    rip_list_path = sys.argv[1]
+
+    with open(rip_list_path, 'r', encoding='utf8') as f:
+        rip_list = json.load(f)
+    clean_assets(rip_list)
 

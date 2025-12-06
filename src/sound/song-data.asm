@@ -3,13 +3,10 @@
 ; |                             FINAL FANTASY V                             |
 ; |                                                                         |
 ; +-------------------------------------------------------------------------+
-; | file: sound/song-data.s                                                 |
+; | file: sound/song-data.asm                                               |
 ; |                                                                         |
 ; | description: background music data                                      |
 ; +-------------------------------------------------------------------------+
-
-.include "sound/song_script.inc"
-.include "sound/sample_brr.inc"
 
 ; c4/3b97: pointers to song scripts
 SongScriptPtrs:
@@ -139,693 +136,715 @@ SampleADSR:
 
 ; ---------------------------------------------------------------------------
 
+; [ make song sample list ]
+
+_song_sample_seq .set 0
+
+.macro add_sample sample_id
+        ; use the sample id plus 1 (zero means no sample)
+        .word SAMPLE_BRR::sample_id + 1
+.endmac
+
+.macro song_sample_list
+        ; save the start position for this song's samples
+        .ident(.sprintf("_song_sample_%d", _song_sample_seq)) := *
+.endmac
+
+.macro end_song_sample_list
+        ; fill remaining space with zeroes (32 bytes total)
+        .res 32 + .ident(.sprintf("_song_sample_%d", _song_sample_seq)) - *, 0
+        _song_sample_seq .set _song_sample_seq + 1
+.endmac
+
+; ------------------------------------------------------------------------------
+
 ; c4/3daa
 
 SongSamples:
 
 ; 00 Ahead on Our Way
-        begin_song_samples 0
-        def_song_sample OBOE
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample CLOSED_HIHAT
-        def_song_sample OPEN_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample SNARE
-        def_song_sample HARP
-        def_song_sample CYMBAL
-        end_song_samples 0
+        song_sample_list
+        add_sample OBOE
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample CLOSED_HIHAT
+        add_sample OPEN_HIHAT
+        add_sample BASS_DRUM
+        add_sample SNARE
+        add_sample HARP
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 01 The Fierce Battle
-        begin_song_samples 1
-        def_song_sample TIMPANI
-        def_song_sample TRUMPET
-        def_song_sample BASS_GUITAR
-        def_song_sample STRINGS
-        def_song_sample CYMBAL
-        def_song_sample SNARE
-        end_song_samples 1
+        song_sample_list
+        add_sample TIMPANI
+        add_sample TRUMPET
+        add_sample BASS_GUITAR
+        add_sample STRINGS
+        add_sample CYMBAL
+        add_sample SNARE
+        end_song_sample_list
 
 ; 02 A Presentiment
-        begin_song_samples 2
-        def_song_sample OBOE
-        def_song_sample FLUTE
-        def_song_sample STRINGS
-        def_song_sample GRAND_PIANO
-        def_song_sample HORN
-        def_song_sample MUSIC_BOX_INSTR
-        def_song_sample CHOIR
-        def_song_sample SYNTH_CHORD
-        def_song_sample CYMBAL
-        end_song_samples 2
+        song_sample_list
+        add_sample OBOE
+        add_sample FLUTE
+        add_sample STRINGS
+        add_sample GRAND_PIANO
+        add_sample HORN
+        add_sample MUSIC_BOX_INSTR
+        add_sample CHOIR
+        add_sample SYNTH_CHORD
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 03 Go Go Boko!
-        begin_song_samples 3
-        def_song_sample OBOE
-        def_song_sample MARIMBA
-        def_song_sample BASS_GUITAR
-        def_song_sample TRUMPET
-        def_song_sample CLOSED_HIHAT
-        def_song_sample OPEN_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample SNARE
-        def_song_sample TOM
-        end_song_samples 3
+        song_sample_list
+        add_sample OBOE
+        add_sample MARIMBA
+        add_sample BASS_GUITAR
+        add_sample TRUMPET
+        add_sample CLOSED_HIHAT
+        add_sample OPEN_HIHAT
+        add_sample BASS_DRUM
+        add_sample SNARE
+        add_sample TOM
+        end_song_sample_list
 
 ; 04 Pirates Ahoy!
-        begin_song_samples 4
-        def_song_sample OBOE
-        def_song_sample FLUTE
-        def_song_sample TRUMPET
-        def_song_sample MANDOLIN
-        def_song_sample BASS_GUITAR
-        def_song_sample TIMPANI
-        end_song_samples 4
+        song_sample_list
+        add_sample OBOE
+        add_sample FLUTE
+        add_sample TRUMPET
+        add_sample MANDOLIN
+        add_sample BASS_GUITAR
+        add_sample TIMPANI
+        end_song_sample_list
 
 ; 05 Tenderness in the Air
-        begin_song_samples 5
-        def_song_sample HARP
-        def_song_sample OBOE
-        def_song_sample HORN
-        def_song_sample STRINGS
-        def_song_sample MANDOLIN
-        end_song_samples 5
+        song_sample_list
+        add_sample HARP
+        add_sample OBOE
+        add_sample HORN
+        add_sample STRINGS
+        add_sample MANDOLIN
+        end_song_sample_list
 
 ; 06 Fate in Haze
-        begin_song_samples 6
-        def_song_sample FLUTE
-        def_song_sample HARP
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample TOM
-        def_song_sample CASABA
-        def_song_sample CONGA
-        def_song_sample CYMBAL
-        end_song_samples 6
+        song_sample_list
+        add_sample FLUTE
+        add_sample HARP
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample TOM
+        add_sample CASABA
+        add_sample CONGA
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 07 Critter Tripper Fritter!
-        begin_song_samples 7
-        def_song_sample OBOE
-        def_song_sample FLUTE
-        def_song_sample MARIMBA
-        def_song_sample TIMPANI
-        def_song_sample BASS_GUITAR
-        end_song_samples 7
+        song_sample_list
+        add_sample OBOE
+        add_sample FLUTE
+        add_sample MARIMBA
+        add_sample TIMPANI
+        add_sample BASS_GUITAR
+        end_song_sample_list
 
 ; 08 The Prelude
-        begin_song_samples 8
-        def_song_sample HARP
-        def_song_sample STRINGS
-        def_song_sample OBOE
-        def_song_sample HORN
-        end_song_samples 8
+        song_sample_list
+        add_sample HARP
+        add_sample STRINGS
+        add_sample OBOE
+        add_sample HORN
+        end_song_sample_list
 
 ; 09 The Last Battle
-        begin_song_samples 9
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample FLUTE
-        def_song_sample CLOSED_HIHAT
-        def_song_sample OPEN_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample HARD_SNARE
-        end_song_samples 9
+        song_sample_list
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample CYMBAL
+        add_sample FLUTE
+        add_sample CLOSED_HIHAT
+        add_sample OPEN_HIHAT
+        add_sample BASS_DRUM
+        add_sample HARD_SNARE
+        end_song_sample_list
 
 ; 0A Requiem
-        begin_song_samples 10
-        def_song_sample FLUTE
-        def_song_sample STRINGS
-        end_song_samples 10
+        song_sample_list
+        add_sample FLUTE
+        add_sample STRINGS
+        end_song_sample_list
 
 ; 0B Nostalgia
-        begin_song_samples 11
-        def_song_sample PIANO
-        def_song_sample CHOIR
-        def_song_sample STRINGS
-        def_song_sample MUSIC_BOX_INSTR
-        end_song_samples 11
+        song_sample_list
+        add_sample PIANO
+        add_sample CHOIR
+        add_sample STRINGS
+        add_sample MUSIC_BOX_INSTR
+        end_song_sample_list
 
 ; 0C Cursed Earths
-        begin_song_samples 12
-        def_song_sample OBOE
-        def_song_sample STRINGS
-        def_song_sample GRAND_PIANO
-        def_song_sample TOM
-        def_song_sample TIMPANI
-        def_song_sample METAL_SYSTEM
-        end_song_samples 12
+        song_sample_list
+        add_sample OBOE
+        add_sample STRINGS
+        add_sample GRAND_PIANO
+        add_sample TOM
+        add_sample TIMPANI
+        add_sample METAL_SYSTEM
+        end_song_sample_list
 
 ; 0D Lenna's Theme
-        begin_song_samples 13
-        def_song_sample FLUTE
-        def_song_sample STRINGS
-        def_song_sample MUSIC_BOX_INSTR
-        def_song_sample BASS_GUITAR
-        def_song_sample VIBRAPHONE
-        end_song_samples 13
+        song_sample_list
+        add_sample FLUTE
+        add_sample STRINGS
+        add_sample MUSIC_BOX_INSTR
+        add_sample BASS_GUITAR
+        add_sample VIBRAPHONE
+        end_song_sample_list
 
 ; 0E Victory's Fanfare
-        begin_song_samples 14
-        def_song_sample TRUMPET
-        def_song_sample BASS_GUITAR
-        def_song_sample SNARE
-        def_song_sample BASS_DRUM
-        def_song_sample ORGAN
-        end_song_samples 14
+        song_sample_list
+        add_sample TRUMPET
+        add_sample BASS_GUITAR
+        add_sample SNARE
+        add_sample BASS_DRUM
+        add_sample ORGAN
+        end_song_sample_list
 
 ; 0F Deception
-        begin_song_samples 15
-        def_song_sample HARP
-        def_song_sample STRINGS
-        def_song_sample FLUTE
-        end_song_samples 15
+        song_sample_list
+        add_sample HARP
+        add_sample STRINGS
+        add_sample FLUTE
+        end_song_sample_list
 
 ; 10 The Day will Come
-        begin_song_samples 16
-        def_song_sample OBOE
-        def_song_sample HARP
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample CHOIR
-        end_song_samples 16
+        song_sample_list
+        add_sample OBOE
+        add_sample HARP
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample CHOIR
+        end_song_sample_list
 
 ; 11 ...silence
-        begin_song_samples 17
-        end_song_samples 17
+        song_sample_list
+        end_song_sample_list
 
 ; 12 Exdeath's Castle
-        begin_song_samples 18
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample TRUMPET
-        def_song_sample ORGAN
-        def_song_sample CYMBAL
-        def_song_sample TIMPANI
-        end_song_samples 18
+        song_sample_list
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample TRUMPET
+        add_sample ORGAN
+        add_sample CYMBAL
+        add_sample TIMPANI
+        end_song_sample_list
 
 ; 13 My Home, Sweet Home
-        begin_song_samples 19
-        def_song_sample FLUTE
-        def_song_sample PIANO
-        def_song_sample STRINGS
-        def_song_sample MANDOLIN
-        end_song_samples 19
+        song_sample_list
+        add_sample FLUTE
+        add_sample PIANO
+        add_sample STRINGS
+        add_sample MANDOLIN
+        end_song_sample_list
 
 ; 14 Waltz Suomi
-        begin_song_samples 20
-        def_song_sample STRINGS
-        def_song_sample FLUTE
-        def_song_sample OBOE
-        def_song_sample SNARE
-        def_song_sample HORN
-        def_song_sample TIMPANI
-        end_song_samples 20
+        song_sample_list
+        add_sample STRINGS
+        add_sample FLUTE
+        add_sample OBOE
+        add_sample SNARE
+        add_sample HORN
+        add_sample TIMPANI
+        end_song_sample_list
 
 ; 15 Sealed Away
-        begin_song_samples 21
-        def_song_sample OBOE
-        def_song_sample KLAVES
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample TIMPANI
-        def_song_sample KRABI
-        def_song_sample HARP
-        def_song_sample HORN
-        end_song_samples 21
+        song_sample_list
+        add_sample OBOE
+        add_sample KLAVES
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample TIMPANI
+        add_sample KRABI
+        add_sample HARP
+        add_sample HORN
+        end_song_sample_list
 
 ; 16 The Four Warriors of Dawn
-        begin_song_samples 22
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample TIMPANI
-        def_song_sample SNARE
-        def_song_sample CYMBAL
-        end_song_samples 22
+        song_sample_list
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample TIMPANI
+        add_sample SNARE
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 17 Danger!
-        begin_song_samples 23
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample BASS_DRUM
-        def_song_sample HARD_SNARE
-        end_song_samples 23
+        song_sample_list
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample CYMBAL
+        add_sample BASS_DRUM
+        add_sample HARD_SNARE
+        end_song_sample_list
 
 ; 18 The Fire-Powered Ship
-        begin_song_samples 24
-        def_song_sample BASS_GUITAR
-        def_song_sample STRINGS
-        def_song_sample SNARE
-        def_song_sample TRUMPET
-        def_song_sample CYMBAL
-        end_song_samples 24
+        song_sample_list
+        add_sample BASS_GUITAR
+        add_sample STRINGS
+        add_sample SNARE
+        add_sample TRUMPET
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 19 As I Feel, You Feel
-        begin_song_samples 25
-        def_song_sample STRINGS
-        def_song_sample OBOE
-        def_song_sample HARP
-        def_song_sample FLUTE
-        end_song_samples 25
+        song_sample_list
+        add_sample STRINGS
+        add_sample OBOE
+        add_sample HARP
+        add_sample FLUTE
+        end_song_sample_list
 
 ; 1A Mambo de Chocobo!
-        begin_song_samples 26
-        def_song_sample TRUMPET
-        def_song_sample UNKNOWN_1
-        def_song_sample BASS_GUITAR
-        def_song_sample KLAVES
-        def_song_sample WOO
-        def_song_sample CASABA
-        def_song_sample UNKNOWN_2
-        def_song_sample CONGA
-        end_song_samples 26
+        song_sample_list
+        add_sample TRUMPET
+        add_sample UNKNOWN_1
+        add_sample BASS_GUITAR
+        add_sample KLAVES
+        add_sample WOO
+        add_sample CASABA
+        add_sample UNKNOWN_2
+        add_sample CONGA
+        end_song_sample_list
 
 ; 1B Music Box
-        begin_song_samples 27
-        def_song_sample MUSIC_BOX_INSTR
-        end_song_samples 27
+        song_sample_list
+        add_sample MUSIC_BOX_INSTR
+        end_song_sample_list
 
 ; 1C Intension of the Earth
-        begin_song_samples 28
-        def_song_sample OBOE
-        def_song_sample HARP
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample ELECTRIC_BASS
-        def_song_sample KLAVES
-        def_song_sample CYMBAL
-        end_song_samples 28
+        song_sample_list
+        add_sample OBOE
+        add_sample HARP
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample ELECTRIC_BASS
+        add_sample KLAVES
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 1D The Dragon Spreads its Wings
-        begin_song_samples 29
-        def_song_sample TRUMPET
-        def_song_sample HARP
-        def_song_sample BASS_GUITAR
-        def_song_sample STRINGS
-        def_song_sample CLOSED_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample SNARE
-        end_song_samples 29
+        song_sample_list
+        add_sample TRUMPET
+        add_sample HARP
+        add_sample BASS_GUITAR
+        add_sample STRINGS
+        add_sample CLOSED_HIHAT
+        add_sample BASS_DRUM
+        add_sample SNARE
+        end_song_sample_list
 
 ; 1E Beyond the Deep Blue Sea
-        begin_song_samples 30
-        def_song_sample FLUTE
-        def_song_sample HARP
-        def_song_sample STRINGS
-        end_song_samples 30
+        song_sample_list
+        add_sample FLUTE
+        add_sample HARP
+        add_sample STRINGS
+        end_song_sample_list
 
 ; 1F Prelude of Empty Skies
-        begin_song_samples 31
-        def_song_sample BASS_DRUM
-        def_song_sample BASS_GUITAR
-        def_song_sample STRINGS
-        def_song_sample TRUMPET
-        def_song_sample FLUTE
-        def_song_sample KLAVES
-        def_song_sample HAND_CLAP
-        def_song_sample CYMBAL
-        end_song_samples 31
+        song_sample_list
+        add_sample BASS_DRUM
+        add_sample BASS_GUITAR
+        add_sample STRINGS
+        add_sample TRUMPET
+        add_sample FLUTE
+        add_sample KLAVES
+        add_sample HAND_CLAP
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 20 Searching the Light
-        begin_song_samples 32
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample SNARE
-        def_song_sample CYMBAL
-        def_song_sample TIMPANI
-        end_song_samples 32
+        song_sample_list
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample SNARE
+        add_sample CYMBAL
+        add_sample TIMPANI
+        end_song_sample_list
 
 ; 21 Harvest
-        begin_song_samples 33
-        def_song_sample OBOE
-        def_song_sample HAND_CLAP
-        def_song_sample FLUTE
-        def_song_sample ELECTRIC_BASS
-        def_song_sample MANDOLIN
-        def_song_sample TOM
-        end_song_samples 33
+        song_sample_list
+        add_sample OBOE
+        add_sample HAND_CLAP
+        add_sample FLUTE
+        add_sample ELECTRIC_BASS
+        add_sample MANDOLIN
+        add_sample TOM
+        end_song_sample_list
 
 ; 22 Gilgamesh
-        begin_song_samples 34
-        def_song_sample ORGAN
-        def_song_sample TRUMPET
-        def_song_sample BASS_GUITAR
-        def_song_sample DIST_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample CLOSED_HIHAT
-        def_song_sample OPEN_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample HARD_SNARE
-        def_song_sample TOM
-        end_song_samples 34
+        song_sample_list
+        add_sample ORGAN
+        add_sample TRUMPET
+        add_sample BASS_GUITAR
+        add_sample DIST_GUITAR
+        add_sample CYMBAL
+        add_sample CLOSED_HIHAT
+        add_sample OPEN_HIHAT
+        add_sample BASS_DRUM
+        add_sample HARD_SNARE
+        add_sample TOM
+        end_song_sample_list
 
 ; 23 Four Valiant Hearts
-        begin_song_samples 35
-        def_song_sample FLUTE
-        def_song_sample STRINGS
-        def_song_sample TIMPANI
-        def_song_sample BASS_GUITAR
-        def_song_sample SNARE
-        def_song_sample HARP
-        def_song_sample CYMBAL
-        def_song_sample HORN
-        def_song_sample TRUMPET
-        end_song_samples 35
+        song_sample_list
+        add_sample FLUTE
+        add_sample STRINGS
+        add_sample TIMPANI
+        add_sample BASS_GUITAR
+        add_sample SNARE
+        add_sample HARP
+        add_sample CYMBAL
+        add_sample HORN
+        add_sample TRUMPET
+        end_song_sample_list
 
 ; 24 The Book of Sealings
-        begin_song_samples 36
-        def_song_sample HARP
-        def_song_sample VIBRAPHONE
-        def_song_sample METAL_SYSTEM
-        def_song_sample CHOIR
-        def_song_sample CONGA
-        def_song_sample STRINGS
-        def_song_sample MANDOLIN
-        def_song_sample CYMBAL
-        end_song_samples 36
+        song_sample_list
+        add_sample HARP
+        add_sample VIBRAPHONE
+        add_sample METAL_SYSTEM
+        add_sample CHOIR
+        add_sample CONGA
+        add_sample STRINGS
+        add_sample MANDOLIN
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 25 What?
-        begin_song_samples 37
-        def_song_sample TOM
-        def_song_sample CONGA
-        def_song_sample CASABA
-        def_song_sample BASS_GUITAR
-        def_song_sample VIBRAPHONE
-        def_song_sample WOO
-        end_song_samples 37
+        song_sample_list
+        add_sample TOM
+        add_sample CONGA
+        add_sample CASABA
+        add_sample BASS_GUITAR
+        add_sample VIBRAPHONE
+        add_sample WOO
+        end_song_sample_list
 
 ; 26 Hurry! Hurry!
-        begin_song_samples 38
-        def_song_sample STRINGS
-        def_song_sample KRABI
-        def_song_sample CLOSED_HIHAT
-        def_song_sample OPEN_HIHAT
-        def_song_sample CONGA
-        def_song_sample BASS_DRUM
-        def_song_sample SNARE
-        def_song_sample VIBRAPHONE
-        def_song_sample BASS_GUITAR
-        def_song_sample CYMBAL
-        end_song_samples 38
+        song_sample_list
+        add_sample STRINGS
+        add_sample KRABI
+        add_sample CLOSED_HIHAT
+        add_sample OPEN_HIHAT
+        add_sample CONGA
+        add_sample BASS_DRUM
+        add_sample SNARE
+        add_sample VIBRAPHONE
+        add_sample BASS_GUITAR
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 27 Unknown Lands
-        begin_song_samples 39
-        def_song_sample FLUTE
-        def_song_sample STRINGS
-        def_song_sample HARP
-        def_song_sample BASS_GUITAR
-        def_song_sample OPEN_HIHAT
-        def_song_sample CLOSED_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample HARD_SNARE
-        def_song_sample SNARE
-        end_song_samples 39
+        song_sample_list
+        add_sample FLUTE
+        add_sample STRINGS
+        add_sample HARP
+        add_sample BASS_GUITAR
+        add_sample OPEN_HIHAT
+        add_sample CLOSED_HIHAT
+        add_sample BASS_DRUM
+        add_sample HARD_SNARE
+        add_sample SNARE
+        end_song_sample_list
 
 ; 28 The Airship
-        begin_song_samples 40
-        def_song_sample FLUTE
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample CLOSED_HIHAT
-        def_song_sample OPEN_HIHAT
-        def_song_sample TIMPANI
-        def_song_sample BASS_DRUM
-        def_song_sample SNARE
-        end_song_samples 40
+        song_sample_list
+        add_sample FLUTE
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample CYMBAL
+        add_sample CLOSED_HIHAT
+        add_sample OPEN_HIHAT
+        add_sample TIMPANI
+        add_sample BASS_DRUM
+        add_sample SNARE
+        end_song_sample_list
 
 ; 29 Fanfare #1
-        begin_song_samples 41
-        def_song_sample TRUMPET
-        def_song_sample TIMPANI
-        def_song_sample CYMBAL
-        def_song_sample STRINGS
-        end_song_samples 41
+        song_sample_list
+        add_sample TRUMPET
+        add_sample TIMPANI
+        add_sample CYMBAL
+        add_sample STRINGS
+        end_song_sample_list
 
 ; 2A Fanfare #2
-        begin_song_samples 42
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample FLUTE
-        def_song_sample CYMBAL
-        def_song_sample SNARE
-        def_song_sample TIMPANI
-        end_song_samples 42
+        song_sample_list
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample FLUTE
+        add_sample CYMBAL
+        add_sample SNARE
+        add_sample TIMPANI
+        end_song_sample_list
 
 ; 2B The Battle
-        begin_song_samples 43
-        def_song_sample STRINGS
-        def_song_sample TRUMPET
-        def_song_sample BASS_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample CLOSED_HIHAT
-        def_song_sample OPEN_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample SNARE
-        def_song_sample VIBRAPHONE
-        end_song_samples 43
+        song_sample_list
+        add_sample STRINGS
+        add_sample TRUMPET
+        add_sample BASS_GUITAR
+        add_sample CYMBAL
+        add_sample CLOSED_HIHAT
+        add_sample OPEN_HIHAT
+        add_sample BASS_DRUM
+        add_sample SNARE
+        add_sample VIBRAPHONE
+        end_song_sample_list
 
 ; 2C Walking the Snowy Mountains
-        begin_song_samples 44
-        def_song_sample TRUMPET
-        def_song_sample ORGAN
-        def_song_sample MANDOLIN
-        def_song_sample BASS_GUITAR
-        def_song_sample DIST_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample CLOSED_HIHAT
-        def_song_sample OPEN_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample SNARE
-        def_song_sample SYNTH_CHORD
-        end_song_samples 44
+        song_sample_list
+        add_sample TRUMPET
+        add_sample ORGAN
+        add_sample MANDOLIN
+        add_sample BASS_GUITAR
+        add_sample DIST_GUITAR
+        add_sample CYMBAL
+        add_sample CLOSED_HIHAT
+        add_sample OPEN_HIHAT
+        add_sample BASS_DRUM
+        add_sample SNARE
+        add_sample SYNTH_CHORD
+        end_song_sample_list
 
 ; 2D The Evil Lord, Exdeath
-        begin_song_samples 45
-        def_song_sample STRINGS
-        def_song_sample CHOIR
-        def_song_sample BASS_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample BASS_DRUM
-        def_song_sample HARD_SNARE
-        def_song_sample DIST_GUITAR
-        end_song_samples 45
+        song_sample_list
+        add_sample STRINGS
+        add_sample CHOIR
+        add_sample BASS_GUITAR
+        add_sample CYMBAL
+        add_sample BASS_DRUM
+        add_sample HARD_SNARE
+        add_sample DIST_GUITAR
+        end_song_sample_list
 
 ; 2E The Castle of Dawn
-        begin_song_samples 46
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample HORN
-        def_song_sample SNARE
-        def_song_sample CYMBAL
-        end_song_samples 46
+        song_sample_list
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample HORN
+        add_sample SNARE
+        add_sample CYMBAL
+        end_song_sample_list
 
 ; 2F I'm a Dancer
-        begin_song_samples 47
-        def_song_sample BASS_GUITAR
-        def_song_sample TRUMPET
-        def_song_sample MANDOLIN
-        def_song_sample KLAVES
-        def_song_sample HAND_CLAP
-        end_song_samples 47
+        song_sample_list
+        add_sample BASS_GUITAR
+        add_sample TRUMPET
+        add_sample MANDOLIN
+        add_sample KLAVES
+        add_sample HAND_CLAP
+        end_song_sample_list
 
 ; 30 Reminiscence
-        begin_song_samples 48
-        end_song_samples 48
+        song_sample_list
+        end_song_sample_list
 
 ; 31 Run!
-        begin_song_samples 49
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample FLUTE
-        def_song_sample MARIMBA
-        def_song_sample TIMPANI
-        def_song_sample CYMBAL
-        def_song_sample HORN
-        def_song_sample SNARE
-        end_song_samples 49
+        song_sample_list
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample FLUTE
+        add_sample MARIMBA
+        add_sample TIMPANI
+        add_sample CYMBAL
+        add_sample HORN
+        add_sample SNARE
+        end_song_sample_list
 
 ; 32 The Ancient Library
-        begin_song_samples 50
-        def_song_sample TOM
-        def_song_sample OPEN_HIHAT
-        def_song_sample SNARE
-        def_song_sample UNKNOWN_2
-        def_song_sample KLAVES
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        end_song_samples 50
+        song_sample_list
+        add_sample TOM
+        add_sample OPEN_HIHAT
+        add_sample SNARE
+        add_sample UNKNOWN_2
+        add_sample KLAVES
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        end_song_sample_list
 
 ; 33 Royal Palace
-        begin_song_samples 51
-        def_song_sample OBOE
-        def_song_sample TRUMPET
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample HARP
-        def_song_sample SNARE
-        def_song_sample TIMPANI
-        def_song_sample VIBRAPHONE
-        end_song_samples 51
+        song_sample_list
+        add_sample OBOE
+        add_sample TRUMPET
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample HARP
+        add_sample SNARE
+        add_sample TIMPANI
+        add_sample VIBRAPHONE
+        end_song_sample_list
 
 ; 34 Good Night!
-        begin_song_samples 52
-        end_song_samples 52
+        song_sample_list
+        end_song_sample_list
 
 ; 35 Piano lesson 1
-        begin_song_samples 53
-        def_song_sample VIBRAPHONE
-        def_song_sample KLAVES
-        def_song_sample VIBRAPHONE
-        def_song_sample ORGAN
-        end_song_samples 53
+        song_sample_list
+        add_sample VIBRAPHONE
+        add_sample KLAVES
+        add_sample VIBRAPHONE
+        add_sample ORGAN
+        end_song_sample_list
 
 ; 36 Piano lesson 2
-        begin_song_samples 54
-        def_song_sample VIBRAPHONE
-        def_song_sample KLAVES
-        def_song_sample VIBRAPHONE
-        def_song_sample ORGAN
-        end_song_samples 54
+        song_sample_list
+        add_sample VIBRAPHONE
+        add_sample KLAVES
+        add_sample VIBRAPHONE
+        add_sample ORGAN
+        end_song_sample_list
 
 ; 37 Piano lesson 3
-        begin_song_samples 55
-        def_song_sample VIBRAPHONE
-        def_song_sample KLAVES
-        def_song_sample VIBRAPHONE
-        def_song_sample ORGAN
-        end_song_samples 55
+        song_sample_list
+        add_sample VIBRAPHONE
+        add_sample KLAVES
+        add_sample VIBRAPHONE
+        add_sample ORGAN
+        end_song_sample_list
 
 ;38 Piano lesson 4
-        begin_song_samples 56
-        def_song_sample VIBRAPHONE
-        def_song_sample KLAVES
-        def_song_sample VIBRAPHONE
-        def_song_sample UNKNOWN_2
-        def_song_sample ORGAN
-        end_song_samples 56
+        song_sample_list
+        add_sample VIBRAPHONE
+        add_sample KLAVES
+        add_sample VIBRAPHONE
+        add_sample UNKNOWN_2
+        add_sample ORGAN
+        end_song_sample_list
 
 ; 39 Piano lesson 5
-        begin_song_samples 57
-        def_song_sample VIBRAPHONE
-        def_song_sample ORGAN
-        end_song_samples 57
+        song_sample_list
+        add_sample VIBRAPHONE
+        add_sample ORGAN
+        end_song_sample_list
 
 ; 3A Piano lesson 6
-        begin_song_samples 58
-        def_song_sample VIBRAPHONE
-        def_song_sample ORGAN
-        end_song_samples 58
+        song_sample_list
+        add_sample VIBRAPHONE
+        add_sample ORGAN
+        end_song_sample_list
 
 ; 3B Piano lesson 7
-        begin_song_samples 59
-        def_song_sample VIBRAPHONE
-        def_song_sample ORGAN
-        end_song_samples 59
+        song_sample_list
+        add_sample VIBRAPHONE
+        add_sample ORGAN
+        end_song_sample_list
 
 ; 3C Piano lesson 8
-        begin_song_samples 60
-        def_song_sample VIBRAPHONE
-        def_song_sample ORGAN
-        end_song_samples 60
+        song_sample_list
+        add_sample VIBRAPHONE
+        add_sample ORGAN
+        end_song_sample_list
 
 ; 3D Musica Machina
-        begin_song_samples 61
-        def_song_sample TIMPANI
-        def_song_sample BASS_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample STRINGS
-        def_song_sample TRUMPET
-        def_song_sample FLUTE
-        end_song_samples 61
+        song_sample_list
+        add_sample TIMPANI
+        add_sample BASS_GUITAR
+        add_sample CYMBAL
+        add_sample STRINGS
+        add_sample TRUMPET
+        add_sample FLUTE
+        end_song_sample_list
 
 ; 3E (a meteor is falling)
-        begin_song_samples 62
-        end_song_samples 62
+        song_sample_list
+        end_song_sample_list
 
 ; 3F The Land Unknown
-        begin_song_samples 63
-        def_song_sample MANDOLIN
-        def_song_sample HARP
-        def_song_sample CHOIR
-        def_song_sample STRINGS
-        def_song_sample BASS_GUITAR
-        def_song_sample FLUTE
-        def_song_sample BASS_DRUM
-        def_song_sample CASABA
-        def_song_sample VIBRAPHONE
-        def_song_sample KLAVES
-        end_song_samples 63
+        song_sample_list
+        add_sample MANDOLIN
+        add_sample HARP
+        add_sample CHOIR
+        add_sample STRINGS
+        add_sample BASS_GUITAR
+        add_sample FLUTE
+        add_sample BASS_DRUM
+        add_sample CASABA
+        add_sample VIBRAPHONE
+        add_sample KLAVES
+        end_song_sample_list
 
 ; 40 The Decisive Battle
-        begin_song_samples 64
-        def_song_sample STRINGS
-        def_song_sample TRUMPET
-        def_song_sample TOM
-        def_song_sample BASS_GUITAR
-        def_song_sample CYMBAL
-        def_song_sample SNARE
-        def_song_sample OPEN_HIHAT
-        def_song_sample CLOSED_HIHAT
-        def_song_sample BASS_DRUM
-        def_song_sample DIST_GUITAR
-        end_song_samples 64
+        song_sample_list
+        add_sample STRINGS
+        add_sample TRUMPET
+        add_sample TOM
+        add_sample BASS_GUITAR
+        add_sample CYMBAL
+        add_sample SNARE
+        add_sample OPEN_HIHAT
+        add_sample CLOSED_HIHAT
+        add_sample BASS_DRUM
+        add_sample DIST_GUITAR
+        end_song_sample_list
 
 ; 41 The Silent Beyond
-        begin_song_samples 65
-        def_song_sample FLUTE
-        def_song_sample OBOE
-        def_song_sample HARP
-        def_song_sample BASS_GUITAR
-        def_song_sample STRINGS
-        end_song_samples 65
+        song_sample_list
+        add_sample FLUTE
+        add_sample OBOE
+        add_sample HARP
+        add_sample BASS_GUITAR
+        add_sample STRINGS
+        end_song_sample_list
 
 ; 42 Dear Friends
-        begin_song_samples 66
-        def_song_sample MANDOLIN
-        def_song_sample FLUTE
-        end_song_samples 66
+        song_sample_list
+        add_sample MANDOLIN
+        add_sample FLUTE
+        end_song_sample_list
 
 ; 43 Final Fantasy
-        begin_song_samples 67
-        def_song_sample HORN
-        def_song_sample STRINGS
-        def_song_sample HARP
-        def_song_sample MUSIC_BOX_INSTR
-        def_song_sample FLUTE
-        def_song_sample VIBRAPHONE
-        end_song_samples 67
+        song_sample_list
+        add_sample HORN
+        add_sample STRINGS
+        add_sample HARP
+        add_sample MUSIC_BOX_INSTR
+        add_sample FLUTE
+        add_sample VIBRAPHONE
+        end_song_sample_list
 
 ; 44 A New Origin
-        begin_song_samples 68
-        def_song_sample STRINGS
-        def_song_sample TRUMPET
-        def_song_sample HORN
-        def_song_sample CYMBAL
-        def_song_sample SNARE
-        def_song_sample TIMPANI
-        def_song_sample FLUTE
-        def_song_sample HARP
-        end_song_samples 68
+        song_sample_list
+        add_sample STRINGS
+        add_sample TRUMPET
+        add_sample HORN
+        add_sample CYMBAL
+        add_sample SNARE
+        add_sample TIMPANI
+        add_sample FLUTE
+        add_sample HARP
+        end_song_sample_list
 
 ; 45 (crickets chirping)
-        begin_song_samples 69
-        end_song_samples 69
+        song_sample_list
+        end_song_sample_list
 
 ; 46 a shore
-        begin_song_samples 70
-        end_song_samples 70
+        song_sample_list
+        end_song_sample_list
 
 ; 47 the tide rolls in
-        begin_song_samples 71
-        end_song_samples 71
+        song_sample_list
+        end_song_sample_list
 
 ; ---------------------------------------------------------------------------
 

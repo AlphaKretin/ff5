@@ -12171,6 +12171,8 @@ _c06961:
         sta     $7f0000,x
         iny
         bra     @6a4e
+
+; big mountain tiles
 @6a1f:  inx
         stx     $23
         tyx
@@ -12181,9 +12183,11 @@ _c06961:
         sta     $7f0002,x
         iny3
         bra     @6a4e
+
+; repeated tile
 @6a36:  sec
         sbc     #$c0
-        sta     $09
+        sta     $09                     ; run length
         lda     $7f7623,x
         inx2
         stx     $23
@@ -22910,6 +22914,12 @@ _2f68:
         sbc     $80
         sta     $f507
         jml     _c13c87
+
+; ---------------------------------------------------------------------------
+
+.export _e02fb2
+
+_e02fb2:
         lda     [$b8]
         bra     _2fb9
 

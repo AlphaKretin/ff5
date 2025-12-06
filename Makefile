@@ -8,9 +8,6 @@ VERSION_EXT =
 LINK = ld65
 LINKFLAGS =
 
-# script to fix the SNES checksum
-FIX_CHECKSUM = python3 tools/fix_checksum.py
-
 # list of ROM versions
 VERSIONS = ff5-jp ff5-en
 OBJ_DIR = obj
@@ -20,8 +17,8 @@ ROMS = $(foreach V, $(VERSIONS), $(ROM_DIR)/$(V).sfc)
 # the SPC program
 # SPC_PRG = src/sound/ff5-spc.dat
 
-.PHONY: all rip clean distclean \
-	$(VERSIONS) $(MODULES)
+.PHONY: all setup rip clean spc distclean rng lz cmp text world_tilemap \
+	battle_bg_tiles battle_bg_flip $(VERSIONS)
 
 # disable default suffix rules
 .SUFFIXES:
@@ -29,20 +26,39 @@ ROMS = $(foreach V, $(VERSIONS), $(ROM_DIR)/$(V).sfc)
 # make all versions
 all: $(VERSIONS)
 
+VENV_DIR := tools/venv
+PYTHON := $(VENV_DIR)/bin/python3
+PIP := $(VENV_DIR)/bin/pip3
+
+# set up a python virtual environment
+setup:
+	@test -d $(VENV_DIR) || python3 -m venv $(VENV_DIR)
+	@$(PIP) install --upgrade pip setuptools
+	@$(PIP) install git+https://github.com/everything8215/romtools.git
+
 # rip data from ROMs
-rip:
-	python3 tools/extract_assets.py
+rip: setup
+	$(PYTHON) tools/extract_assets.py
+
+# shuffle the RNG table
+rng:
+	$(PYTHON) tools/shuffle_rng.py src/field/rng_tbl.dat
 
 # remove all intermediate files
 clean:
-	$(RM) -rf $(ROM_DIR) $(OBJ_DIR)
+	$(RM) -r $(ROM_DIR) $(OBJ_DIR)
 	find ./src -name "*.cmp" -type f -delete
 	find ./src -name "*.lz" -type f -delete
+	find ./src -name "*.bgt" -type f -delete
+	find ./src -name "*.bgf" -type f -delete
 	find ./src/text -name "*.dat" -type f -delete
+	$(RM) ./src/field/world_tilemap.dat
 
 # remove all ripped assets
 distclean: clean
-	python3 tools/clean_assets.py
+	$(PYTHON) tools/clean_assets.py tools/rip_list_jp.json
+	$(PYTHON) tools/clean_assets.py tools/rip_list_en.json
+	find ./src/field/world_tilemap -name "*.dat" -type f -delete
 
 # ROM filenames
 FF5_JP_PATH = $(ROM_DIR)/ff5-jp.sfc
@@ -59,10 +75,10 @@ ff5-jp: ASMFLAGS += -D ROM_VERSION=0
 ff5-en: ASMFLAGS += -D LANG_EN=1 -D ROM_VERSION=0
 
 %.lz: %
-	python3 tools/ff5_compress.py $< $@ lzss
+	$(PYTHON) tools/ff5_compress.py $< lzss
 
 %.cmp: %
-	python3 tools/ff5_compress.py $< $@ multi
+	$(PYTHON) tools/ff5_compress.py $< multi
 
 # list of all include files
 INC_FILES = $(wildcard include/*.inc) $(wildcard include/*/*.inc)
@@ -129,8 +145,8 @@ src/cutscene/unknown_c37a07.dat \
 src/cutscene/unknown_c37a69.dat \
 src/cutscene/unknown_c37b92.dat
 
-LZ_FILES = $(foreach file, $(LZ_LIST), $(file).lz)
-CMP_FILES = $(foreach file, $(CMP_LIST), $(file).cmp)
+LZ_FILES = $(addsuffix .lz, $(LZ_LIST))
+CMP_FILES = $(addsuffix .cmp, $(CMP_LIST))
 
 lz: $(LZ_FILES)
 cmp: $(CMP_FILES)
@@ -168,26 +184,41 @@ text_en: $(TEXT_DAT_EN)
 text: text_jp text_en
 
 src/text/%.dat: src/text/%.json
-	python3 tools/encode_text.py $<
+	$(PYTHON) tools/encode_text.py $<
+
+src/field/world_tilemap.dat: $(wildcard src/field/world_tilemap/world_tilemap_*.dat)
+	$(PYTHON) tools/encode_world_tilemap.py
+
+world_tilemap: src/field/world_tilemap.dat
+
+battle_bg_tiles: $(addsuffix .bgt, $(wildcard src/gfx/battle_bg_tiles/*.scr))
+
+%.bgt: %
+	$(PYTHON) tools/encode_battle_bg_tiles.py $<
+
+battle_bg_flip: $(addsuffix .bgf, $(wildcard src/gfx/battle_bg_flip/*.dat))
+
+%.bgf: %
+	$(PYTHON) tools/encode_battle_bg_flip.py $<
 
 # rules for making ROM files
 # run linker twice: 1st for the cutscene program, 2nd for the ROM itself
-$(FF5_JP_PATH): cfg/ff5-jp.cfg text_jp cmp lz $(OBJ_FILES_JP)
+$(FF5_JP_PATH): cfg/ff5-jp.cfg text_jp cmp lz world_tilemap battle_bg_tiles $(OBJ_FILES_JP)
 	@mkdir -p $(LZ_DIR) $(ROM_DIR)
 	$(LINK) $(LINKFLAGS) -o "" -C $< $(OBJ_FILES_JP)
-	python3 tools/encode_cutscene.py $(CUTSCENE_LZ:lz=bin) $(CUTSCENE_LZ)
+	$(PYTHON) tools/encode_cutscene.py $(CUTSCENE_LZ:lz=bin) $(CUTSCENE_LZ)
 	@printf '.segment "cutscene_code_lz"\n.incbin "cutscene.lz"' > $(CUTSCENE_LZ_ASM)
 	$(ASM) --bin-include-dir $(LZ_DIR) $(CUTSCENE_LZ_ASM) -o $(CUTSCENE_LZ).o
 	$(LINK) $(LINKFLAGS) --dbgfile $(@:sfc=dbg) -m $(@:sfc=map) -o $@ -C $< $(OBJ_FILES_JP) $(CUTSCENE_LZ).o
-	@$(RM) -rf $(LZ_DIR)
-	$(FIX_CHECKSUM) $@
+	@$(RM) -r $(LZ_DIR)
+	$(PYTHON) tools/fix_checksum.py $@
 
-$(FF5_EN_PATH): cfg/ff5-en.cfg text_en cmp lz $(OBJ_FILES_EN)
+$(FF5_EN_PATH): cfg/ff5-en.cfg text_en cmp lz world_tilemap battle_bg_tiles $(OBJ_FILES_EN)
 	@mkdir -p $(LZ_DIR) $(ROM_DIR)
 	$(LINK) $(LINKFLAGS) -o "" -C $< $(OBJ_FILES_EN)
-	python3 tools/encode_cutscene.py $(CUTSCENE_LZ:lz=bin) $(CUTSCENE_LZ)
+	$(PYTHON) tools/encode_cutscene.py $(CUTSCENE_LZ:lz=bin) $(CUTSCENE_LZ)
 	@printf '.segment "cutscene_code_lz"\n.incbin "cutscene.lz"' > $(CUTSCENE_LZ_ASM)
 	$(ASM) --bin-include-dir $(LZ_DIR) $(CUTSCENE_LZ_ASM) -o $(CUTSCENE_LZ).o
 	$(LINK) $(LINKFLAGS) --dbgfile $(@:sfc=dbg) -m $(@:sfc=map) -o $@ -C $< $(OBJ_FILES_EN) $(CUTSCENE_LZ).o
-	@$(RM) -rf $(LZ_DIR)
-	$(FIX_CHECKSUM) $@
+	@$(RM) -r $(LZ_DIR)
+	$(PYTHON) tools/fix_checksum.py $@

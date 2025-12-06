@@ -1,8 +1,9 @@
 {
-  "asset_label": "JobDesc",
+  "asset_label": "AbilityDesc",
   "inc_path": "include/text/ability_desc_en.inc",
   "char_tables": [
     "battle_escape",
+    "small_symbols_en",
     "battle_symbols_en",
     "text_en",
     "dte_en"

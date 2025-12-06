@@ -87,7 +87,7 @@
     },
     {
       "json_path": "src/text/key_item_name_en.json",
-      "asset_range": "0xE73568-0xE7369F"
+      "asset_range": "0xE73500-0xE7369F"
     },
     {
       "json_path": "src/text/monster_special_name_en.json",

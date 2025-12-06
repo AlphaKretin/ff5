@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # calculate CRC32
     crc32 = binascii.crc32(src_data) & 0xFFFFFFFF
-    print('Cutscene CRC32:', rt.hex_string(crc32, 8))
+    print('Cutscene CRC32:', '0x%08X' % crc32)
 
     # check if it matches a vanilla cutscene program
     if crc32 == 0xAEF2C05E and os.path.exists(CUTSCENE_LZ_PATH):
