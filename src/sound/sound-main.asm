@@ -875,9 +875,9 @@ _c40641:
 
 ; c4/064d
 SPCCode:
-        spc_block
+        ; spc_block
         .incbin "ff5_spc.dat"
-        end_spc_block
+        ; end_spc_block
 
 ; ---------------------------------------------------------------------------
 
