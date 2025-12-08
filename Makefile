@@ -31,6 +31,7 @@ PYTHON := python3
 export PYTHONPATH := tools/romtools:$(PYTHONPATH)
 
 # rip data from ROMs
+rip:
 	$(PYTHON) tools/extract_assets.py
 
 # shuffle the RNG table
