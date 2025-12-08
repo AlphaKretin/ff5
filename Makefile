@@ -32,6 +32,7 @@ export PYTHONPATH := tools/romtools:$(PYTHONPATH)
 
 # rip data from ROMs
 rip:
+	git submodule update --init --recursive
 	$(PYTHON) tools/extract_assets.py
 
 # shuffle the RNG table
