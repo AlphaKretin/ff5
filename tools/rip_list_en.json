@@ -87,7 +87,7 @@
     },
     {
       "json_path": "src/text/key_item_name_en.json",
-      "asset_range": "0xE73568-0xE7369F"
+      "asset_range": "0xE73500-0xE7369F"
     },
     {
       "json_path": "src/text/monster_special_name_en.json",
@@ -142,6 +142,14 @@
     {
       "file_path": "src/gfx/battle_sprites1_en.3bpp",
       "asset_range": "0xD497C0-0xD49E4F"
+    },
+    {
+      "file_path": "src/field/font_width_en.dat",
+      "asset_range": "0xE03225-0xE03724"
+    },
+    {
+      "file_path": "src/field/prophecy_text.1bpp",
+      "asset_range": "0xE03725-0xE04C24"
     }
   ],
   "array": []

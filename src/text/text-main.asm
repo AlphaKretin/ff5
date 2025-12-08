@@ -349,10 +349,14 @@ MenuText:
 
 .segment "key_item_name_en"
 
-; e7/3568
+.export KeyItemName, _e736a0
+
+; e7/3500
 KeyItemName:
         .incbin "key_item_name_en.dat"
 
+; e7/36a0
+_e736a0:
         .word   $6388,$63a4,$6408,$6424,$6488,$64a4,$6508,$6524
         .word   $6588,$65a4,$6608,$6624,$6688,$66a4,$6708,$6724
         .word   $6788,$67a4,$6808,$6824,$6888,$68a4,$68a4,$68a4

@@ -591,6 +591,59 @@
       "asset_range": "0xD1F000-0xD1FFFF"
     },
     {
+      "file_path": "src/gfx/battle_bg_flip/%s.dat.bgf",
+      "asset_range": "0xD4C748-0xD4C86C",
+      "ptr_range": "0xD4C736-0xD4C747",
+      "ptr_offset": "0xD40000",
+      "file_list": [
+        "none",
+        "forest",
+        "moore_ext",
+        "mountain_ext",
+        "beach",
+        "grass",
+        "void",
+        "desert_holes",
+        "final_battle"
+      ]
+    },
+    {
+      "file_path": "src/gfx/battle_bg_tiles/%s.scr.bgt",
+      "asset_range": "0xD4C8A5-0xD4EFF0",
+      "ptr_range": "0xD4C86D-0xD4C8A4",
+      "ptr_offset": "0xD40000",
+      "file_list": [
+        "grass",
+        "beach",
+        "desert",
+        "forest",
+        "moore_ext",
+        "cave",
+        "cave_water",
+        "mountain_ext",
+        "swamp",
+        "tower_int",
+        "tower_ext",
+        "shrine",
+        "castle_int",
+        "castle_ext",
+        "library",
+        "pyramid",
+        "ship_int",
+        "shipwreck_int",
+        "fire_ship",
+        "ship_ext",
+        "flying_fortress",
+        "moore_int",
+        "castle_exdeath",
+        "void",
+        "desert_holes",
+        "ronka_ruins",
+        "phoenix_tower",
+        "final_battle"
+      ]
+    },
+    {
       "file_path": "src/sound/sample_brr_33.dat",
       "asset_range": "0xD4F000-0xD4FE7D"
     },
@@ -625,18 +678,6 @@
       "file_path": "src/gfx/battle_bg_pal/pal_%s.pal",
       "asset_range": "0xD4BB31-0xD4C5B0",
       "item_size": 32
-    },
-    {
-      "file_path": "src/gfx/battle_bg_flip/flip_%s.dat",
-      "asset_range": "0xD4C748-0xD4C86C",
-      "ptr_range": "0xD4C736-0xD4C747",
-      "ptr_offset": "0xD40000"
-    },
-    {
-      "file_path": "src/gfx/battle_bg_tiles/tiles_%s.scr",
-      "asset_range": "0xD4C8A5-0xD4EFF0",
-      "ptr_range": "0xD4C86D-0xD4C8A4",
-      "ptr_offset": "0xD40000"
     },
     {
       "file_path": "src/gfx/monster_gfx.dat",
@@ -810,38 +851,6 @@
       "ptr_range": "0xC43C6F-0xC43CD7",
       "ptr_size": 3,
       "is_mapped": true
-    },
-    {
-      "file_path": "src/gfx/battle_bg_anim.dat",
-      "inc_path": "include/gfx/battle_bg_anim.inc",
-      "asset_range": "0xD4C5C1-0xD4C6CC",
-      "asset_label": "BattleBGAnim",
-      "ptr_range": "0xD4C5B1-0xD4C5C0",
-      "ptr_offset": "0xD40000"
-    },
-    {
-      "file_path": "src/gfx/battle_bg_pal_anim.dat",
-      "inc_path": "include/gfx/battle_bg_pal_anim.inc",
-      "asset_range": "0xD4C6D3-0xD4C735",
-      "asset_label": "BattleBGPalAnim",
-      "ptr_range": "0xD4C6CD-0xD4C6D2",
-      "ptr_offset": "0xD40000"
-    },
-    {
-      "file_path": "src/gfx/battle_bg_flip.dat",
-      "inc_path": "include/gfx/battle_bg_flip.inc",
-      "asset_range": "0xD4C748-0xD4C86C",
-      "asset_label": "BattleBGFlip",
-      "ptr_range": "0xD4C736-0xD4C747",
-      "ptr_offset": "0xD40000"
-    },
-    {
-      "file_path": "src/gfx/battle_bg_tiles.dat",
-      "inc_path": "include/gfx/battle_bg_tiles.inc",
-      "asset_range": "0xD4C8A5-0xD4EFF0",
-      "asset_label": "BattleBGTiles",
-      "ptr_range": "0xD4C86D-0xD4C8A4",
-      "ptr_offset": "0xD40000"
     },
     {
       "file_path": "src/btlgfx/attack_anim_script.dat",

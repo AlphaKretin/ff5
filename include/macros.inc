@@ -534,8 +534,340 @@ PSW_C = %00000001
 
 ; ------------------------------------------------------------------------------
 
+.mac make_bitmask prefix, base_val, namespace, b1, b2, b3, b4, b5, b6, b7, b8
+        .local @val
+        @val .set 0
+        .ifnblank b1
+                @val .set (@val | ::namespace::b1)
+        .endif
+        .ifnblank b2
+                @val .set (@val | ::namespace::b2)
+        .endif
+        .ifnblank b3
+                @val .set (@val | ::namespace::b3)
+        .endif
+        .ifnblank b4
+                @val .set (@val | ::namespace::b4)
+        .endif
+        .ifnblank b5
+                @val .set (@val | ::namespace::b5)
+        .endif
+        .ifnblank b6
+                @val .set (@val | ::namespace::b6)
+        .endif
+        .ifnblank b7
+                @val .set (@val | ::namespace::b7)
+        .endif
+        .ifnblank b8
+                @val .set (@val | ::namespace::b8)
+        .endif
+        prefix @val | base_val
+.endmac
+
+; ------------------------------------------------------------------------------
+
+.mac opflg op, namespace, flags
+        make_bitmask op, 0, namespace, flags
+.endmac
+
+.define ldaflg opflg lda #,
+.define ldxflg opflg ldx #,
+.define ldyflg opflg ldy #,
+.define setflg opflg ora #,
+.define andflg opflg and #,
+.define eorflg opflg eor #,
+.define bitflg opflg bit #,
+.define peaflg opflg pea,
+
+.mac clrflg namespace, flags
+        .if .asize = 8
+                opflg and #$ff^, namespace, {flags}
+        .else
+                opflg and #$ffff^, namespace, {flags}
+        .endif
+.endmac
+
+; ------------------------------------------------------------------------------
+
+; [ hdma macros ]
+
+.mac hdma_byte lines, value
+        .byte lines
+        .byte value
+.endmac
+
+.mac hdma_word lines, value
+        .byte lines
+        .if value < 0
+                .word .loword(value)
+        .else
+                .word value
+        .endif
+.endmac
+
+.mac _hdma_2byte lines, value1, value2
+        .byte lines
+        .byte value1, value2
+.endmac
+
+.mac hdma_2byte lines, values
+        _hdma_2byte lines, values
+.endmac
+
+.mac _hdma_4byte lines, value1, value2, value3, value4
+        .byte lines
+        .byte value1, value2, value3, value4
+.endmac
+
+.mac hdma_4byte lines, values
+        _hdma_4byte lines, values
+.endmac
+
+.mac hdma_addr lines, value
+        .byte lines
+        .addr value
+.endmac
+
+.mac hdma_end
+        .byte 0
+.endmac
+
+; ------------------------------------------------------------------------------
+
+; [ macros for reserving RAM variables ]
+
+.enum RAM_ADDR_SIZE
+        ZP = 1
+        NEAR = 2
+        FAR = 3
+.endenum
+
+::_ram_offset .set 0
+::_ram_verbose .set 0
+::_ram_addr_size .set RAM_ADDR_SIZE::FAR
+::_ram_scope_start .set 0
+
+.define ram_org(offset) ::_ram_offset .set offset
+.define ram_verbose(value) ::_ram_verbose .set value
+.define ram_addr_size(size) ::_ram_addr_size .set RAM_ADDR_SIZE::size
+
+.mac ram_label label, namespace
+        .ifblank namespace
+                .ident(.sprintf("%s_zp", .string(label))) := <::_ram_offset
+                .ident(.sprintf("%s_near", .string(label))) := near ::_ram_offset
+                .ident(.sprintf("%s_far", .string(label))) := ::_ram_offset
+                .if ::_ram_addr_size = RAM_ADDR_SIZE::ZP
+                        label := <::_ram_offset
+                .elseif ::_ram_addr_size = RAM_ADDR_SIZE::NEAR
+                        label := near ::_ram_offset
+                .elseif ::_ram_addr_size = RAM_ADDR_SIZE::FAR
+                        label := ::_ram_offset
+                .endif
+        .else
+                namespace::.ident(.sprintf("%s_zp", .string(label))) := <::_ram_offset
+                namespace::.ident(.sprintf("%s_near", .string(label))) := near ::_ram_offset
+                namespace::.ident(.sprintf("%s_far", .string(label))) := ::_ram_offset
+                .if ::_ram_addr_size = RAM_ADDR_SIZE::ZP
+                        namespace::label := <::_ram_offset
+                .elseif ::_ram_addr_size = RAM_ADDR_SIZE::NEAR
+                        namespace::label := near ::_ram_offset
+                .elseif ::_ram_addr_size = RAM_ADDR_SIZE::FAR
+                        namespace::label := ::_ram_offset
+                .endif
+        .endif
+.endmac
+
+.mac ram_res size, label
+        ; define the label
+        .ifnblank label
+                ram_label label
+
+                ; define labels for array items
+                .if .defined(ARRAY_LENGTH) && .defined(ITEM_SIZE)
+                        .local old_offset
+                        old_offset = ::_ram_offset
+                        .repeat ARRAY_LENGTH, i
+                                ram_label label, .ident(.sprintf("_%d", i))
+                                ::_ram_offset .set ::_ram_offset + BLOCK_SIZE
+                        .endrep
+                        ::_ram_offset .set old_offset
+                .endif
+
+                ; print the label and address
+                .if ::_ram_verbose
+                        .if label <= $ff
+                                .out .sprintf("$%02x %s", label, .string(label))
+                        .elseif label <= $ffff
+                                .out .sprintf("$%04x %s", label, .string(label))
+                        .else
+                                .out .sprintf("$%06x %s", label, .string(label))
+                        .endif
+                .endif
+
+                ; define the size
+                .if size <> 0
+                        .scope label
+                        .endscope
+                        label::SIZE = size
+                .endif
+        .endif
+
+        ; increment the ram offset
+        ::_ram_offset .set ::_ram_offset + size
+.endmac
+
+.mac ram_byte label
+        ram_res 1, label
+.endmac
+
+.mac ram_word label
+        ram_res 2, label
+.endmac
+
+.mac ram_faraddr label
+        ram_res 3, label
+.endmac
+
+.mac ram_dword label
+        ram_res 4,  label
+.endmac
+
+.mac ram_scope label
+        ram_res 0, label
+        .scope label
+        START = ::_ram_offset
+.endmac
+
+.mac end_ram_scope
+; define the size of this scope and end the scope
+        .ifndef SIZE
+                SIZE = ::_ram_offset - START
+        .endif
+        .endscope
+.endmac
+
+.mac ram_array label, array_length, item_size, num_blocks
+        ram_scope label
+        ITEM_SIZE = item_size
+        ARRAY_LENGTH = array_length
+        SIZE = ITEM_SIZE * ARRAY_LENGTH
+        .ifnblank num_blocks
+                ; array with more than 1 block
+                .assert item_size .mod num_blocks = 0, error, "Item size must be divisible by the number of blocks"
+                BLOCK_SIZE = item_size / num_blocks
+                NUM_BLOCKS = num_blocks
+                ::_block_start .set START
+        .else
+                BLOCK_SIZE = item_size
+                NUM_BLOCKS = 1
+        .endif
+
+        ; create namespaces for each array item
+        .repeat ARRAY_LENGTH, i
+                .scope .ident(.sprintf("_%d", i))
+                .endscope
+                ::_ram_offset .set START + i * ITEM_SIZE / NUM_BLOCKS
+                ram_label .ident(.sprintf("_%d", i)), label
+        .endrep
+        ::_ram_offset .set START
+
+        .repeat NUM_BLOCKS, i
+                ::_ram_offset .set START + i * BLOCK_SIZE * ARRAY_LENGTH
+                ram_label .ident(.sprintf("BLOCK_%d", i)), label
+                .repeat ARRAY_LENGTH, j
+                        ram_label .ident(.sprintf("BLOCK_%d", i)), label::.ident(.sprintf("_%d", j))
+                        ::_ram_offset .set ::_ram_offset + ITEM_SIZE / NUM_BLOCKS
+                .endrep
+        .endrep
+        ::_ram_offset .set START
+.endmac
+
+.mac end_ram_array
+        ; make sure we didn't overflow
+        .local bytes_over
+        .if NUM_BLOCKS > 1
+                bytes_over = ::_ram_offset - ::_block_start - BLOCK_SIZE
+                .assert bytes_over <= 0, error, .sprintf("Array block too large by %d bytes", bytes_over)
+        .else
+                bytes_over = ::_ram_offset - START - ITEM_SIZE
+                .assert bytes_over <= 0, error, .sprintf("Array item too large by %d bytes", bytes_over)
+        .endif
+
+        ; increment the RAM offset
+        ::_ram_offset .set START + SIZE
+        end_ram_scope
+.endmac
+
+.mac end_ram_block
+        ; check if the block overflowed
+        .local bytes_over
+        bytes_over = ::_ram_offset - ::_block_start - BLOCK_SIZE
+        .assert bytes_over <= 0, error, .sprintf("Array block too large by %d bytes", bytes_over)
+
+        ; go to the next block
+        ::_ram_offset .set ::_block_start + BLOCK_SIZE * ARRAY_LENGTH
+        ::_block_start .set ::_ram_offset
+.endmac
+
 .define array_item(array, index) array::.ident(.sprintf("_%d", index))
 .define array_member(array, index, member) array::.ident(.sprintf("_%d", index))::member
+.define array_offset(array, index) (array::.ident(.sprintf("_%d", index)) - array)
+.define array_member_offset(array, index, member) (array::.ident(.sprintf("_%d", index))::member - array)
+.define array_label(array, index) array_item array, {index} := *
+
+; ------------------------------------------------------------------------------
+
+_bitlist_size .set 0
+
+.mac bitlist size
+; allow up to 1024 bits (thirty-two 32-bit variables)
+        .assert size <= 1024, error, "Too many bits in bitlist"
+        ::_bitlist_size .set size
+; reset all bitlist variables
+        .repeat 32, i
+                ::.ident(.sprintf("_bitlist_%d", i)) .set 0
+        .endrep
+.endmac
+
+.mac bitlist_set bit_index
+        .assert (bit_index) < ::_bitlist_size, error, "Invalid bit_index"
+        .local bit_mask
+        .local var_index
+        .local old_var
+        bit_mask = 1 << ((bit_index) & %11111)
+        var_index = (bit_index) >> 5
+        old_var = ::.ident(.sprintf("_bitlist_%d", var_index))
+        ::.ident(.sprintf("_bitlist_%d", var_index)) .set old_var | bit_mask
+.endmac
+
+.mac bitlist_clr bit_index
+        .assert (bit_index) < ::_bitlist_size, error, "Invalid bit_index"
+        .local bit_mask
+        .local var_index
+        .local old_var
+        bit_mask = 1 << ((bit_index) & %11111)
+        var_index = (bit_index) >> 5
+        old_var = ::.ident(.sprintf("_bitlist_%d", var_index))
+        ::.ident(.sprintf("_bitlist_%d", var_index)) .set old_var & ~bit_mask
+.endmac
+
+.mac end_bitlist
+        .local num_vars
+        .local leftover_bytes
+        num_vars = (::_bitlist_size + 7) / 32
+        .repeat num_vars, ii
+                .dword ::.ident(.sprintf("_bitlist_%d", ii))
+        .endrep
+        leftover_bytes = ((::_bitlist_size + 7) / 8) .mod 4
+        .if leftover_bytes = 1
+                .byte ::.ident(.sprintf("_bitlist_%d", num_vars))
+        .elseif leftover_bytes = 2
+                .word ::.ident(.sprintf("_bitlist_%d", num_vars))
+        .elseif leftover_bytes = 3
+                .faraddr ::.ident(.sprintf("_bitlist_%d", num_vars))
+        .endif
+        ::_bitlist_size .set 0
+.endmac
 
 ; ------------------------------------------------------------------------------
 

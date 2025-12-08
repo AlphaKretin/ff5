@@ -30,26 +30,27 @@ def check_memory_region(gen_data, orig_data, start_pos, bytes_to_check):
         else:
             bytes_identical += 1
     bytes_checked += bytes_to_check
-    
+
     print(f"ROM Matches from 0x{start_pos:06X}-0x{start_pos + bytes_to_check:06X}: {not has_errors}")
 
 def main():
-    with open("../rom/ff5-en.sfc", "rb") as gen_file, open("../rom/Final Fantasy 5.sfc", "rb") as orig_file:
+    with open("rom/ff5-jp.sfc", "rb") as gen_file, open("vanilla/ff5-j.sfc", "rb") as orig_file:
         gen_data = gen_file.read()
         orig_data = orig_file.read()
 
     print("Checking memory regions...\n")
 
-    # C2 Battle Code validation
-    check_memory_region(gen_data, orig_data, 0x20000, 0x9FFF)
-
-    # Monster AI validation
-    check_memory_region(gen_data, orig_data, 0x109C00, 0x2BFF)
+    check_memory_region(gen_data, orig_data, 0x000000, 0x00FFD0)
+    check_memory_region(gen_data, orig_data, 0x010000, 0x020170)
+    check_memory_region(gen_data, orig_data, 0x030200, 0x03A060 - 0x030200)
+    check_memory_region(gen_data, orig_data, 0x03A300, 0x040000 - 0x03A300)
+    check_memory_region(gen_data, orig_data, 0x040000, 0x0C0000)
+    check_memory_region(gen_data, orig_data, 0x100000, 0x100000)
 
     print(f"\nNumbers of bytes checked: {bytes_checked}")
     print(f"Numbers of bytes identical: {bytes_identical}")
     print(f"% of ROM matched: {(bytes_identical/len(orig_data)*100):10.4f}%")
-   
+
 
 if __name__ == "__main__":
     main()

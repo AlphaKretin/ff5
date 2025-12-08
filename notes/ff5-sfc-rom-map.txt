@@ -451,8 +451,8 @@
 | E71780-E72740 | long attack names (168 items, 24 bytes each)              |
 | E72760-E72F00 | battle messages (256 items, variable size)                |
 | E72F00-E733EC | menu strings                                              |
-| E733EC-E73568 | unused                                                    |
-| E73568-E736A0 | rare item names (24 items, 13 bytes each)                 |
+| E733EC-E73500 | unused                                                    |
+| E73500-E736A0 | rare item names (32 items, 13 bytes each)                 |
 | E736A0-E73700 |                                                           |
 | E73700-E73B00 | monster special attack names (64 items, 16 bytes each)    |
 | E73B00-E74FAD | battle dialogue (234 items, variable size)                |
