@@ -664,11 +664,6 @@ MonsterGfxProp:
 
 ; ------------------------------------------------------------------------------
 
-.include "gfx/battle_bg_anim.inc"
-.include "gfx/battle_bg_pal_anim.inc"
-.include "gfx/battle_bg_flip.inc"
-.include "gfx/battle_bg_tiles.inc"
-
 .export BattleBGProp, BattleBGPal
 .export BattleBGAnim, BattleBGAnimPtrs
 .export BattleBGPalAnim, BattleBGPalAnimPtrs
@@ -687,21 +682,156 @@ BattleBGPal:
         .incbin .sprintf("battle_bg_pal/pal_%04x.pal", i)
         .endrep
 
+; ---------------------------------------------------------------------------
+
+.scope BattleBGAnim
+        Start := bank_start BattleBGAnim
+        ARRAY_LENGTH = 8
+.endscope
+
 ; d4/c5b1: pointers to battle bg animation data (+$D40000)
 BattleBGAnimPtrs:
         ptr_tbl BattleBGAnim
 
 ; d4/c5c1: battle bg animation data (8 items, variable size)
+
+; Battle BG tile animation works by copying tile graphics from secondary
+; buffers to the VRAM buffer, then from the VRAM buffer to VRAM. The data below
+; is a list of tiles to copy. Up to 16 tiles get copied from the secondary
+; buffers to the VRAM buffer every frame. During NMI, 8 tiles get transferred
+; to VRAM every frame, so it takes 8 frames to copy all 64 tiles to VRAM.
+; When the FF terminator is encountered, it loops back to the start of the
+; animation data list. Each animated tile in the animation data is stored as 2
+; bytes in the format below. There are 128 battle bg tiles, but only the first
+; 64 can be animated.
+
+; ffdddddd vhssssss 2-byte per animated tile format
+;   f: frame index (cycles at 7.5 hz)
+;   d: destination tile index
+;   v: vertical flip (used if v+h set, can't flip both simultaneously)
+;   h: horizontal flip
+;   s: source tile index
+
 BattleBGAnim:
-        .incbin "battle_bg_anim.dat"
+
+; castle interior
+BattleBGAnim::_7:
+        .byte   $29,$29
+        .byte   $69,$2a
+        .byte   $a9,$2b
+        .byte   $e9,$2c
+        .byte   $ff
+
+; castle exdeath
+BattleBGAnim::_6:
+        .byte   $10,$10,$11,$11,$20,$20,$21,$21,$18,$18,$19,$19,$28,$28,$29,$29
+        .byte   $50,$12,$51,$13,$60,$22,$61,$23,$58,$1a,$59,$1b,$68,$2a,$69,$2b
+        .byte   $90,$14,$91,$15,$a0,$24,$a1,$25,$98,$1c,$99,$1d,$a8,$2c,$a9,$2d
+        .byte   $d0,$16,$d1,$17,$e0,$26,$e1,$27,$d8,$1e,$d9,$1f,$e8,$2e,$e9,$2f
+        .byte   $ff
+
+; flying fortress
+BattleBGAnim::_5:
+        .byte   $30,$30,$31,$31,$32,$32,$33,$33
+        .byte   $70,$34,$71,$35,$72,$36,$73,$37
+        .byte   $b0,$38,$b1,$39,$b2,$3a,$b3,$3b
+        .byte   $f0,$3c,$f1,$3d,$f2,$3e,$f3,$3f
+        .byte   $ff
+
+; beach
+BattleBGAnim::_4:
+        .byte   $00,$00,$01,$01
+        .byte   $40,$02,$41,$03
+        .byte   $80,$04,$81,$05
+        .byte   $c0,$02,$c1,$03
+        .byte   $ff
+
+; unknown
+BattleBGAnim::_3:
+        .byte   $00,$00,$01,$01,$02,$02,$03,$03,$04,$04,$05,$05,$06,$06,$07,$07,$08,$08
+        .byte   $49,$09,$4a,$0a,$4b,$0b,$4c,$0c,$4d,$0d,$4e,$0e,$61,$21,$62,$22
+        .byte   $80,$10,$81,$11,$82,$12,$83,$13,$84,$14,$85,$15,$86,$16,$87,$17,$88,$18
+        .byte   $c9,$19,$ca,$1a,$cb,$1b,$cc,$1c,$cd,$1d,$ce,$1e,$e1,$23,$e2,$24
+        .byte   $ff
+
+; none
+BattleBGAnim::_0:
+        .byte   $ff
+
+; cave w/ water
+BattleBGAnim::_1:
+        .byte   $30,$30,$31,$31,$38,$38,$39,$39
+        .byte   $70,$32,$71,$33,$78,$3a,$79,$3b
+        .byte   $b0,$34,$b1,$35,$b8,$3c,$b9,$3d
+        .byte   $f0,$36,$f1,$37,$f8,$3e,$f9,$3f
+        .byte   $ff
+
+; fire-powered ship
+BattleBGAnim::_2:
+        .byte   $0b,$0b,$10,$10,$14,$14,$18,$18,$19,$19
+        .byte   $4b,$0c,$50,$11,$54,$15,$58,$1a,$59,$1b
+        .byte   $8b,$0d,$90,$12,$94,$16,$98,$1c,$99,$1d
+        .byte   $cb,$0e,$d0,$13,$d4,$17,$d8,$1e,$d9,$1f
+        .byte   $ff
+
+; ---------------------------------------------------------------------------
+
+.scope BattleBGPalAnim
+        Start := bank_start BattleBGPalAnim
+        ARRAY_LENGTH = 3
+.endscope
 
 ; d4/c6cd: pointers to battle bg palette animation data (+$D4000)
 BattleBGPalAnimPtrs:
         ptr_tbl BattleBGPalAnim
 
 ; d4/c6d3: battle bg palette animation data (3 items, variable size)
+
+; One 16-color palette gets loaded each frame. The MSB determines if it
+; gets copied to the first or second battle bg palette in vram. The lower
+; bits are the index of the battle bg palette to load from the ROM.
+
 BattleBGPalAnim:
-        .incbin "battle_bg_pal_anim.dat"
+
+; the void
+BattleBGPalAnim::_1:
+        .byte   $24,$24,$24,$24,$24,$24,$24,$24
+        .byte   $a5,$a5,$a5,$a5,$a5,$a5,$a5,$a5
+        .byte   $38,$38,$38,$38,$38,$38,$38,$38
+        .byte   $b9,$b9,$b9,$b9,$b9,$b9,$b9,$b9
+        .byte   $3a,$3a,$3a,$3a,$3a,$3a,$3a,$3a
+        .byte   $bb,$bb,$bb,$bb,$bb,$bb,$bb,$bb
+        .byte   $38,$38,$38,$38,$38,$38,$38,$38
+        .byte   $b9,$b9,$b9,$b9,$b9,$b9,$b9,$b9
+        .byte   $ff
+
+; neo exdeath
+BattleBGPalAnim::_2:
+        .byte   $40,$40
+        .byte   $41,$41
+        .byte   $42,$42
+        .byte   $43,$43
+        .byte   $44,$44
+        .byte   $45,$45
+        .byte   $46,$46
+        .byte   $ff
+
+; flying fortress
+BattleBGPalAnim::_0:
+        .byte   $30,$b1,$b1
+        .byte   $30,$b4,$b4
+        .byte   $32,$b5,$b5
+        .byte   $32,$b1,$b1
+        .byte   $33,$b4,$b4
+        .byte   $33,$b5,$b5
+        .byte   $ff
+
+; ---------------------------------------------------------------------------
+
+.scope BattleBGFlip
+        Start := bank_start BattleBGFlip
+        ARRAY_LENGTH = 9
+.endscope
 
 ; d4/c736: pointers to battle bg tile flip data (+$D40000)
 BattleBGFlipPtrs:
@@ -709,7 +839,23 @@ BattleBGFlipPtrs:
 
 ; d4/c748: battle bg tile flip data (9 items, variable size)
 BattleBGFlip:
-        .incbin "battle_bg_flip.dat"
+
+BattleBGFlip::_7: .incbin "battle_bg_flip/desert_holes.dat.bgf"
+BattleBGFlip::_0: .incbin "battle_bg_flip/none.dat.bgf"
+BattleBGFlip::_6: .incbin "battle_bg_flip/void.dat.bgf"
+BattleBGFlip::_1: .incbin "battle_bg_flip/forest.dat.bgf"
+BattleBGFlip::_2: .incbin "battle_bg_flip/moore_ext.dat.bgf"
+BattleBGFlip::_3: .incbin "battle_bg_flip/mountain_ext.dat.bgf"
+BattleBGFlip::_4: .incbin "battle_bg_flip/beach.dat.bgf"
+BattleBGFlip::_5: .incbin "battle_bg_flip/grass.dat.bgf"
+BattleBGFlip::_8: .incbin "battle_bg_flip/final_battle.dat.bgf"
+
+; ------------------------------------------------------------------------------
+
+.scope BattleBGTiles
+        Start := bank_start BattleBGTiles
+        ARRAY_LENGTH = 28
+.endscope
 
 ; d4/c86d: pointers to battle bg tile layout (+$D40000)
 BattleBGTilesPtrs:
@@ -717,7 +863,35 @@ BattleBGTilesPtrs:
 
 ; d4/c8a5: battle bg tile layout (28 items, variable size)
 BattleBGTiles:
-        .incbin "battle_bg_tiles.dat"
+
+BattleBGTiles::_27: .incbin "battle_bg_tiles/final_battle.scr.bgt"
+BattleBGTiles::_26: .incbin "battle_bg_tiles/phoenix_tower.scr.bgt"
+BattleBGTiles::_25: .incbin "battle_bg_tiles/ronka_ruins.scr.bgt"
+BattleBGTiles::_23: .incbin "battle_bg_tiles/void.scr.bgt"
+BattleBGTiles::_20: .incbin "battle_bg_tiles/flying_fortress.scr.bgt"
+BattleBGTiles::_21: .incbin "battle_bg_tiles/moore_int.scr.bgt"
+BattleBGTiles::_22: .incbin "battle_bg_tiles/castle_exdeath.scr.bgt"
+BattleBGTiles::_19: .incbin "battle_bg_tiles/ship_ext.scr.bgt"
+BattleBGTiles::_8: .incbin "battle_bg_tiles/swamp.scr.bgt"
+BattleBGTiles::_9: .incbin "battle_bg_tiles/tower_int.scr.bgt"
+BattleBGTiles::_10: .incbin "battle_bg_tiles/tower_ext.scr.bgt"
+BattleBGTiles::_11: .incbin "battle_bg_tiles/shrine.scr.bgt"
+BattleBGTiles::_12: .incbin "battle_bg_tiles/castle_int.scr.bgt"
+BattleBGTiles::_13: .incbin "battle_bg_tiles/castle_ext.scr.bgt"
+BattleBGTiles::_14: .incbin "battle_bg_tiles/library.scr.bgt"
+BattleBGTiles::_15: .incbin "battle_bg_tiles/pyramid.scr.bgt"
+BattleBGTiles::_0: .incbin "battle_bg_tiles/grass.scr.bgt"
+BattleBGTiles::_1: .incbin "battle_bg_tiles/beach.scr.bgt"
+BattleBGTiles::_2: .incbin "battle_bg_tiles/desert.scr.bgt"
+BattleBGTiles::_24: .incbin "battle_bg_tiles/desert_holes.scr.bgt"
+BattleBGTiles::_3: .incbin "battle_bg_tiles/forest.scr.bgt"
+BattleBGTiles::_4: .incbin "battle_bg_tiles/moore_ext.scr.bgt"
+BattleBGTiles::_5: .incbin "battle_bg_tiles/cave.scr.bgt"
+BattleBGTiles::_6: .incbin "battle_bg_tiles/cave_water.scr.bgt"
+BattleBGTiles::_7: .incbin "battle_bg_tiles/mountain_ext.scr.bgt"
+BattleBGTiles::_16: .incbin "battle_bg_tiles/ship_int.scr.bgt"
+BattleBGTiles::_17: .incbin "battle_bg_tiles/shipwreck_int.scr.bgt"
+BattleBGTiles::_18: .incbin "battle_bg_tiles/fire_ship.scr.bgt"
 
 ; ------------------------------------------------------------------------------
 
@@ -766,24 +940,24 @@ _d84157:
 BattleBGGfxPtrs:
         ptr_tbl_far BattleBGGfx
 
-; d8/41d5
+; d8/41d5: Tower, Shrine, Castle, Pyramid
 BattleBGGfx::_6:
 BattleBGGfx::_7:
         .incbin "battle_bg_gfx/gfx_0000.4bpp.lz"
 
-; d8/5a3d
+; d8/5a3d: Swamp, Library, Forest of Moore Interior, Castle Exdeath, Ship Exterior
 BattleBGGfx::_8:
 BattleBGGfx::_9:
 BattleBGGfx::_14:
 BattleBGGfx::_15:
         .incbin "battle_bg_gfx/gfx_0001.4bpp.lz"
 
-; d8/7878
+; d8/7878: Flying Fortress, Ronka Ruins
 BattleBGGfx::_16:
 BattleBGGfx::_18:
         .incbin "battle_bg_gfx/gfx_0002.4bpp.lz"
 
-; d8/88b2
+; d8/88b2: Forest, Desert, Beach, Cave
 BattleBGGfx::_0:
 BattleBGGfx::_1:
 BattleBGGfx::_2:
@@ -791,26 +965,26 @@ BattleBGGfx::_3:
 BattleBGGfx::_5:
         .incbin "battle_bg_gfx/gfx_0003.4bpp.lz"
 
-; d8/a517
+; d8/a517: Ship Interior, Mountain, Fire-Powered Ship
 BattleBGGfx::_4:
 BattleBGGfx::_10:
 BattleBGGfx::_11:
         .incbin "battle_bg_gfx/gfx_0004.4bpp.lz"
 
-; d8/b959
+; d8/b959: Grass, The Void
 BattleBGGfx::_13:
 BattleBGGfx::_17:
         .incbin "battle_bg_gfx/gfx_0005.4bpp.lz"
 
-; d8/cdd8
+; d8/cdd8: Final Battle
 BattleBGGfx::_20:
         .incbin "battle_bg_gfx/gfx_0006.4bpp.lz"
 
-; d8/d881
+; d8/d881: Phoenix Tower
 BattleBGGfx::_19:
         .incbin "battle_bg_gfx/gfx_0007.4bpp.lz"
 
-; d8/dc32
+; d8/dc32: Neo Exdeath
 BattleBGGfx::_12:
         .incbin "battle_bg_gfx/gfx_0008.4bpp.lz"
 

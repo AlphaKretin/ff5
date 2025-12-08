@@ -14,9 +14,15 @@ CONST_INC = 1
 
 ; ---------------------------------------------------------------------------
 
-.ifndef LANG_EN
-        LANG_EN = 0
-.endif
+; define a config constant if it's not already defined
+.macro def_config _const, _value
+        .ifndef _const
+        _const = _value
+        .endif
+.endmacro
+
+        def_config LANG_EN, 0
+        def_config BUGFIX_DECOMP, 0
 
 ; define language suffix
 .if LANG_EN

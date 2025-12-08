@@ -17,6 +17,7 @@
 .export ShowCutscene_ext, Decomp_ext
 
 .import ExecSound_ext
+.import RNGTbl, SmallFontGfx
 
 ; ---------------------------------------------------------------------------
 
@@ -243,7 +244,20 @@ Decomp:
         beq     @00f7
         iny
         ldx     $cc
+
+; *** bug ***
+; the accumulator is 16-bit here so this overwrites the next byte in the buffer
+; with whatever was in the upper 8 bits of the accumulator. This will corrupt
+; the output if the lzss buffer offset is exactly $0800 bytes behind the
+; destination offset.
+
+.if BUGFIX_DECOMP
+        shorta
         sta     $f7ff,x                 ; copy to buffer
+        longa
+.else
+        sta     $f7ff,x                 ; copy to buffer
+.endif
         inc     $cc
         lda     $cc
         and     $de
@@ -491,11 +505,11 @@ _7f801a:
 _7f803a:
 @803a:  sei
         lda     #$80
-        sta     $2100
+        sta     hINIDISP
         lda     #$00
-        sta     $4200
+        sta     hNMITIMEN
         lda     $c7
-        sta     $420c
+        sta     hHDMAEN
 
 _7f804a:
         rts
@@ -561,7 +575,7 @@ _7f804b:
         lda     #$01
         tsb     $4f
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         ldx     $c7
         stx     $42
@@ -733,7 +747,7 @@ _7f804b:
         jsr     _7f945d
         jsr     _7fbbe4
         jsr     _7f945d
-        lda     #$19
+        lda     #<hVMDATAH
         sta     $b4
         lda     #$00
         sta     $b3
@@ -748,7 +762,7 @@ _7f804b:
         lda     #$02
         tsb     $4f
         jsr     _7f945d
-        lda     #$19
+        lda     #<hVMDATAH
         sta     $b4
         ldx     #$1000
         stx     $ac
@@ -1014,7 +1028,7 @@ _7f84bb:
         lda     #$01
         tsb     $4f
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         rts
 
@@ -1194,7 +1208,7 @@ _7f867d:
         ldx     #$0280
         stx     $36
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         lda     #$40
         sta     $44
@@ -1305,7 +1319,7 @@ _7f8784:
         ldx     #$0238
         stx     $36
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         lda     #$40
         sta     $44
@@ -1402,15 +1416,15 @@ _7f8888:
         jsr     _7f8660
         jsr     _7fab7a
         lda     #$02
-        sta     $2130
+        sta     hCGSWSEL
         lda     #$70
-        sta     $2131
+        sta     hCGADSUB
         sta     $8e
         lda     #$01
-        sta     $212d
+        sta     hTS
         sta     $3a
         lda     #$10
-        sta     $212c
+        sta     hTM
         sta     $3b
         jsr     _7f9deb
         ldx     #$ff00
@@ -1432,7 +1446,7 @@ _7f8888:
         lda     #$05
         sta     $72
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         lda     #$60
         sta     $44
@@ -1499,15 +1513,15 @@ _7f8963:
         jsr     _7f8660
         jsr     _7fab7a
         lda     #$02
-        sta     $2130
+        sta     hCGSWSEL
         lda     #$30
-        sta     $2131
+        sta     hCGADSUB
         sta     $8e
         lda     #$01
-        sta     $212d
+        sta     hTS
         sta     $3a
         lda     #$10
-        sta     $212c
+        sta     hTM
         sta     $3b
         lda     #$01
         tsb     $4f
@@ -1532,7 +1546,7 @@ _7f8963:
         sta     $72
         jsr     _7f9f2c
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         lda     #$02
         sta     $48
@@ -1606,7 +1620,7 @@ _7f8a4e:
         jsr     _7fac2a
         jsr     _7fc1f4
         lda     #$00
-        sta     $2130
+        sta     hCGSWSEL
         lda     #$01
         tsb     $70
         stz     $71
@@ -1630,7 +1644,7 @@ _7f8a4e:
         ldx     #$0118
         stx     $36
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         rts
 
@@ -1854,15 +1868,15 @@ _7f8c78:
         jsr     _7fab3b
         jsr     _7f9780
         lda     #$02
-        sta     $2130
+        sta     hCGSWSEL
         lda     #$30
-        sta     $2131
+        sta     hCGADSUB
         sta     $8e
         lda     #$01
-        sta     $212d
+        sta     hTS
         sta     $3a
         lda     #$10
-        sta     $212c
+        sta     hTM
         sta     $3b
         jsr     _7fafc1
         jsr     _7f9deb
@@ -1874,7 +1888,7 @@ _7f8c78:
         lda     #$01
         tsb     $4f
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         jsr     _7fbbb0
         jsr     _7f945d
@@ -2116,7 +2130,7 @@ _7f8c78:
         lda     #$01
         tsb     $4f
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         lda     #$02
         trb     $70
@@ -2515,7 +2529,7 @@ _7f8c78:
         lda     #$01
         tsb     $4f
         lda     #$81
-        sta     $4200
+        sta     hNMITIMEN
         cli
         lda     #$02
         trb     $70
@@ -2732,93 +2746,93 @@ _7f94a5:
         pha
         plb
         lda     #$63
-        sta     $2101
+        sta     hOBJSEL
         lda     #$00
-        sta     $2102
-        sta     $2103
+        sta     hOAMADDL
+        sta     hOAMADDH
         lda     #$09
-        sta     $2105
+        sta     hBGMODE
         lda     #$00
-        sta     $2106
-        sta     $2107
-        sta     $2108
-        sta     $2109
-        sta     $210a
-        sta     $210b
-        sta     $210c
-        sta     $210d
-        sta     $210d
-        sta     $210e
-        sta     $210e
-        sta     $210f
-        sta     $210f
-        sta     $2110
-        sta     $2110
-        sta     $2111
-        sta     $2111
-        sta     $2112
-        sta     $2112
-        sta     $2113
-        sta     $2113
-        sta     $2114
-        sta     $2114
-        sta     $2115
-        sta     $2116
-        sta     $2117
-        sta     $211a
-        sta     $211b
+        sta     hMOSAIC
+        sta     hBG1SC
+        sta     hBG2SC
+        sta     hBG3SC
+        sta     hBG4SC
+        sta     hBG12NBA
+        sta     hBG34NBA
+        sta     hBG1HOFS
+        sta     hBG1HOFS
+        sta     hBG1VOFS
+        sta     hBG1VOFS
+        sta     hBG2HOFS
+        sta     hBG2HOFS
+        sta     hBG2VOFS
+        sta     hBG2VOFS
+        sta     hBG3HOFS
+        sta     hBG3HOFS
+        sta     hBG3VOFS
+        sta     hBG3VOFS
+        sta     hBG4HOFS
+        sta     hBG4HOFS
+        sta     hBG4VOFS
+        sta     hBG4VOFS
+        sta     hVMAINC
+        sta     hVMADDL
+        sta     hVMADDH
+        sta     hM7SEL
+        sta     hM7A
         lda     #$01
-        sta     $211b
+        sta     hM7A
         dec
-        sta     $211c
-        sta     $211c
-        sta     $211d
-        sta     $211d
-        sta     $211e
+        sta     hM7B
+        sta     hM7B
+        sta     hM7C
+        sta     hM7C
+        sta     hM7D
         inc
-        sta     $211e
+        sta     hM7D
         dec
-        sta     $211f
-        sta     $211f
-        sta     $2120
-        sta     $2120
-        sta     $2121
-        sta     $2123
+        sta     hM7X
+        sta     hM7X
+        sta     hM7Y
+        sta     hM7Y
+        sta     hCGADD
+        sta     hW12SEL
         lda     #$03
-        sta     $2124
-        stz     $2125
-        stz     $2126
-        stz     $2127
-        stz     $2128
-        stz     $2129
-        stz     $212a
-        stz     $212b
-        stz     $212e
-        stz     $212f
-        stz     $2130
-        stz     $2131
+        sta     hW34SEL
+        stz     hWOBJSEL
+        stz     hWH0
+        stz     hWH1
+        stz     hWH2
+        stz     hWH3
+        stz     hWBGLOG
+        stz     hWOBJLOG
+        stz     hTMW
+        stz     hTSW
+        stz     hCGSWSEL
+        stz     hCGADSUB
         stz     $8e
-        stz     $212c
-        stz     $212d
+        stz     hTM
+        stz     hTS
         stz     $3a
         stz     $3b
         lda     #$e0
-        sta     $2132
-        stz     $2133
-        stz     $4200
+        sta     hCOLDATA
+        stz     hSETINI
+        stz     hNMITIMEN
         lda     #$ff
-        sta     $4201
-        stz     $4202
-        stz     $4203
-        stz     $4204
-        stz     $4205
-        stz     $4206
-        stz     $4207
-        stz     $4208
-        stz     $4209
-        stz     $420a
-        stz     $420b
-        stz     $420c
+        sta     hWRIO
+        stz     hWRMPYA
+        stz     hWRMPYB
+        stz     hWRDIVL
+        stz     hWRDIVH
+        stz     hWRDIVB
+        stz     hHTIMEL
+        stz     hHTIMEH
+        stz     hVTIMEL
+        stz     hVTIMEH
+        stz     hMDMAEN
+        stz     hHDMAEN
         rts
 
 ; ------------------------------------------------------------------------------
@@ -2884,123 +2898,123 @@ _7f95ec:
 
 _7f95ff:
         lda     #$17
-        sta     $2105
+        sta     hBGMODE
         lda     #$40
-        sta     $211a
+        sta     hM7SEL
         lda     #$00
-        sta     $212d
+        sta     hTS
         sta     $3a
-        sta     $212d
+        sta     hTS
         lda     #$01
-        sta     $212c
+        sta     hTM
         sta     $3b
         lda     #$01
-        sta     $212e
+        sta     hTMW
         lda     #$00
-        sta     $2131
+        sta     hCGADSUB
         sta     $8e
         lda     #$e0
-        sta     $2132
+        sta     hCOLDATA
         stz     $8b
         stz     $8c
         stz     $8d
         lda     #$00
-        sta     $2130
-        sta     $210b
+        sta     hCGSWSEL
+        sta     hBG12NBA
         rts
 
 ; ------------------------------------------------------------------------------
 
 _7f963a:
         lda     #$17
-        sta     $2105
+        sta     hBGMODE
         lda     #$40
-        sta     $211a
+        sta     hM7SEL
         lda     #$00
-        sta     $212f
+        sta     hTSW
         lda     #$01
-        sta     $212d
+        sta     hTS
         sta     $3a
         lda     #$10
-        sta     $212c
+        sta     hTM
         sta     $3b
         lda     #$01
-        sta     $212e
+        sta     hTMW
         lda     #$30
-        sta     $2131
+        sta     hCGADSUB
         sta     $8e
         lda     #$e0
-        sta     $2132
+        sta     hCOLDATA
         stz     $8b
         stz     $8c
         stz     $8d
         lda     #$02
-        sta     $2130
+        sta     hCGSWSEL
         lda     #$00
-        sta     $210b
+        sta     hBG12NBA
         rts
 
 ; ------------------------------------------------------------------------------
 
 _7f9679:
         lda     #$17
-        sta     $2105
+        sta     hBGMODE
         lda     #$80
-        sta     $211a
+        sta     hM7SEL
         lda     #$00
-        sta     $212f
+        sta     hTSW
         lda     #$01
-        sta     $212d
+        sta     hTS
         sta     $3a
         lda     #$11
-        sta     $212c
+        sta     hTM
         sta     $3b
         lda     #$01
-        sta     $212e
+        sta     hTMW
         lda     #$70
-        sta     $2131
+        sta     hCGADSUB
         sta     $8e
         lda     #$e0
-        sta     $2132
+        sta     hCOLDATA
         stz     $8b
         stz     $8c
         stz     $8d
         lda     #$02
-        sta     $2130
+        sta     hCGSWSEL
         lda     #$00
-        sta     $210b
+        sta     hBG12NBA
         rts
 
 ; ------------------------------------------------------------------------------
 
 _7f96b8:
         lda     #$17
-        sta     $2105
+        sta     hBGMODE
         lda     #$40
-        sta     $211a
+        sta     hM7SEL
         lda     #$00
-        sta     $212f
+        sta     hTSW
         lda     #$01
-        sta     $212d
+        sta     hTS
         sta     $3a
         lda     #$11
-        sta     $212c
+        sta     hTM
         sta     $3b
         lda     #$01
-        sta     $212e
+        sta     hTMW
         lda     #$00
-        sta     $2130
+        sta     hCGSWSEL
         lda     #$21
         sta     $8e
-        sta     $2131
+        sta     hCGADSUB
         sta     $8e
         lda     #$e0
-        sta     $2132
+        sta     hCOLDATA
         stz     $8b
         stz     $8c
         stz     $8d
         lda     #$00
-        sta     $210b
+        sta     hBG12NBA
         rts
 
 ; ------------------------------------------------------------------------------
@@ -3100,9 +3114,9 @@ _7f9780:
 
 _7f97ad:
 @97ad:  ldx     #$0000
-        stx     $2116
+        stx     hVMADDL
         lda     #$80
-        sta     $2115
+        sta     hVMAINC
         ldx     $c7
         stx     $0c
         stx     $0e
@@ -3112,12 +3126,12 @@ _7f97ad:
         and     #$0f
         ldx     $0e
         ora     $7e9000,x
-        sta     $2119
+        sta     hVMDATAH
         pla
         and     #$f0
         lsr4
         ora     $7e9000,x
-        sta     $2119
+        sta     hVMDATAH
         longa
         lda     $0c
         inc
@@ -3344,13 +3358,13 @@ _7f9943:
 
 _7f99b6:
 @99b6:  lda     #$00
-        sta     $2115
+        sta     hVMAINC
         ldx     $14
-        stx     $2116
+        stx     hVMADDL
         ldx     $c7
         ldy     #$0040
 @99c5:  lda     $7e9000,x
-        sta     $2118
+        sta     hVMDATAL
         cpx     #$0fff
         beq     @99e9
         inx
@@ -3361,7 +3375,7 @@ _7f99b6:
         clc
         adc     #$0080
         sta     $14
-        sta     $2116
+        sta     hVMADDL
         shorta
         ldy     #$0040
         bra     @99c5
@@ -3371,13 +3385,13 @@ _7f99b6:
 
 _7f99ea:
 @99ea:  lda     #$00
-        sta     $2115
+        sta     hVMAINC
         ldx     $14
-        stx     $2116
+        stx     hVMADDL
         ldx     $c7
         ldy     #$0020
 @99f9:  lda     $7e9000,x
-        sta     $2118
+        sta     hVMDATAL
         cpx     #$0400
         beq     @9a1d
         inx
@@ -3388,7 +3402,7 @@ _7f99ea:
         clc
         adc     #$0080
         sta     $14
-        sta     $2116
+        sta     hVMADDL
         shorta
         ldy     #$0020
         bra     @99f9
@@ -3617,34 +3631,34 @@ _7f9af2:
 @9b47:  lda     #$0f
         tsb     $40
         lda     #$42
-        sta     $4300
-        sta     $4310
-        sta     $4320
-        sta     $4330
-        lda     #$1b
-        sta     $4301
-        lda     #$1e
-        sta     $4311
-        lda     #$1c
-        sta     $4321
-        lda     #$1d
-        sta     $4331
+        sta     hDMA0::CTRL
+        sta     hDMA1::CTRL
+        sta     hDMA2::CTRL
+        sta     hDMA3::CTRL
+        lda     #<hM7A
+        sta     hDMA0::HREG
+        lda     #<hM7D
+        sta     hDMA1::HREG
+        lda     #<hM7B
+        sta     hDMA2::HREG
+        lda     #<hM7C
+        sta     hDMA3::HREG
         ldx     #$8000
-        stx     $4302
-        stx     $4312
+        stx     hDMA0::ADDR
+        stx     hDMA1::ADDR
         ldx     #$8006
-        stx     $4322
+        stx     hDMA2::ADDR
         ldx     #$800c
-        stx     $4332
+        stx     hDMA3::ADDR
         lda     #$7e
-        sta     $4304
-        sta     $4314
-        sta     $4324
-        sta     $4334
-        sta     $4307
-        sta     $4317
-        sta     $4327
-        sta     $4337
+        sta     hDMA0::ADDR_B
+        sta     hDMA1::ADDR_B
+        sta     hDMA2::ADDR_B
+        sta     hDMA3::ADDR_B
+        sta     hDMA0::HDMA_B
+        sta     hDMA1::HDMA_B
+        sta     hDMA2::HDMA_B
+        sta     hDMA3::HDMA_B
         lda     #$ff
         sta     $7e8000
         sta     $7e8006
@@ -3669,17 +3683,17 @@ _7f9af2:
         lda     $5e
         sec
         sbc     $5c
-        sta     $4204
+        sta     hWRDIVL
         ldy     #$0071
-        sty     $4206
+        sty     hWRDIVB
         sty     $0e
         ldx     $c7
         lda     $5c
         sta     $0a
-        lda     $4214
+        lda     hRDDIVL
         sta     $5a
         lda     $58
-        sta     $4204
+        sta     hWRDIVL
         shorta
         lda     $50
         beq     @9c0d
@@ -3688,36 +3702,36 @@ _7f9af2:
 @9c0f:  lda     $0a
         adc     $5a
         xba
-        sta     $4206
+        sta     hWRDIVB
         xba
         sta     $0a
         shorta
         lda     $54
-        sta     $4202
-        ldy     $4214
+        sta     hWRMPYA
+        ldy     hRDDIVL
         tya
-        sta     $4203
+        sta     hWRMPYB
         sty     $56
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8100,x
         sta     $7e8102,x
         lda     $55
-        sta     $4202
+        sta     hWRMPYA
         shorta
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8300,x
         sta     $7e8302,x
@@ -3737,38 +3751,38 @@ _7f9af2:
 @9c87:  lda     $0a
         adc     $5a
         xba
-        sta     $4206
+        sta     hWRDIVB
         xba
         sta     $0a
         shorta
         lda     $54
-        sta     $4202
-        ldy     $4214
+        sta     hWRMPYA
+        ldy     hRDDIVL
         tya
-        sta     $4203
+        sta     hWRMPYB
         sty     $56
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         eor     $c5
         inc
         sta     $7e8100,x
         sta     $7e8102,x
         lda     $55
-        sta     $4202
+        sta     hWRMPYA
         shorta
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8300,x
         sta     $7e8302,x
@@ -3789,38 +3803,38 @@ _7f9af2:
 @9d04:  lda     $0a
         adc     $5a
         xba
-        sta     $4206
+        sta     hWRDIVB
         xba
         sta     $0a
         shorta
         lda     $54
-        sta     $4202
-        ldy     $4214
+        sta     hWRMPYA
+        ldy     hRDDIVL
         tya
-        sta     $4203
+        sta     hWRMPYB
         sty     $56
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         eor     $c5
         inc
         sta     $7e8100,x
         sta     $7e8102,x
         lda     $55
-        sta     $4202
+        sta     hWRMPYA
         shorta
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8500,x
         sta     $7e8502,x
@@ -3838,36 +3852,36 @@ _7f9af2:
 @9d7a:  lda     $0a
         adc     $5a
         xba
-        sta     $4206
+        sta     hWRDIVB
         xba
         sta     $0a
         shorta
         lda     $54
-        sta     $4202
-        ldy     $4214
+        sta     hWRMPYA
+        ldy     hRDDIVL
         tya
-        sta     $4203
+        sta     hWRMPYB
         sty     $56
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8100,x
         sta     $7e8102,x
         lda     $55
-        sta     $4202
+        sta     hWRMPYA
         shorta
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8500,x
         sta     $7e8502,x
@@ -3888,50 +3902,50 @@ _7f9deb:
         lda     #$3f
         tsb     $40
         lda     #$42
-        sta     $4300
-        sta     $4310
-        sta     $4320
-        sta     $4330
-        sta     $4350
+        sta     hDMA0::CTRL
+        sta     hDMA1::CTRL
+        sta     hDMA2::CTRL
+        sta     hDMA3::CTRL
+        sta     hDMA5::CTRL
         lda     #$40
-        sta     $4340
-        sta     $4360
-        lda     #$1b
-        sta     $4301
-        lda     #$1e
-        sta     $4311
-        lda     #$1c
-        sta     $4321
-        lda     #$1d
-        sta     $4331
-        lda     #$21
-        sta     $4341
-        lda     #$22
-        sta     $4351
+        sta     hDMA4::CTRL
+        sta     hDMA6::CTRL
+        lda     #<hM7A
+        sta     hDMA0::HREG
+        lda     #<hM7D
+        sta     hDMA1::HREG
+        lda     #<hM7B
+        sta     hDMA2::HREG
+        lda     #<hM7C
+        sta     hDMA3::HREG
+        lda     #<hCGADD
+        sta     hDMA4::HREG
+        lda     #<hCGDATA
+        sta     hDMA5::HREG
         ldx     #$8000
-        stx     $4302
-        stx     $4312
+        stx     hDMA0::ADDR
+        stx     hDMA1::ADDR
         ldx     #$8006
-        stx     $4322
+        stx     hDMA2::ADDR
         ldx     #$800c
-        stx     $4332
+        stx     hDMA3::ADDR
         ldx     #$8012
-        stx     $4342
+        stx     hDMA4::ADDR
         ldx     #$8018
-        stx     $4352
+        stx     hDMA5::ADDR
         lda     #$7e
-        sta     $4304
-        sta     $4314
-        sta     $4324
-        sta     $4334
-        sta     $4344
-        sta     $4354
-        sta     $4307
-        sta     $4317
-        sta     $4327
-        sta     $4337
-        sta     $4347
-        sta     $4357
+        sta     hDMA0::ADDR_B
+        sta     hDMA1::ADDR_B
+        sta     hDMA2::ADDR_B
+        sta     hDMA3::ADDR_B
+        sta     hDMA4::ADDR_B
+        sta     hDMA5::ADDR_B
+        sta     hDMA0::HDMA_B
+        sta     hDMA1::HDMA_B
+        sta     hDMA2::HDMA_B
+        sta     hDMA3::HDMA_B
+        sta     hDMA4::HDMA_B
+        sta     hDMA5::HDMA_B
         lda     #$ff
         sta     $7e8000
         sta     $7e8006
@@ -4035,9 +4049,9 @@ _7f9f2c:
         lda     $5e
         sec
         sbc     $5c
-        sta     $4204
+        sta     hWRDIVL
         ldy     #$0071
-        sty     $4206
+        sty     hWRDIVB
         lda     #$00e1
         sec
         sbc     $38
@@ -4049,10 +4063,10 @@ _7f9f2c:
         tax
         lda     $5c
         sta     $0a
-        lda     $4214
+        lda     hRDDIVL
         sta     $5a
         lda     $58
-        sta     $4204
+        sta     hWRDIVL
         shorta
         lda     $50
         beq     @9fb6
@@ -4061,36 +4075,36 @@ _7f9f2c:
 @9fb8:  lda     $0a
         adc     $5a
         xba
-        sta     $4206
+        sta     hWRDIVB
         xba
         sta     $0a
         shorta
         lda     $54
-        sta     $4202
-        ldy     $4214
+        sta     hWRMPYA
+        ldy     hRDDIVL
         tya
-        sta     $4203
+        sta     hWRMPYB
         sty     $56
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8100,x
         sta     $7e8102,x
         lda     $55
-        sta     $4202
+        sta     hWRMPYA
         shorta
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8300,x
         sta     $7e8302,x
@@ -4102,11 +4116,11 @@ _7f9f2c:
         lda     $56
         lsr2
         shorta
-        sta     $4202
-        sta     $4203
+        sta     hWRMPYA
+        sta     hWRMPYB
         longa
         nop2
-        lda     $4216
+        lda     hRDMPYL
         lsr2
         xba
         and     $c6
@@ -4128,38 +4142,38 @@ _7f9f2c:
 @a05c:  lda     $0a
         adc     $5a
         xba
-        sta     $4206
+        sta     hWRDIVB
         xba
         sta     $0a
         shorta
         lda     $54
-        sta     $4202
-        ldy     $4214
+        sta     hWRMPYA
+        ldy     hRDDIVL
         tya
-        sta     $4203
+        sta     hWRMPYB
         sty     $56
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         eor     $c5
         inc
         sta     $7e8100,x
         sta     $7e8102,x
         lda     $55
-        sta     $4202
+        sta     hWRMPYA
         shorta
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8300,x
         sta     $7e8302,x
@@ -4171,11 +4185,11 @@ _7f9f2c:
         lda     $56
         lsr2
         shorta
-        sta     $4202
-        sta     $4203
+        sta     hWRMPYA
+        sta     hWRMPYB
         longa
         nop2
-        lda     $4216
+        lda     hRDMPYL
         lsr2
         xba
         and     $c6
@@ -4198,38 +4212,38 @@ _7f9f2c:
 @a105:  lda     $0a
         adc     $5a
         xba
-        sta     $4206
+        sta     hWRDIVB
         xba
         sta     $0a
         shorta
         lda     $54
-        sta     $4202
-        ldy     $4214
+        sta     hWRMPYA
+        ldy     hRDDIVL
         tya
-        sta     $4203
+        sta     hWRMPYB
         sty     $56
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         eor     $c5
         inc
         sta     $7e8100,x
         sta     $7e8102,x
         lda     $55
-        sta     $4202
+        sta     hWRMPYA
         shorta
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8500,x
         sta     $7e8502,x
@@ -4241,11 +4255,11 @@ _7f9f2c:
         lda     $56
         lsr2
         shorta
-        sta     $4202
-        sta     $4203
+        sta     hWRMPYA
+        sta     hWRMPYB
         longa
         nop2
-        lda     $4216
+        lda     hRDMPYL
         lsr2
         xba
         and     $c6
@@ -4265,36 +4279,36 @@ _7f9f2c:
 @a1a7:  lda     $0a
         adc     $5a
         xba
-        sta     $4206
+        sta     hWRDIVB
         xba
         sta     $0a
         shorta
         lda     $54
-        sta     $4202
-        ldy     $4214
+        sta     hWRMPYA
+        ldy     hRDDIVL
         tya
-        sta     $4203
+        sta     hWRMPYB
         sty     $56
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8100,x
         sta     $7e8102,x
         lda     $55
-        sta     $4202
+        sta     hWRMPYA
         shorta
         lda     $57
-        ldy     $4217
-        sta     $4203
+        ldy     hRDMPYH
+        sta     hWRMPYB
         sty     $08
         stz     $09
         longa
-        lda     $4216
+        lda     hRDMPYL
         adc     $08
         sta     $7e8500,x
         sta     $7e8502,x
@@ -4306,11 +4320,11 @@ _7f9f2c:
         lda     $56
         lsr2
         shorta
-        sta     $4202
-        sta     $4203
+        sta     hWRMPYA
+        sta     hWRMPYB
         longa
         nop2
-        lda     $4216
+        lda     hRDMPYL
         lsr2
         xba
         and     $c6
@@ -4333,22 +4347,22 @@ _7fa244:
         lda     #$60
         sta     $40
         lda     #$40
-        sta     $4350
+        sta     hDMA5::CTRL
         lda     #$42
-        sta     $4360
-        lda     #$21
-        sta     $4351
-        lda     #$22
-        sta     $4361
+        sta     hDMA6::CTRL
+        lda     #<hCGADD
+        sta     hDMA5::HREG
+        lda     #<hCGDATA
+        sta     hDMA6::HREG
         ldx     #$8080
-        stx     $4352
+        stx     hDMA5::ADDR
         ldx     #$8086
-        stx     $4362
+        stx     hDMA6::ADDR
         lda     #$7e
-        sta     $4354
-        sta     $4364
-        sta     $4357
-        sta     $4367
+        sta     hDMA5::ADDR_B
+        sta     hDMA6::ADDR_B
+        sta     hDMA5::HDMA_B
+        sta     hDMA6::HDMA_B
         lda     #$ff
         sta     $7e8080
         sta     $7e8086
@@ -4477,22 +4491,22 @@ _7fa3b6:
         lda     #$60
         tsb     $40
         lda     #$40
-        sta     $4350
+        sta     hDMA5::CTRL
         lda     #$42
-        sta     $4360
-        lda     #$21
-        sta     $4351
-        lda     #$22
-        sta     $4361
+        sta     hDMA6::CTRL
+        lda     #<hCGADD
+        sta     hDMA5::HREG
+        lda     #<hCGDATA
+        sta     hDMA6::HREG
         ldx     #$8080
-        stx     $4352
+        stx     hDMA5::ADDR
         ldx     #$8086
-        stx     $4362
+        stx     hDMA6::ADDR
         lda     #$7e
-        sta     $4354
-        sta     $4364
-        sta     $4357
-        sta     $4367
+        sta     hDMA5::ADDR_B
+        sta     hDMA6::ADDR_B
+        sta     hDMA5::HDMA_B
+        sta     hDMA6::HDMA_B
         lda     #$ff
         sta     $7e8080
         sta     $7e8086
@@ -4677,58 +4691,58 @@ _7fa570:
         lda     #$7f
         tsb     $40
         lda     #$42
-        sta     $4310
-        sta     $4320
-        sta     $4330
+        sta     hDMA1::CTRL
+        sta     hDMA2::CTRL
+        sta     hDMA3::CTRL
         lda     #$40
-        sta     $4300
-        sta     $4340
-        sta     $4350
+        sta     hDMA0::CTRL
+        sta     hDMA4::CTRL
+        sta     hDMA5::CTRL
         lda     #$42
-        sta     $4360
-        lda     #$31
-        sta     $4301
-        lda     #$1e
-        sta     $4311
-        lda     #$0e
-        sta     $4321
-        lda     #$0d
-        sta     $4331
-        lda     #$1a
-        sta     $4341
-        lda     #$21
-        sta     $4351
-        lda     #$22
-        sta     $4361
+        sta     hDMA6::CTRL
+        lda     #<hCGADSUB
+        sta     hDMA0::HREG
+        lda     #<hM7D
+        sta     hDMA1::HREG
+        lda     #<hBG1VOFS
+        sta     hDMA2::HREG
+        lda     #<hBG1HOFS
+        sta     hDMA3::HREG
+        lda     #<hM7SEL
+        sta     hDMA4::HREG
+        lda     #<hCGADD
+        sta     hDMA5::HREG
+        lda     #<hCGDATA
+        sta     hDMA6::HREG
         ldx     #$8000
-        stx     $4302
+        stx     hDMA0::ADDR
         ldx     #$8006
-        stx     $4312
+        stx     hDMA1::ADDR
         ldx     #$800c
-        stx     $4322
+        stx     hDMA2::ADDR
         ldx     #$8012
-        stx     $4332
+        stx     hDMA3::ADDR
         ldx     #$8018
-        stx     $4342
+        stx     hDMA4::ADDR
         ldx     #$801e
-        stx     $4352
+        stx     hDMA5::ADDR
         ldx     #$8024
-        stx     $4362
+        stx     hDMA6::ADDR
         lda     #$7e
-        sta     $4304
-        sta     $4314
-        sta     $4324
-        sta     $4334
-        sta     $4344
-        sta     $4354
-        sta     $4364
-        sta     $4307
-        sta     $4317
-        sta     $4327
-        sta     $4337
-        sta     $4347
-        sta     $4357
-        sta     $4367
+        sta     hDMA0::ADDR_B
+        sta     hDMA1::ADDR_B
+        sta     hDMA2::ADDR_B
+        sta     hDMA3::ADDR_B
+        sta     hDMA4::ADDR_B
+        sta     hDMA5::ADDR_B
+        sta     hDMA6::ADDR_B
+        sta     hDMA0::HDMA_B
+        sta     hDMA1::HDMA_B
+        sta     hDMA2::HDMA_B
+        sta     hDMA3::HDMA_B
+        sta     hDMA4::HDMA_B
+        sta     hDMA5::HDMA_B
+        sta     hDMA6::HDMA_B
         lda     #$ff
         sta     $7e8000
         sta     $7e8006
@@ -4791,7 +4805,7 @@ _7fa570:
         cpy     $60
         bne     @a6c3
         ldx     $c7
-@a6cd:  lda     $7fc780,x
+@a6cd:  lda     f:_7fc780,x
         sta     [$d3],y
         iny2
         cpx     $62
@@ -4799,7 +4813,7 @@ _7fa570:
         inx2
         bra     @a6cd
 @a6dd:  ldx     $64
-@a6df:  lda     $7fc780,x
+@a6df:  lda     f:_7fc780,x
         sta     [$d3],y
         iny2
         sta     [$d3],y
@@ -4941,7 +4955,7 @@ _7fa811:
         cpy     $60
         bne     @a820
         ldx     $c7
-@a82a:  lda     $7fc780,x
+@a82a:  lda     f:_7fc780,x
         sta     [$d3],y
         iny2
         cpx     $62
@@ -4949,7 +4963,7 @@ _7fa811:
         inx2
         bra     @a82a
 @a83a:  ldx     $64
-@a83c:  lda     $7fc780,x
+@a83c:  lda     f:_7fc780,x
         sta     [$d3],y
         iny2
         sta     [$d3],y
@@ -5022,7 +5036,7 @@ _7fa8c6:
         cpy     $60
         bne     @a8d5
         ldx     $c7
-@a8df:  lda     $7fc780,x
+@a8df:  lda     f:_7fc780,x
         sta     [$d3],y
         iny2
         cpx     $62
@@ -5030,7 +5044,7 @@ _7fa8c6:
         inx2
         bra     @a8df
 @a8ef:  ldx     $64
-@a8f1:  lda     $7fc780,x
+@a8f1:  lda     f:_7fc780,x
         sta     [$d3],y
         iny2
         sta     [$d3],y
@@ -5420,19 +5434,19 @@ _7fac2a:
 
 _7fac54:
 @ac54:  lda     $b8
-        sta     $2121
+        sta     hCGADD
         lda     #$00
-        sta     $4370
-        lda     #$22
-        sta     $4371
+        sta     hDMA7::CTRL
+        lda     #<hCGDATA
+        sta     hDMA7::HREG
         ldx     $ba
-        stx     $4372
+        stx     hDMA7::ADDR
         lda     $bc
-        sta     $4374
+        sta     hDMA7::ADDR_B
         ldx     $bd
-        stx     $4375
+        stx     hDMA7::SIZE
         lda     #$80
-        sta     $420b
+        sta     hMDMAEN
         rts
 
 ; ------------------------------------------------------------------------------
@@ -5443,20 +5457,20 @@ _7fac78:
         asl
         tax
         lda     $7ff110,x
-        sta     $4372
+        sta     hDMA7::ADDR
         lda     $7ff120,x
-        sta     $4375
+        sta     hDMA7::SIZE
         shorta
         lda     $7ff101,x
-        sta     $2121
+        sta     hCGADD
         lda     #$00
-        sta     $4370
-        lda     #$22
-        sta     $4371
+        sta     hDMA7::CTRL
+        lda     #<hCGDATA
+        sta     hDMA7::HREG
         lda     #$7e
-        sta     $4374
+        sta     hDMA7::ADDR_B
         lda     #$80
-        sta     $420b
+        sta     hMDMAEN
         rts
 
 ; ------------------------------------------------------------------------------
@@ -5941,21 +5955,21 @@ _7fafc1:
 
 _7fafed:
         lda     #$22
-        sta     $2101
+        sta     hOBJSEL
         rts
 
 ; ------------------------------------------------------------------------------
 
 _7faff3:
         lda     #$02
-        sta     $2101
+        sta     hOBJSEL
         rts
 
 ; ------------------------------------------------------------------------------
 
 _7faff9:
         lda     #$62
-        sta     $2101
+        sta     hOBJSEL
         rts
 
 ; ------------------------------------------------------------------------------
@@ -5975,7 +5989,7 @@ _7fafff:
         and     #$0007
         asl
         tax
-        lda     $7fc7f0,x
+        lda     f:_7fc7f0,x
         sta     $12
         lda     $10
         and     #$00ff
@@ -6086,7 +6100,7 @@ _7fb0ad:
         and     #$0007
         asl
         tax
-        lda     $7fc7e0,x
+        lda     f:_7fc7e0,x
         sta     $12
         ldx     $14
         lda     $0400,x
@@ -6151,7 +6165,7 @@ _7fb124:
         and     #$0007
         asl
         tax
-        lda     $7fc7e0,x
+        lda     f:_7fc7e0,x
         sta     $12
         ldx     $14
         lda     $0400,x
@@ -6216,7 +6230,7 @@ _7fb19f:
         and     #$0007
         asl
         tax
-        lda     $7fc7e0,x
+        lda     f:_7fc7e0,x
         sta     $12
         ldx     $14
         lda     $0400,x
@@ -6465,7 +6479,7 @@ _7fb375:
 ; ------------------------------------------------------------------------------
 
 _7fb38a:
-        lda     #$18
+        lda     #<hVMDATAL
         sta     $b4
         lda     #$01
         sta     $b3
@@ -6482,7 +6496,7 @@ _7fb38a:
 ; ------------------------------------------------------------------------------
 
 _7fb3a6:
-        lda     #$18
+        lda     #<hVMDATAL
         sta     $b4
         lda     #$01
         sta     $b3
@@ -6499,7 +6513,7 @@ _7fb3a6:
 ; ------------------------------------------------------------------------------
 
 _7fb3c2:
-        lda     #$18
+        lda     #<hVMDATAL
         sta     $b4
         lda     #$01
         sta     $b3
@@ -6516,7 +6530,7 @@ _7fb3c2:
 ; ------------------------------------------------------------------------------
 
 _7fb3de:
-        lda     #$18
+        lda     #<hVMDATAL
         sta     $b4
         lda     #$01
         sta     $b3
@@ -7230,10 +7244,10 @@ _7fb8f2:
         xba
         lda     $46
         tax
-        lda     $c0fec0,x   ; random number table
+        lda     f:RNGTbl,x   ; random number table
         and     #$07
         tax
-        lda     $7fc7b8,x
+        lda     f:_7fc7b8,x
         sta     $ca
         txa
         asl
@@ -7689,7 +7703,7 @@ _7fbc3e:
         ldx     $c7
         txy
 @bc4b:  inx
-        lda     $d1f1f0,x
+        lda     f:SmallFontGfx+$01f0,x
         sta     ($c0),y
         iny
         lda     $c7
@@ -7748,24 +7762,24 @@ _7fbc9a:
         asl
         clc
         adc     #$2000
-        sta     $4372
+        sta     hDMA7::ADDR
         lda     #$0800
-        sta     $4375
+        sta     hDMA7::SIZE
         lda     $08
         clc
         adc     #$4000
-        sta     $2116
+        sta     hVMADDL
         shorta
         lda     #$01
-        sta     $4370
-        lda     #$18
-        sta     $4371
+        sta     hDMA7::CTRL
+        lda     #<hVMDATAL
+        sta     hDMA7::HREG
         lda     #$7e
-        sta     $4374
+        sta     hDMA7::ADDR_B
         lda     #$80
-        sta     $2115
+        sta     hVMAINC
         lda     #$80
-        sta     $420b
+        sta     hMDMAEN
         rts
 
 ; ------------------------------------------------------------------------------
@@ -7776,7 +7790,7 @@ _7fbcd7:
         and     $c6
         asl
         tax
-        lda     $7fc7b0,x
+        lda     f:_7fc7b0,x
         lsr5
         sta     $22
         shorta
@@ -8457,21 +8471,21 @@ _7fc0f0:
 
 _7fc1a3:
 @c1a3:  ldx     $b8
-        stx     $2116
+        stx     hVMADDL
         lda     #$80
-        sta     $2115
+        sta     hVMAINC
         lda     #$01
-        sta     $4370
-        lda     #$18
-        sta     $4371
+        sta     hDMA7::CTRL
+        lda     #<hVMDATAL
+        sta     hDMA7::HREG
         ldx     $ba
-        stx     $4372
+        stx     hDMA7::ADDR
         lda     $bc
-        sta     $4374
+        sta     hDMA7::ADDR_B
         ldx     $bd
-        stx     $4375
+        stx     hDMA7::SIZE
         lda     #$80
-        sta     $420b
+        sta     hMDMAEN
         rts
 
 ; ------------------------------------------------------------------------------
@@ -8601,7 +8615,7 @@ _7fc500:
 @c56a:  lda     $4f
         bit     #$01
         beq     @c573
-        jsr     _7fc64f
+        jsr     TfrSprites
 @c573:  lda     $4f
         bit     #$02
         beq     @c57c
@@ -8627,40 +8641,40 @@ _7fc500:
         lda     #$03
         jsr     _7fbc9a
 @c5a8:  lda     #$00
-        sta     $2121
+        sta     hCGADD
         lda     $40
-        sta     $420c
+        sta     hHDMAEN
         lda     $30
-        sta     $210d
+        sta     hBG1HOFS
         lda     $31
-        sta     $210d
+        sta     hBG1HOFS
         lda     $32
-        sta     $210e
+        sta     hBG1VOFS
         lda     $33
-        sta     $210e
+        sta     hBG1VOFS
         lda     $3b
-        sta     $212c
+        sta     hTM
         lda     $3a
-        sta     $212d
+        sta     hTS
         lda     $34
-        sta     $211f
+        sta     hM7X
         lda     $35
-        sta     $211f
+        sta     hM7X
         lda     $36
-        sta     $2120
+        sta     hM7Y
         lda     $37
-        sta     $2120
+        sta     hM7Y
         lda     $8e
-        sta     $2131
+        sta     hCGADSUB
         lda     $8b
         ora     #$20
-        sta     $2132
+        sta     hCOLDATA
         lda     $8c
         ora     #$40
-        sta     $2132
+        sta     hCOLDATA
         lda     $8d
         ora     #$80
-        sta     $2132
+        sta     hCOLDATA
         lda     $70
         bit     #$01
         beq     @c61c
@@ -8674,7 +8688,7 @@ _7fc500:
         inc
         cmp     #$10
         beq     @c61c
-        sta     $2100
+        sta     hINIDISP
         sta     $71
 @c61c:  lda     $70
         bit     #$02
@@ -8688,12 +8702,12 @@ _7fc500:
         lda     $71
         beq     @c633
         dec
-@c633:  sta     $2100
+@c633:  sta     hINIDISP
         sta     $71
-@c638:  lda     $4212
+@c638:  lda     hHVBJOY
         bit     #$01
         bne     @c638
-        ldx     $4218
+        ldx     hSTDCNTRL1L
         stx     $42
         stz     $07
         longa
@@ -8708,43 +8722,45 @@ _7fc500:
 
 ; ------------------------------------------------------------------------------
 
-_7fc64f:
+; [ transfer sprite data to ppu ]
+
+TfrSprites:
 @c64f:  lda     #$00
-        sta     $2102
-        sta     $2103
+        sta     hOAMADDL
+        sta     hOAMADDH
         lda     #$00
-        sta     $4370
-        lda     #$04
-        sta     $4371
+        sta     hDMA7::CTRL
+        lda     #<hOAMDATA
+        sta     hDMA7::HREG
         ldx     #$0200
-        stx     $4372
+        stx     hDMA7::ADDR
         lda     #$00
-        sta     $4374
+        sta     hDMA7::ADDR_B
         ldx     #$0220
-        stx     $4375
+        stx     hDMA7::SIZE
         lda     #$80
-        sta     $420b
+        sta     hMDMAEN
         rts
 
 ; ------------------------------------------------------------------------------
 
 _7fc678:
 @c678:  ldx     $ac
-        stx     $2116
+        stx     hVMADDL
         lda     #$80
-        sta     $2115
+        sta     hVMAINC
         lda     $b3
-        sta     $4370
+        sta     hDMA7::CTRL
         lda     $b4
-        sta     $4371
+        sta     hDMA7::HREG
         ldx     $ae
-        stx     $4372
+        stx     hDMA7::ADDR
         lda     $b0
-        sta     $4374
+        sta     hDMA7::ADDR_B
         ldx     $b1
-        stx     $4375
+        stx     hDMA7::SIZE
         lda     #$80
-        sta     $420b
+        sta     hMDMAEN
         rts
 
 ; ------------------------------------------------------------------------------

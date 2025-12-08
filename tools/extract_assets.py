@@ -6,274 +6,136 @@ import json
 import romtools as rt
 from ff5_compress import *
 
-class AssetExtractor:
 
-    def __init__(self, rom_bytes, map_mode):
-        self.rom_bytes = rom_bytes
-        self.memory_map = rt.MemoryMap(map_mode)
+def write_asset_file(asset_bytes, asset_path):
 
-    def extract_object(self, asset_range, **kwargs):
+    # create directories
+    os.makedirs(os.path.dirname(asset_path), exist_ok=True)
 
-        # calculate the appropriate ROM range using the mapper
-        unmapped_range = rt.Range(asset_range)
-        mapped_range = self.memory_map.map_range(unmapped_range)
+    # decompress the data, if necessary
+    if asset_path.endswith('.lz'):
+        with open(asset_path[:-3], 'wb') as f:
+            f.write(decode_lzss(asset_bytes))
+    elif asset_path.endswith('.cmp'):
+        with open(asset_path[:-4], 'wb') as f:
+            f.write(decode_multi(asset_bytes))
+    elif asset_path.endswith('.bgt'):
+        with open(asset_path[:-4], 'wb') as f:
+            f.write(decode_battle_bg_tiles(asset_bytes))
+    elif asset_path.endswith('.bgf'):
+        with open(asset_path[:-4], 'wb') as f:
+            f.write(decode_battle_bg_flip(asset_bytes))
 
-        # extract the asset data
-        asset_bytes = self.rom_bytes[mapped_range.begin:mapped_range.end + 1]
+    # save the raw data
+    with open(asset_path, 'wb') as f:
+        f.write(asset_bytes)
 
-        # make a list of pointers for each item in the asset
-        pointer_list = []
 
-        if 'ptr_range' in kwargs:
-            # array with a pointer table
-            is_mapped = kwargs.get('is_mapped', False)
-            ptr_offset = kwargs.get('ptr_offset', 0)
-            if isinstance(ptr_offset, str):
-                ptr_offset = int(ptr_offset, 0)
+def extract_text(ae, text_def):
+    assert 'json_path' in text_def, 'json_path not found'
+    json_path = text_def['json_path']
 
-            if not is_mapped:
-                # map the pointer offset first, then add pointers
-                ptr_offset = self.memory_map.map_address(ptr_offset)
+    # read the json file
+    with open(json_path, 'r', encoding='utf8') as json_file:
+        asset_def = json.load(json_file)
 
-            # extract the pointer table data
-            ptr_range = rt.Range(kwargs['ptr_range'])
-            ptr_range = self.memory_map.map_range(ptr_range)
-            ptr_data = self.rom_bytes[ptr_range.begin:ptr_range.end + 1]
-            ptr_size = kwargs.get('ptr_size', 2)
-            assert len(ptr_data) % ptr_size == 0, 'Pointer table length' \
-                + ' is not divisible by pointer size'
-            array_length = len(ptr_data) // ptr_size
+    # check if the data file already exists and is not empty
+    dat_path = os.path.splitext(json_path)[0] + '.dat'
+    if os.path.exists(dat_path) and os.stat(dat_path).st_size != 0:
+        return
 
-            auto_bank = kwargs.get('auto_bank', False)
-            for i in range(array_length):
-                pointer = ptr_data[i * ptr_size]
-                if ptr_size > 1:
-                    pointer |= ptr_data[i * ptr_size + 1] << 8
-                if ptr_size > 2:
-                    pointer |= ptr_data[i * ptr_size + 2] << 16
-                if ptr_size > 3:
-                    pointer |= ptr_data[i * ptr_size + 3] << 24
+    # otherwise, we need to extract the text and create the data file
+    assert 'asset_range' in text_def, 'asset_range not found'
+    asset_range = text_def['asset_range']
+    print(f'{asset_range} -> {json_path}')
 
-                pointer += ptr_offset
-                if is_mapped:
-                    # map pointer after adding pointer offset
-                    pointer = self.memory_map.map_address(pointer)
-                pointer -= mapped_range.begin
+    # for fixed-length text strings, copy the item length to text_def
+    if 'item_size' in asset_def:
+        text_def['item_size'] = asset_def['item_size']
 
-                # check if we just reached a new bank (auto-bank)
-                if auto_bank and i > 0 and pointer < pointer_list[-1]:
-                    ptr_offset += 0x010000
-                    pointer += 0x010000
+    # extract the text from the ROM
+    asset_bytes, item_ranges = ae.extract_asset(**text_def)
 
-                pointer_list.append(pointer)
+    # update include file
+    if 'inc_path' in asset_def:
+        rt.update_array_inc(item_ranges, **asset_def)
 
-        elif 'item_offsets' in kwargs:
-            # items with specified offsets
-            item_offsets = kwargs['item_offsets']
-            array_length = len(item_offsets)
-            for begin in item_offsets:
-                if isinstance(begin, str):
-                    begin = int(begin, 0)
-                begin = self.memory_map.map_address(begin)
-                pointer_list.append(begin - mapped_range.begin)
+    # create the text codec
+    text_codec = rt.TextCodec()
+    if 'item_size' in asset_def:
+        text_codec.item_size = asset_def['item_size']
+    for char_table in asset_def['char_tables']:
+        text_codec.load_char_table(f'tools/char_table/{char_table}.json')
 
-        elif 'terminator' in kwargs:
-            # terminated items
-            terminator = kwargs['terminator']
-            if isinstance(terminator, str):
-                terminator = int(terminator, 0)
-            pointer_list.append(0)
-            for p in range(len(asset_bytes) - 1):
-                if asset_bytes[p] == terminator:
-                    pointer_list.append(p + 1)
-            array_length = len(pointer_list)
+    # decode the text strings
+    text_list = []
+    for item_range in item_ranges:
+        item_bytes = asset_bytes[item_range.begin:item_range.end + 1]
+        text_list.append(text_codec.decode(item_bytes))
 
-        elif 'item_size' in kwargs:
-            # fixed item size
-            item_size = kwargs['item_size']
-            if isinstance(item_size, str):
-                item_size = int(item_size, 0)
-            assert len(asset_bytes) % item_size == 0, \
-                'Fixed-length array size mismatch'
-            array_length = len(asset_bytes) // item_size
-            for i in range(array_length):
-                pointer_list.append(i * item_size)
+    asset_def['text'] = text_list
 
-        else:
-            # single object
-            pointer_list.append(0)
-            array_length = 1
+    # write text strings to the asset file
+    asset_json = json.dumps(asset_def, ensure_ascii=False, indent=2)
+    with open(json_path, 'w', encoding='utf8') as f:
+        f.write(asset_json)
 
-        # remove duplicates and sort pointers
-        sorted_pointers = sorted(set(pointer_list))
+    # write data file
+    write_asset_file(asset_bytes, dat_path)
 
-        # create a list of pointer ranges (these don't correspond with item
-        # ranges for terminated and sequential items)
-        pointer_ranges = {}
-        for p, pointer in enumerate(sorted_pointers):
-            begin = pointer
-            if p == len(sorted_pointers) - 1:
-                end = len(asset_bytes) - 1
-            else:
-                end = sorted_pointers[p + 1] - 1
-            pointer_ranges[begin] = rt.Range(begin, end)
 
-        # create ranges for each item
-        item_ranges = []
+def extract_data(ae, data_def):
 
-        for i in range(array_length):
-            begin = pointer_list[i]
-            if 'terminator' in kwargs:
-                # item range goes until terminator is found
-                end = begin
-                terminator = kwargs['terminator']
-                if isinstance(terminator, str):
-                    terminator = int(terminator, 0)
-                while end < len(asset_bytes):
-                    if asset_bytes[end] == terminator:
-                        break
-                    end = end + 1
-                item_ranges.append(rt.Range(begin, end))
+    # extract the asset from the ROM
+    asset_bytes, item_ranges = ae.extract_asset(**data_def)
 
-            elif kwargs.get('is_sequential', False):
-                if i != array_length - 1:
-                    # item range goes up to next sequential pointer
-                    end = pointer_list[i + 1] - 1
-                else:
-                    # last item goes up to end of asset range
-                    end = len(asset_bytes) - 1
-                item_ranges.append(rt.Range(begin, end))
+    # generate a list of file names
+    assert 'file_path' in data_def, 'file_path not found'
+    file_path = data_def['file_path']
+    if 'file_list' in data_def:
+        file_list = data_def['file_list']
+        assert len(file_list) == len(item_ranges), 'array length mismatch'
+    else:
+        file_list = [('%04x' % i) for i in range(len(item_ranges))]
+    path_list = [
+        file_path.replace('%s', file_list[i])
+        for i in range(len(item_ranges))
+    ]
 
-            else:
-                # otherwise, item range is same as pointer range
-                item_ranges.append(pointer_ranges[begin])
+    assert 'asset_range' in data_def, 'asset_range not found'
+    asset_range = data_def['asset_range']
+    extracted_one = False
+    for i, item_range in enumerate(item_ranges):
+        if os.path.exists(path_list[i]):
+            continue
+        if item_range.is_empty() or item_range.begin < 0:
+            continue
+        if not extracted_one:
+            extracted_one = True
+            print(f'{asset_range} -> {file_path}')
+        data_bytes = asset_bytes[item_range.begin:item_range.end + 1]
+        write_asset_file(data_bytes, path_list[i])
 
-        return asset_bytes, item_ranges
 
-    def write_asset_file(self, asset_bytes, asset_path):
+def extract_array(ae, array_def):
 
-        # create directories
-        os.makedirs(os.path.dirname(asset_path), exist_ok=True)
+    # extract the array data from the ROM
+    asset_bytes, item_ranges = ae.extract_asset(**array_def)
 
-        # decompress the data, if necessary
-        if asset_path.endswith('.lz'):
-            with open(asset_path[:-3], 'wb') as f:
-                f.write(decode_lzss(asset_bytes))
-        elif asset_path.endswith('.cmp'):
-            with open(asset_path[:-4], 'wb') as f:
-                f.write(decode_multi(asset_bytes))
+    assert 'file_path' in array_def, 'file_path not found'
+    file_path = array_def['file_path']
+    if os.path.exists(file_path):
+        return
 
-        # save the raw data
-        with open(asset_path, 'wb') as f:
-            f.write(asset_bytes)
+    # write data file
+    assert 'asset_range' in array_def, 'asset_range not found'
+    asset_range = array_def['asset_range']
+    print(f'{asset_range} -> {file_path}')
+    write_asset_file(asset_bytes, file_path)
 
-    def extract_text(self, json_path, asset_range, **kwargs):
-
-        # read the json file
-        with open(json_path, 'r', encoding='utf8') as json_file:
-            asset_def = json.load(json_file)
-
-        if 'item_size' in asset_def:
-            kwargs['item_size'] = asset_def['item_size']
-
-        asset_root, _ = os.path.splitext(json_path)
-
-        # check if the data file already exists
-        dat_path = asset_root + '.dat'
-        if os.path.exists(dat_path):
-            return
-
-        # otherwise, we need to extract the text and create the data file
-        print(f'{asset_range} -> {json_path}')
-
-        # extract the text from the ROM
-        asset_bytes, item_ranges = self.extract_object(asset_range, **kwargs)
-
-        # update include file
-        rt.update_array_inc(asset_bytes, item_ranges, **asset_def)
-
-        # create the text codec
-        text_codec = rt.TextCodec(asset_def)
-
-        # decode the text strings
-        text_list = []
-        for item_range in item_ranges:
-            item_bytes = asset_bytes[item_range.begin:item_range.end + 1]
-            text_list.append(text_codec.decode(item_bytes))
-
-        asset_def['text'] = text_list
-
-        # write text strings to the asset file
-        asset_json = json.dumps(asset_def, ensure_ascii=False, indent=2)
-        with open(json_path, 'w', encoding='utf8') as f:
-            f.write(asset_json)
-
-        # write data file
-        self.write_asset_file(asset_bytes, dat_path)
-
-    def extract_array(self, file_path, asset_range, **kwargs):
-
-        # extract the array data from the ROM
-        asset_bytes, item_ranges = self.extract_object(asset_range, **kwargs)
-
-        if os.path.exists(file_path):
-            return
-
-        # write data file
-        print(f'{asset_range} -> {file_path}')
-        self.write_asset_file(asset_bytes, file_path)
-
-        # check if an include file exists
-        rt.update_array_inc(asset_bytes, item_ranges, **kwargs)
-
-    def extract_asset(self, file_path, asset_range, **kwargs):
-
-        # extract the asset from the ROM
-        asset_bytes, item_ranges = self.extract_object(asset_range, **kwargs)
-
-        # generate a list of file names
-        if 'file_list' in kwargs:
-            file_list = kwargs['file_list']
-            assert len(file_list) == len(item_ranges)
-        else:
-            file_list = [('%04x' % i) for i in range(len(item_ranges))]
-        path_list = [
-            file_path.replace('%s', file_list[i])
-            for i in range(len(item_ranges))
-        ]
-
-        extracted_one = False
-        for i, item_range in enumerate(item_ranges):
-            if os.path.exists(path_list[i]):
-                continue
-            if item_range.is_empty() or item_range.begin < 0:
-                continue
-            if not extracted_one:
-                extracted_one = True
-                print(f'{asset_range} -> {file_path}')
-            gfx_bytes = asset_bytes[item_range.begin:item_range.end + 1]
-            self.write_asset_file(gfx_bytes, path_list[i])
-
-def extract_rom(rom_bytes, language):
-
-    ae = AssetExtractor(rom_bytes, 'hirom')
-
-    # load rip info
-    rip_list_path = os.path.join('tools', f'rip_list_{language}.json')
-    with open(rip_list_path, 'r', encoding='utf8') as rip_list_file:
-        rip_list = json.load(rip_list_file)
-
-    # extract text
-    for text in rip_list['text']:
-        ae.extract_text(**text)
-
-    # extract data
-    for data in rip_list['data']:
-        ae.extract_asset(**data)
-
-    # extract arrays
-    for arr in rip_list['array']:
-        ae.extract_array(**arr)
+    # check if an include file exists
+    if 'inc_path' in array_def:
+        rt.update_array_inc(item_ranges, **array_def)
 
 
 if __name__ == '__main__':
@@ -307,9 +169,32 @@ if __name__ == '__main__':
         print(f'File: {file_path}')
         found_one = True
 
-        extract_rom(file_bytes, rom_language)
+        # load rip info
+        rip_list_path = os.path.join('tools', f'rip_list_{rom_language}.json')
+        with open(rip_list_path, 'r', encoding='utf8') as rip_list_file:
+            rip_list = json.load(rip_list_file)
+
+        ae = rt.AssetExtractor(file_bytes, 'hirom')
+        [extract_text(ae, text_def) for text_def in rip_list['text']]
+        [extract_data(ae, data_def) for data_def in rip_list['data']]
+        [extract_array(ae, array_def) for array_def in rip_list['array']]
 
     if not found_one:
-        print('No valid ROM files found!\nPlease copy your valid FF6 ROM ' +
-              'file(s) into the "vanilla" directory.\nIf your ROM has a ' +
-              '512-byte copier header, please remove it first.')
+        print('No valid ROM files found!')
+        print('Please copy your valid FF5 ROM file(s) into the ' +
+              '"vanilla" directory.')
+        print('If your ROM has a 512-byte copier header, please remove it ' +
+              'first.')
+    else:
+
+        # decode world tilemaps
+        if os.path.exists('src/field/world_tilemap.dat'):
+            os.makedirs('src/field/world_tilemap', exist_ok=True)
+            with open('src/field/world_tilemap.dat', 'rb') as world_tilemap_file:
+                decoded_bytes = decode_world(world_tilemap_file.read())
+            for w in range(5):
+                tilemap_path = 'src/field/world_tilemap/world_tilemap_%d.dat' % w
+                if not os.path.isfile(tilemap_path):
+                    with open(tilemap_path, 'wb') as f:
+                        f.write(decoded_bytes[0x10000 * w:0x10000 * (w + 1)])
+            os.utime('src/field/world_tilemap.dat')
