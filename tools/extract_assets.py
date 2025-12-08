@@ -188,13 +188,14 @@ if __name__ == '__main__':
     else:
 
         # decode world tilemaps
-        if not os.path.isdir('src/field/world_tilemap') and os.path.exists('src/field/world_tilemap.dat'):
-            os.mkdir('src/field/world_tilemap')
+        if os.path.exists('src/field/world_tilemap.dat'):
+            os.makedirs('src/field/world_tilemap', exist_ok=True)
             with open('src/field/world_tilemap.dat', 'rb') as world_tilemap_file:
-                world_tilemap_bytes = bytearray(world_tilemap_file.read())
-            decoded_bytes = decode_world(world_tilemap_bytes)
+                decoded_bytes = decode_world(world_tilemap_file.read())
             for w in range(5):
-                with open('src/field/world_tilemap/world_tilemap_%d.dat' % w, 'wb') as f:
-                    f.write(decoded_bytes[0x10000 * w:0x10000 * (w + 1)])
+                tilemap_path = 'src/field/world_tilemap/world_tilemap_%d.dat' % w
+                if not os.path.isfile(tilemap_path):
+                    with open(tilemap_path, 'wb') as f:
+                        f.write(decoded_bytes[0x10000 * w:0x10000 * (w + 1)])
             os.utime('src/field/world_tilemap.dat')
 

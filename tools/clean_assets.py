@@ -65,6 +65,10 @@ def clean_assets(rip_list):
         if 'inc_path' in data_def:
             rt.insert_asm(data_def['inc_path'], '')
 
+        asset_dir = os.path.dirname(file_path)
+        if os.path.isdir(asset_dir) and not os.listdir(asset_dir):
+            os.rmdir(asset_dir)
+
 
 if __name__ == '__main__':
 
