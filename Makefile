@@ -17,7 +17,6 @@ ROMS = $(foreach V, $(VERSIONS), $(ROM_DIR)/$(V).sfc)
 # the SPC program
 # SPC_PRG = src/sound/ff5-spc.dat
 
-.PHONY: all setup rip clean spc distclean rng lz cmp text world_tilemap \
 	battle_bg_tiles battle_bg_flip $(VERSIONS)
 
 # disable default suffix rules
@@ -32,7 +31,6 @@ PYTHON := python3
 export PYTHONPATH := tools/romtools:$(PYTHONPATH)
 
 # rip data from ROMs
-rip: setup
 	$(PYTHON) tools/extract_assets.py
 
 # shuffle the RNG table
