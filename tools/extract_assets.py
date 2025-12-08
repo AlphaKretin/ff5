@@ -198,4 +198,3 @@ if __name__ == '__main__':
                     with open(tilemap_path, 'wb') as f:
                         f.write(decoded_bytes[0x10000 * w:0x10000 * (w + 1)])
             os.utime('src/field/world_tilemap.dat')
-
