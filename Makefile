@@ -17,6 +17,7 @@ ROMS = $(foreach V, $(VERSIONS), $(ROM_DIR)/$(V).sfc)
 # the SPC program
 # SPC_PRG = src/sound/ff5-spc.dat
 
+.PHONY: all rip clean spc distclean rng lz cmp text world_tilemap \
 	battle_bg_tiles battle_bg_flip $(VERSIONS)
 
 # disable default suffix rules
