@@ -4,7 +4,7 @@
 ; |                             FINAL FANTASY V                             |
 ; |                                                                         |
 ; +-------------------------------------------------------------------------+
-; | file: sound/sound-data.s                                                |
+; | file: sound/sfx-data.asm                                                |
 ; |                                                                         |
 ; | description: sound effects data                                         |
 ; +-------------------------------------------------------------------------+
@@ -15,8 +15,9 @@ SfxBRR:
 
 ; ---------------------------------------------------------------------------
 
-;c4/1f4f
-spc_block SfxLoopStart
+; c4/1f4f
+SfxLoopStart:
+        spc_block
         .word $4800,$4800
         .word $4824,$4824
         .word $4848,$4848
@@ -25,10 +26,11 @@ spc_block SfxLoopStart
         .word $48d8,$48d8
         .word $48ea,$48ea
         .word $48fc,$48fc
-end_spc_block
+        end_spc_block
 
-;c4/1F71
-spc_block SfxADSR
+; c4/1f71
+SfxADSR:
+        spc_block
         make_adsr 15,7,7,0
         make_adsr 15,7,7,0
         make_adsr 15,7,7,0
@@ -37,10 +39,11 @@ spc_block SfxADSR
         make_adsr 15,7,7,0
         make_adsr 15,7,7,0
         make_adsr 15,7,7,0
-end_spc_block
+        end_spc_block
 
-;c4/1f83
-spc_block SfxFreqMult
+; c4/1f83
+SfxFreqMult:
+        spc_block
         .byte $e0,$a0
         .byte $e0,$a0
         .byte $e0,$a0
@@ -49,10 +52,12 @@ spc_block SfxFreqMult
         .byte $e0,$a0
         .byte $e0,$a0
         .byte $e0,$a0
-end_spc_block
+        end_spc_block
 
 ; ---------------------------------------------------------------------------
 
 ; c4/1f95
 SfxScript:
         .incbin "sfx_script.dat"
+
+; ---------------------------------------------------------------------------

@@ -18,7 +18,7 @@ ROM_DIR = rom
 ROMS = $(foreach V, $(VERSIONS), $(ROM_DIR)/$(V).sfc)
 
 # the SPC program
-# SPC_PRG = src/sound/ff5-spc.dat
+SPC_PRG = src/sound/ff5-spc.dat
 
 .PHONY: all rip clean distclean \
 	$(VERSIONS) $(MODULES)
@@ -29,9 +29,19 @@ ROMS = $(foreach V, $(VERSIONS), $(ROM_DIR)/$(V).sfc)
 # make all versions
 all: $(VERSIONS)
 
+PYTHON := python3
+export PYTHONPATH := tools/romtools:$(PYTHONPATH)
+
 # rip data from ROMs
 rip:
-	python3 tools/extract_assets.py
+	git submodule update --init --recursive
+	$(PYTHON) tools/extract_assets.py
+
+# shuffle the RNG table
+rng:
+	$(PYTHON) tools/shuffle_rng.py src/field/rng_tbl.dat
+
+spc: $(SPC_PRG)
 
 # remove all intermediate files
 clean:
@@ -39,6 +49,8 @@ clean:
 	find ./src -name "*.cmp" -type f -delete
 	find ./src -name "*.lz" -type f -delete
 	find ./src/text -name "*.dat" -type f -delete
+	$(RM) ./src/field/world_tilemap.dat
+	$(RM) $(SPC_PRG)
 
 # remove all ripped assets
 distclean: clean
@@ -153,6 +165,13 @@ LZ_DIR = temp_lz
 CUTSCENE_LZ = $(LZ_DIR)/cutscene.lz
 CUTSCENE_LZ_ASM = $(LZ_DIR)/cutscene_lz.asm
 
+$(OBJ_DIR)/ff5-spc.o: src/sound/ff5-spc.asm $(INC_FILES)
+	@mkdir -p $(OBJ_DIR)
+	$(ASM) $(ASMFLAGS) -l $(@:o=lst) $< -o $@
+
+$(SPC_PRG): cfg/ff5-spc.cfg $(OBJ_DIR)/ff5-spc.o
+	$(LINK) $(LINKFLAGS) -o $@ -C $< $(OBJ_DIR)/ff5-spc.o
+
 # list of all text files
 TEXT_JSON_JP = $(wildcard src/text/*jp.json)
 TEXT_JSON_EN = $(wildcard src/text/*en.json) \
@@ -172,7 +191,7 @@ src/text/%.dat: src/text/%.json
 
 # rules for making ROM files
 # run linker twice: 1st for the cutscene program, 2nd for the ROM itself
-$(FF5_JP_PATH): cfg/ff5-jp.cfg text_jp cmp lz $(OBJ_FILES_JP)
+$(FF5_JP_PATH): cfg/ff5-jp.cfg spc text_jp cmp lz $(OBJ_FILES_JP)
 	@mkdir -p $(LZ_DIR) $(ROM_DIR)
 	$(LINK) $(LINKFLAGS) -o "" -C $< $(OBJ_FILES_JP)
 	python3 tools/encode_cutscene.py $(CUTSCENE_LZ:lz=bin) $(CUTSCENE_LZ)
@@ -182,7 +201,7 @@ $(FF5_JP_PATH): cfg/ff5-jp.cfg text_jp cmp lz $(OBJ_FILES_JP)
 	@$(RM) -rf $(LZ_DIR)
 	$(FIX_CHECKSUM) $@
 
-$(FF5_EN_PATH): cfg/ff5-en.cfg text_en cmp lz $(OBJ_FILES_EN)
+$(FF5_EN_PATH): cfg/ff5-en.cfg spc text_en cmp lz $(OBJ_FILES_EN)
 	@mkdir -p $(LZ_DIR) $(ROM_DIR)
 	$(LINK) $(LINKFLAGS) -o "" -C $< $(OBJ_FILES_EN)
 	python3 tools/encode_cutscene.py $(CUTSCENE_LZ:lz=bin) $(CUTSCENE_LZ)
