@@ -27,14 +27,9 @@ ROMS = $(foreach V, $(VERSIONS), $(ROM_DIR)/$(V).sfc)
 all: $(VERSIONS)
 
 VENV_DIR := tools/venv
-PYTHON := $(VENV_DIR)/bin/python3
-PIP := $(VENV_DIR)/bin/pip3
+PYTHON := python3
 
-# set up a python virtual environment
-setup:
-	@test -d $(VENV_DIR) || python3 -m venv $(VENV_DIR)
-	@$(PIP) install --upgrade pip setuptools
-	@$(PIP) install git+https://github.com/everything8215/romtools.git
+export PYTHONPATH := tools/romtools:$(PYTHONPATH)
 
 # rip data from ROMs
 rip: setup
