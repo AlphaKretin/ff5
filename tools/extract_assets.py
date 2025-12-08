@@ -196,3 +196,5 @@ if __name__ == '__main__':
             for w in range(5):
                 with open('src/field/world_tilemap/world_tilemap_%d.dat' % w, 'wb') as f:
                     f.write(decoded_bytes[0x10000 * w:0x10000 * (w + 1)])
+            os.utime('src/field/world_tilemap.dat')
+
