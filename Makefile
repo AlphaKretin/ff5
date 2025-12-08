@@ -54,7 +54,7 @@ clean:
 distclean: clean
 	$(PYTHON) tools/clean_assets.py tools/rip_list_jp.json
 	$(PYTHON) tools/clean_assets.py tools/rip_list_en.json
-	find ./src/field/world_tilemap -name "*.dat" -type f -delete
+	$(RM) -rf ./src/field/world_tilemap
 
 # ROM filenames
 FF5_JP_PATH = $(ROM_DIR)/ff5-jp.sfc
