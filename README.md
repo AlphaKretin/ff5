@@ -1,7 +1,7 @@
 # Final Fantasy V Disassembly
 
-This is a disassembly of Final Fantasy V for the Super Famicom/SNES. It is a
-work in progress which aims to build the following ROMs:
+This is a disassembly of Final Fantasy V for the Super Famicom/SNES. It
+builds the following ROMs:
 
 - Final Fantasy V 1.0 (J), CRC32: `0xC1BC267D`
 - Final Fantasy V 1.10 (RPGe), CRC32: `0x17444605`
@@ -23,9 +23,8 @@ a Windows machine: <https://github.com/SlithyMatt/x16-hello-cc65>
 
 ## Project roadmap
 
-This repo currently contains a barebones set of files which build a mostly empty
-ROM file. The project will go through the stages below in order to
-ultimately produce a ROM which matches the original game byte-for-byte.
+The project is going through the stages below in order to
+produce a ROM which matches the original game byte-for-byte.
 
 IMPORTANT: Fair use privilege allows assembly files to be added to a public
 repo even if they produce copyrighted material when assembled. However, raw
@@ -33,7 +32,7 @@ copyrighted material should never be added to the repo. All such copyrighted
 assets must be extracted from an original ROM. This includes raw graphics,
 text, and other game data files.
 
-### Stage 1
+### Stage 1 (Complete)
 
 All 65c816 and SPC-700 machine code is converted into assembly files that can be assembled back
 into the original machine code. It is not necessary to add descriptive labels or for the code to be
@@ -50,17 +49,19 @@ individually:
 - Sound module (bank `C4`), includes SPC code and music/sfx scripts
 - RPGe translation code (bank `E0`)
 
-### Stage 2
+### Stage 2 (Complete)
 
 Add labels to assembly code to allow for code insertions/deletions and
 relocation.
 
 Start to add descriptive names for labels and constant values (e.g. subroutines like `DrawNPC` or constants like `STATUS::POISON`).
 
-### Stage 3
+### Stage 3 (Complete)
 
-Add tools to extract all game data/assets from an original ROM and include everything into the assembly. Most assets will be included in the appropriate code modules
-above, but a few additional modules will be added for more complex game data:
+Add tools to extract all game data/assets from an original ROM and include
+everything into the assembly. Most assets will be included in the appropriate
+code modules above, but a few additional modules will be added for more
+complex game data:
 
 - Text module
 - Graphics module (includes all graphics, palettes, and tilemaps)
@@ -69,7 +70,7 @@ above, but a few additional modules will be added for more complex game data:
 When this stage is complete the project will produce
 a fully matching ROM.
 
-### Stage 4
+### Stage 4 (In Progress)
 
 Add RAM definitions for each module so that variables can be inserted and
 deleted.
