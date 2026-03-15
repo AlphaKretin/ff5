@@ -23,5 +23,9 @@ public:
     void execFieldLoop();
 
 private:
+    // Mirrors field-main.asm InitHardware.
+    // Translates the meaningful PPU register writes to IRenderer calls.
+    void initHardware();
+
     Engine& m_engine;
 };
