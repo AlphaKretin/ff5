@@ -122,8 +122,11 @@ void Field::execFieldLoop() {
     // Temporary: keep the window alive until the user closes it
     auto& input    = m_engine.input();
     auto& renderer = m_engine.renderer();
+    m_engine.sound().playSong(0);  // TODO: play the correct song for the current map
+
     while (!input.isQuitRequested()) {
         input.poll();
+        m_engine.sound().exec();
         renderer.beginFrame();
         renderer.endFrame();
     }

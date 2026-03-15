@@ -46,6 +46,9 @@ add_library(ff5-engine STATIC
     src/engine/menu/Menu.cpp
     src/engine/cutscene/Cutscene.cpp
     src/engine/sound/Sound.cpp
+    src/engine/sound/BRRDecoder.cpp
+    src/engine/sound/SampleBank.cpp
+    src/engine/sound/Sequencer.cpp
 )
 
 target_include_directories(ff5-engine PUBLIC src)
