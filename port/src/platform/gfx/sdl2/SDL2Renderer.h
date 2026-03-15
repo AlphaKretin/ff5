@@ -27,45 +27,51 @@ public:
     void setBGCharBase(int bg, uint8_t charAddr) override;
 
 private:
-    // Converts a SNES 15-bit BGR word (0bxBBBBBGGGGGRRRRR) to SDL_Color RGBA.
-    static SDL_Color snesColorToSDL(uint16_t snesColor);
+    // Converts a SNES 15-bit BGR word to a packed ARGB8888 uint32 (0xAARRGGBB).
+    static uint32_t snesColorPacked(uint16_t snesColor);
 
-    // Marks the tile texture atlas as dirty so it is regenerated on next endFrame.
-    void invalidateTileCache();
+    // Builds the CPU-side frame buffer from current VRAM/CGRAM/OAM state.
+    // Called at the start of endFrame before uploading to the GPU.
+    void buildFrame();
 
-    SDL_Window*   m_window   = nullptr;
-    SDL_Renderer* m_renderer = nullptr;
+    // Renders a single BG layer (0–3) into m_framebuf.
+    void renderBG(int layer);
 
-    // The game renders into this 256×224 texture; it is then scaled to fill
-    // the window. This keeps all rendering at native SNES resolution.
-    SDL_Texture*  m_renderTarget = nullptr;
+    // Renders all OAM sprites into m_framebuf.
+    void renderSprites();
 
-    // Mirrors of SNES memory
-    uint8_t  m_vram[VRAM_SIZE_BYTES]  = {};
-    uint16_t m_cgram[CGRAM_SIZE]      = {};   // SNES 15-bit colors
-    uint8_t  m_oam[544]               = {};   // 512 + 32 bytes
+    SDL_Window*   m_window        = nullptr;
+    SDL_Renderer* m_renderer      = nullptr;
+
+    // Streaming texture: CPU writes m_framebuf here each frame, SDL scales to
+    // fill the window via SDL_RenderSetLogicalSize.
+    SDL_Texture*  m_streamTexture = nullptr;
+
+    // CPU-side pixel buffer. Each uint32 is ARGB8888 (0xAARRGGBB).
+    uint32_t m_framebuf[SNES_WIDTH * SNES_HEIGHT] = {};
+
+    // Mirrors of SNES video memory
+    uint8_t  m_vram[VRAM_SIZE_BYTES] = {};
+    uint16_t m_cgram[CGRAM_SIZE]     = {};   // SNES 15-bit colors
+    uint8_t  m_oam[544]              = {};   // 512 + 32 bytes
+
+    // Precomputed ARGB8888 values for each CGRAM entry.
+    // Updated in writeCGRAM to avoid per-pixel color conversion in the hot path.
+    uint32_t m_colorLut[CGRAM_SIZE] = {};
 
     // PPU state
-    uint8_t  m_bgMode      = 0;
-    uint8_t  m_brightness  = 15;
-    uint16_t m_bgHofs[4]   = {};
-    uint16_t m_bgVofs[4]   = {};
+    uint8_t  m_bgMode     = 0;
+    uint8_t  m_brightness = 15;
+    uint16_t m_bgHofs[4]  = {};
+    uint16_t m_bgVofs[4]  = {};
 
     struct BGRegs {
-        uint8_t scAddr   = 0;
+        uint8_t scAddr   = 0;   // tilemap base:  scAddr   * 0x800 bytes in VRAM
+        uint8_t charBase = 0;   // char data base: charBase * 0x2000 bytes in VRAM
         bool    hMirror  = false;
         bool    vMirror  = false;
-        uint8_t charBase = 0;
     };
     BGRegs m_bgRegs[4];
-
-    // Tile atlas: one SDL_Texture that holds decoded 8×8 tiles.
-    // Updated lazily when VRAM or CGRAM changes.
-    SDL_Texture* m_tileAtlas    = nullptr;
-    bool         m_atlasInvalid = true;
-
-    int m_windowWidth  = 0;
-    int m_windowHeight = 0;
 };
 
 #endif // FF5_GFX_SDL2
