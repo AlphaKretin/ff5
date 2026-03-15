@@ -58,4 +58,11 @@ public:
     // Mirrors hBG1SC, hBG12NBA etc.
     virtual void setBGTilemapBase(int bg, uint8_t scAddr, bool hMirror, bool vMirror) = 0;
     virtual void setBGCharBase(int bg, uint8_t charAddr) = 0;
+
+    // ── OBJ (sprite) settings ─────────────────────────────────────────────────
+    // Mirrors hOBJSEL ($2101).
+    //   bits 2-0: name base — OBJ char data starts at (nameBase * 0x2000) VRAM words
+    //   bits 4-3: name select — second 256-tile page offset from base
+    //   bits 6-5: size select — which 8 of the 5 available size pairs to use
+    virtual void setOBJSEL(uint8_t objsel) = 0;
 };

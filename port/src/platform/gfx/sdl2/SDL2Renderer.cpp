@@ -155,6 +155,10 @@ void SDL2Renderer::setBGCharBase(int bg, uint8_t charAddr) {
     m_bgRegs[bg].charBase = charAddr;
 }
 
+void SDL2Renderer::setOBJSEL(uint8_t objsel) {
+    m_objsel = objsel;
+}
+
 // ── Frame building ────────────────────────────────────────────────────────────
 
 void SDL2Renderer::buildFrame() {
@@ -259,9 +263,90 @@ void SDL2Renderer::renderBG(int layer) {
 }
 
 void SDL2Renderer::renderSprites() {
-    // TODO: decode OAM and draw 8×8 / 16×16 sprites.
-    // Sprites use CGRAM entries 128–255 (palettes 0–7, 16 colors each).
-    // Priority interleaving with BG tiles to be added alongside priority system.
+    // OAM layout:
+    //   Bytes 0–511:  4 bytes per sprite × 128 sprites
+    //     [0] X low 8 bits
+    //     [1] Y (1–224 on-screen; 0 or ≥240 off-screen)
+    //     [2] tile number within page (0–255)
+    //     [3] vhoopppt  v=vflip h=hflip oo=priority ppp=palette t=tile_page
+    //   Bytes 512–543: 2 bits per sprite — bit0=X high bit, bit1=size select
+    //
+    // OBJ char data addressing (from OBJSEL, stored in m_objsel):
+    //   name_base    = m_objsel & 0x07   → page-0 tiles at name_base * 0x4000 bytes
+    //   name_select  = (m_objsel >> 3) & 0x03
+    //   page-1 tiles at name_base * 0x4000 + (name_select + 1) * 0x2000 bytes
+    //
+    // Sprites use CGRAM entries 128–255 (palettes 0–7 → offsets 128, 144, …, 240).
+    // Color index 0 within any sprite palette is transparent.
+    //
+    // TODO: priority interleaving with BG tiles.
+    // TODO: 16×16 (and larger) sprite sizes.
+
+    const uint32_t nameBase   = (m_objsel & 0x07u);
+    const uint32_t nameSelect = (m_objsel >> 3) & 0x03u;
+    const uint32_t page0Base  = nameBase * 0x4000u;                          // byte address
+    const uint32_t page1Base  = page0Base + (nameSelect + 1u) * 0x2000u;    // byte address
+
+    // Iterate sprites in reverse order so sprite 0 ends up on top
+    for (int s = 127; s >= 0; --s) {
+        const uint8_t* entry = m_oam + s * 4;
+
+        // Auxiliary table byte/bit for this sprite
+        const uint8_t auxByte = m_oam[512 + s / 4];
+        const int     auxShift = (s % 4) * 2;
+        const bool    xHigh   = (auxByte >> auxShift) & 1;
+
+        // X: 9-bit value; treat as signed so sprites can slide off the left edge
+        int sx = static_cast<int>(entry[0]) | (xHigh ? 0x100 : 0);
+        if (sx >= 256) sx -= 512;   // convert to signed: 256–511 → -256 to -1
+
+        const int     sy       = static_cast<int>(entry[1]);
+        const uint8_t tileNum  = entry[2];
+        const uint8_t attr     = entry[3];
+        const bool    tilePage = attr & 0x01;
+        const uint8_t palNum   = (attr >> 1) & 0x07;
+        const bool    hFlip    = (attr >> 6) & 0x01;
+        const bool    vFlip    = (attr >> 7) & 0x01;
+
+        // Off-screen checks (8×8 sprites only for now)
+        if (sy == 0 || sy >= 240) continue;             // Y off-screen
+        if (sx <= -8 || sx >= SNES_WIDTH) continue;     // X off-screen
+
+        const uint32_t tileBase = (tilePage ? page1Base : page0Base) + tileNum * 32u;
+        if (tileBase + 32u > VRAM_SIZE_BYTES) continue;
+        const uint8_t* tile = m_vram + tileBase;
+
+        // Sprites use CGRAM 128–255: base = 128 + palNum * 16
+        const uint8_t cgBase = static_cast<uint8_t>(128u + palNum * 16u);
+
+        for (int py = 0; py < 8; ++py) {
+            const int screenY = sy + py;        // Y=1 is the first visible row
+            if (screenY < 1 || screenY > SNES_HEIGHT) continue;
+
+            const int fpy = vFlip ? (7 - py) : py;
+            const int bit4 = 7;  // bit index constant
+
+            for (int px = 0; px < 8; ++px) {
+                const int screenX = sx + px;
+                if (screenX < 0 || screenX >= SNES_WIDTH) continue;
+
+                const int fpx = hFlip ? (7 - px) : px;
+                const int bit = bit4 - fpx;
+
+                const uint8_t pixIdx = static_cast<uint8_t>(
+                    ((tile[fpy * 2 + 0]      >> bit) & 1u)
+                  | (((tile[fpy * 2 + 1]      >> bit) & 1u) << 1)
+                  | (((tile[16 + fpy * 2 + 0] >> bit) & 1u) << 2)
+                  | (((tile[16 + fpy * 2 + 1] >> bit) & 1u) << 3)
+                );
+
+                if (pixIdx == 0) continue;  // transparent
+
+                m_framebuf[(screenY - 1) * SNES_WIDTH + screenX] =
+                    m_colorLut[cgBase + pixIdx] | 0xFF000000u;
+            }
+        }
+    }
 }
 
 // ── Color conversion ──────────────────────────────────────────────────────────

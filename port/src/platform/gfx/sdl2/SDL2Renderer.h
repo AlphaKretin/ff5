@@ -25,6 +25,7 @@ public:
     void setBGScroll(int bg, uint16_t hofs, uint16_t vofs) override;
     void setBGTilemapBase(int bg, uint8_t scAddr, bool hMirror, bool vMirror) override;
     void setBGCharBase(int bg, uint8_t charAddr) override;
+    void setOBJSEL(uint8_t objsel) override;
 
 private:
     // Converts a SNES 15-bit BGR word to a packed ARGB8888 uint32 (0xAARRGGBB).
@@ -72,6 +73,9 @@ private:
         bool    vMirror  = false;
     };
     BGRegs m_bgRegs[4];
+
+    // OBJSEL ($2101): OBJ name base and size select
+    uint8_t m_objsel = 0;
 };
 
 #endif // FF5_GFX_SDL2

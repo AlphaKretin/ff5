@@ -38,10 +38,23 @@ if(FF5_INPUT_SDL2)
     target_compile_definitions(ff5-platform PUBLIC FF5_INPUT_SDL2)
 endif()
 
+# ── Engine library ─────────────────────────────────────────────────────────────
+add_library(ff5-engine STATIC
+    src/engine/Engine.cpp
+    src/engine/field/Field.cpp
+    src/engine/battle/Battle.cpp
+    src/engine/menu/Menu.cpp
+    src/engine/cutscene/Cutscene.cpp
+    src/engine/sound/Sound.cpp
+)
+
+target_include_directories(ff5-engine PUBLIC src)
+target_link_libraries(ff5-engine PUBLIC ff5-platform)
+
 # ── Main executable ────────────────────────────────────────────────────────────
 add_executable(ff5-port src/main.cpp)
 
-target_link_libraries(ff5-port PRIVATE ff5-platform)
+target_link_libraries(ff5-port PRIVATE ff5-engine)
 
 # SDL2main provides the WinMain → main entry-point shim on Windows.
 # It must link to the executable, not the static library.
