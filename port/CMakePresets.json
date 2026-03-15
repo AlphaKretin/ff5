@@ -1,0 +1,37 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "sdl2-windows",
+            "displayName": "SDL2 — Windows (Debug)",
+            "generator": "Visual Studio 17 2022",
+            "binaryDir": "${sourceDir}/build/sdl2-windows",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "FF5_GFX_SDL2":   "ON",
+                "FF5_AUDIO_SDL2": "ON",
+                "FF5_INPUT_SDL2": "ON"
+            }
+        },
+        {
+            "name": "sdl2-windows-release",
+            "displayName": "SDL2 — Windows (Release)",
+            "inherits": "sdl2-windows",
+            "binaryDir": "${sourceDir}/build/sdl2-windows-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "sdl2-windows",
+            "configurePreset": "sdl2-windows"
+        },
+        {
+            "name": "sdl2-windows-release",
+            "configurePreset": "sdl2-windows-release"
+        }
+    ]
+}

@@ -20,3 +20,6 @@ pretty/*
 rom/*
 vanilla/*
 !vanilla/README.md
+
+build/*
+*/build/*
