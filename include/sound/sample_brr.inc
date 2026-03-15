@@ -49,6 +49,43 @@ SAMPLE_BRR_INC = 1
 ; ###          AUTOMATICALLY GENERATED CODE, DO NOT MODIFY MANUALLY          ###
 ; ##############################################################################
 
+        ARRAY_LENGTH = 35
+
+        _0 := SampleBRR + 0
+        _1 := SampleBRR + 2702
+        _2 := SampleBRR + 5737
+        _3 := SampleBRR + 10239
+        _4 := SampleBRR + 13904
+        _5 := SampleBRR + 19531
+        _6 := SampleBRR + 20658
+        _7 := SampleBRR + 25160
+        _8 := SampleBRR + 29662
+        _9 := SampleBRR + 32337
+        _10 := SampleBRR + 33041
+        _11 := SampleBRR + 41107
+        _12 := SampleBRR + 44655
+        _13 := SampleBRR + 45530
+        _14 := SampleBRR + 47467
+        _15 := SampleBRR + 48099
+        _16 := SampleBRR + 49586
+        _17 := SampleBRR + 52432
+        _18 := SampleBRR + 56799
+        _19 := SampleBRR + 57287
+        _20 := SampleBRR + 58711
+        _21 := SampleBRR + 60504
+        _22 := SampleBRR + 63494
+        _23 := SampleBRR + 67996
+        _24 := SampleBRR + 76305
+        _25 := SampleBRR + 82121
+        _26 := SampleBRR + 84967
+        _27 := SampleBRR + 89109
+        _28 := SampleBRR + 94772
+        _29 := SampleBRR + 1552726
+        _30 := SampleBRR + 95647
+        _31 := SampleBRR + 98655
+        _32 := SampleBRR + 100844
+        _33 := SampleBRR + 1091926
+        _34 := SampleBRR + 103375
 
 ; ##############################################################################
 
