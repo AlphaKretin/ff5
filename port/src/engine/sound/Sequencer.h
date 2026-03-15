@@ -25,7 +25,8 @@ public:
 
     // Load and start playing a song.
     // songData/songLen: raw bytes from song_script.dat at the song's offset.
-    void playSong(const uint8_t* songData, int songLen);
+    // songIdx: 0-based song index (used to build the SPC sample-slot → instrument map).
+    void playSong(const uint8_t* songData, int songLen, int songIdx);
 
     void stopSong();
 
@@ -93,10 +94,18 @@ private:
     static const int k_noteDurTbl[15];
     // ChCmdParams[46]: parameter counts for commands $D2..$FF
     static const uint8_t k_cmdParams[46];
+    // SongSamples[72][16]: instrument index for each SPC slot per song (0xFF=unused).
+    // Mirrors song-data.asm SongSamples table; slot 32+k = k-th sample listed for song.
+    static const uint8_t k_songSamples[72][16];
 
     SampleBank& m_bank;
 
     bool    m_active   = false;
+
+    // SPC sample-slot → instrument index map (0xFF = unmapped).
+    // Slots 0–31 are SFX (not yet implemented); slots 32–47 are BGM samples,
+    // populated in SongSamples order for the current song.
+    uint8_t m_sampleSlotMap[64];
     uint8_t m_tempo    = 1;    // zTempo+1: added to tick-accum every 144 samples
     uint8_t m_songVol  = 255;  // global song volume (0..255)
 

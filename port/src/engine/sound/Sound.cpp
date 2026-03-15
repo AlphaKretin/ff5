@@ -80,7 +80,7 @@ void Sound::playSong(int songIdx) {
             std::fprintf(stderr, "[Sound] failed to load song_script_41.dat\n");
             return;
         }
-        m_sequencer->playSong(data.data(), (int)data.size());
+        m_sequencer->playSong(data.data(), (int)data.size(), songIdx);
         return;
     }
 
@@ -96,7 +96,7 @@ void Sound::playSong(int songIdx) {
         return;
     }
 
-    m_sequencer->playSong(dat.data() + offset, (int)dat.size() - offset);
+    m_sequencer->playSong(dat.data() + offset, (int)dat.size() - offset, songIdx);
 }
 
 void Sound::stopSong() {
