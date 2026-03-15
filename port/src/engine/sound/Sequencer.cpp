@@ -109,7 +109,7 @@ void Sequencer::playSong(const uint8_t* songData, int songLen) {
 
     // Reset global state
     m_tempo    = 1;      // will be set by $F3 SetTempo early in script
-    m_songVol  = 127;
+    m_songVol  = 255;
     m_tickAccum   = 255; // zSongTickCounter=$FF → fires on first main-loop pass
     m_sampleCount = 0;
 
@@ -217,12 +217,12 @@ void Sequencer::generateAudio(float* out, int nFrames) {
             float frac = (float)(ch.phaseAccum & 0xFFF) * (1.0f / 4096.0f);
             float s = s0 + frac * (s1 - s0);
 
-            // Apply volume (0..127) and master song volume
-            float vol = (ch.volume / 127.0f) * (m_songVol / 127.0f);
+            // Apply volume (0..255) and master song volume
+            float vol = (ch.volume / 255.0f) * (m_songVol / 255.0f);
             s *= vol;
 
-            // Apply pan: 0x01=full-left, 0x40=center, 0x7F=full-right
-            float panR = std::max(0.0f, std::min(1.0f, (ch.pan - 1) / 62.0f));
+            // Apply pan: 0x01=full-left, 0x40=center, 0x7F=full-right (range 1..127 = span 126)
+            float panR = std::max(0.0f, std::min(1.0f, (ch.pan - 1) / 126.0f));
             float panL = 1.0f - panR;
             left  += s * panL;
             right += s * panR;
@@ -361,13 +361,13 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
 
     // ── $D2 SetVol: set channel volume ──────────────────────────────────────
     case 0xD2:
-        ch.volume = p1 & 0x7F;  // high byte of wChVol = 0..127
+        ch.volume = p1;  // 0..255
         break;
 
     // ── $D3 SetVolEnv: set volume with envelope (skip 2nd param) ───────────
     case 0xD3:
-        readByte(ch);           // consume p2 (final volume)
-        ch.volume = p1 & 0x7F; // p1 = duration; use as instant set
+        readByte(ch);    // consume p2 (final volume)
+        ch.volume = p1;  // p1 = duration; use as instant set
         break;
 
     // ── $D4 SetPan: set stereo pan ──────────────────────────────────────────
@@ -538,7 +538,7 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
 
     // ── $F8 SetSongVol ──────────────────────────────────────────────────────
     case 0xF8:
-        m_songVol = p1 & 0x7F;
+        m_songVol = p1;  // 0..255
         break;
 
     // ── $F9 VoltaRepeat (p1=ending_num, p2=dest_lo, p3=dest_hi) ────────────

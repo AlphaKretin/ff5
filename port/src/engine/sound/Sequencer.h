@@ -60,7 +60,7 @@ private:
         int8_t transpose  = 0;
         int8_t detune     = 0;
         uint8_t sampleId  = 0;
-        uint8_t volume    = 127;  // 0..127 (chVol hi byte)
+        uint8_t volume    = 255;  // 0..255
         uint8_t pan       = 0x40; // 0x01=left, 0x40=center, 0x7F=right
         uint8_t freqMultLo = 0;
         uint8_t freqMultHi = 0;
@@ -98,7 +98,7 @@ private:
 
     bool    m_active   = false;
     uint8_t m_tempo    = 1;    // zTempo+1: added to tick-accum every 144 samples
-    uint8_t m_songVol  = 127;  // global song volume (0..127)
+    uint8_t m_songVol  = 255;  // global song volume (0..255)
 
     // Tick accumulator: += m_tempo every 144 samples; tick fires on overflow
     int m_tickAccum   = 255;   // 255 = fire on first main-loop pass (zSongTickCounter=$FF)
