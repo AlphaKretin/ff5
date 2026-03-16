@@ -755,6 +755,8 @@ void Sequencer::stepEnvelope(ChannelState& ch) {
 
     case EnvPhase::DECAY: {
         // Exponential decrease until sustain threshold (SL+1)*256 is reached.
+        // Note: for SL=7, threshold=2048 > max level 2047, so the first decay
+        // step always triggers SUSTAIN immediately.
         int threshold = (ch.adsrSustainLvl + 1) * 256;
         ch.envStepCounter--;
         if (ch.envStepCounter <= 0) {
@@ -763,9 +765,9 @@ void Sequencer::stepEnvelope(ChannelState& ch) {
             int step = std::max(1, ch.envLevel >> 3);
             ch.envLevel -= step;
             if (ch.envLevel <= threshold) {
-                ch.envLevel = threshold;
+                // Clamp to max valid level (threshold may exceed 2047 for SL=7).
+                ch.envLevel = std::min(ch.envLevel, 2047);
                 // Switch to sustain.
-                ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
                 ch.envPhase = EnvPhase::SUSTAIN;
             }
         }
@@ -773,17 +775,9 @@ void Sequencer::stepEnvelope(ChannelState& ch) {
     }
 
     case EnvPhase::SUSTAIN: {
-        if (ch.adsrSustainRate == 0) break;  // hold forever
-        ch.envStepCounter--;
-        if (ch.envStepCounter <= 0) {
-            ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
-            int step = std::max(1, ch.envLevel >> 3);
-            ch.envLevel -= step;
-            if (ch.envLevel <= 0) {
-                ch.envLevel = 0;
-                ch.envPhase = EnvPhase::OFF;
-            }
-        }
+        // On real SPC-700: sustain phase holds the level constant while the key
+        // is on.  SR (adsrSustainRate) is the RELEASE rate — it only applies
+        // after key-off.  Do not decay here.
         break;
     }
 
