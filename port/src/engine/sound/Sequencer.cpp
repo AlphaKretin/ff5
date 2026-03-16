@@ -348,11 +348,14 @@ void Sequencer::execScript(ChannelState& ch) {
         ch.dspFreq = calcFreq((uint8_t)pitch,
                               ch.freqMultLo, ch.freqMultHi, ch.detune);
 
+        // Always key-on for new note bytes (mirrors SPC ExecChScript which
+        // unconditionally sets zKeyOn for every note byte).  isTie only
+        // suppresses the sample-phase reset to avoid a click when the same
+        // pitch continues after a tie chain.
         if (!ch.isTie) {
-            // New note: key-on → reset phase and trigger ADSR attack
             ch.phaseAccum = 0;
-            keyOn(ch);
         }
+        keyOn(ch);
         ch.playing = true;
 
         // Look ahead to see if the following note-class byte is a tie.
@@ -714,14 +717,14 @@ void Sequencer::keyOn(ChannelState& ch) {
 }
 
 void Sequencer::keyOff(ChannelState& ch) {
-    if (ch.adsrSustainRate == 0) {
-        // No release configured — silence immediately.
-        ch.envPhase = EnvPhase::OFF;
-        ch.envLevel = 0;
-    } else {
-        ch.envPhase       = EnvPhase::RELEASE;
-        ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
-    }
+    // Switch to release phase regardless of SR.
+    // SR=0 → k_gainRate[0]=0 → RELEASE phase holds at current level forever
+    //         (stepEnvelope RELEASE breaks immediately for SR=0).
+    // SR>0 → decays exponentially at rate SR until reaching 0.
+    // This mirrors SPC-700: key-off in ADSR mode starts release at rate SR;
+    // SR=0 means hold indefinitely (note continues audible through rests).
+    ch.envPhase       = EnvPhase::RELEASE;
+    ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
 }
 
 // ---------------------------------------------------------------------------
@@ -785,6 +788,8 @@ void Sequencer::stepEnvelope(ChannelState& ch) {
     }
 
     case EnvPhase::RELEASE: {
+        // SR=0: hold at current level (rate 0 = infinite hold; mirrors hardware).
+        if (ch.adsrSustainRate == 0) break;
         ch.envStepCounter--;
         if (ch.envStepCounter <= 0) {
             ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
