@@ -233,18 +233,13 @@ void Sequencer::generateAudio(float* out, int nFrames) {
             // Handle looping
             if (smp.loops) {
                 int loopLen = (int)smp.pcm.size() - smp.loopStart;
-                // If loopStart >= pcm.size(), the stored loop offset is the
-                // absolute SPC RAM address (not relative), so we can't recover
-                // the true intro length.  Fall back to looping the whole sample.
-                if (loopLen <= 0) loopLen = (int)smp.pcm.size();
+                if (loopLen <= 0) loopLen = (int)smp.pcm.size();  // safety fallback
                 while (sampleIdx >= (int)smp.pcm.size()) {
                     sampleIdx  -= loopLen;
                     ch.phaseAccum -= (uint32_t)loopLen << 12;
                 }
             } else {
                 if (sampleIdx >= (int)smp.pcm.size()) {
-                    std::fprintf(stderr, "[Seq] ch%d sampleId=%d non-loop end at sampleCount=%u\n",
-                        i, ch.sampleId, m_sampleCount);
                     ch.playing    = false;
                     ch.envPhase   = EnvPhase::OFF;
                     continue;
