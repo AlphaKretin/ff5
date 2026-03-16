@@ -125,6 +125,10 @@ bool SampleBank::load(const AssetManager& assets) {
         }
 
         m_samples[i] = BRRDecoder::decode(brrData, brrLen, loopByteOfs);
+        const auto& s = m_samples[i];
+        int loopLen = (int)s.pcm.size() - s.loopStart;
+        std::fprintf(stderr, "[SampleBank] instr %2d: pcm=%5zu  loopStart=%5d  loopLen=%5d  loops=%d\n",
+            i, s.pcm.size(), s.loopStart, loopLen, (int)s.loops);
     }
 
     return true;

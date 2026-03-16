@@ -32,6 +32,9 @@ bool SDL2AudioOutput::init(int sampleRate, int channels) {
     m_sampleRate = obtained.freq;
     m_channels   = obtained.channels;
 
+    SDL_Log("SDL2Audio: requested %d Hz, obtained %d Hz, channels %d",
+            sampleRate, m_sampleRate, m_channels);
+
     SDL_PauseAudioDevice(m_device, 0);  // start playback
     return true;
 }

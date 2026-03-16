@@ -233,13 +233,18 @@ void Sequencer::generateAudio(float* out, int nFrames) {
             // Handle looping
             if (smp.loops) {
                 int loopLen = (int)smp.pcm.size() - smp.loopStart;
-                if (loopLen <= 0) loopLen = 1;
+                // If loopStart >= pcm.size(), the stored loop offset is the
+                // absolute SPC RAM address (not relative), so we can't recover
+                // the true intro length.  Fall back to looping the whole sample.
+                if (loopLen <= 0) loopLen = (int)smp.pcm.size();
                 while (sampleIdx >= (int)smp.pcm.size()) {
                     sampleIdx  -= loopLen;
                     ch.phaseAccum -= (uint32_t)loopLen << 12;
                 }
             } else {
                 if (sampleIdx >= (int)smp.pcm.size()) {
+                    std::fprintf(stderr, "[Seq] ch%d sampleId=%d non-loop end at sampleCount=%u\n",
+                        i, ch.sampleId, m_sampleCount);
                     ch.playing    = false;
                     ch.envPhase   = EnvPhase::OFF;
                     continue;
@@ -624,6 +629,11 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
     // p1 = new tempo byte (zTempo+1). Affects how many ticks fire per second.
     case 0xF3:
         m_tempo = (p1 == 0) ? 1 : p1;  // guard against 0 (would never tick)
+        std::fprintf(stderr, "[Seq] SetTempo: %d  tick_hz=%.1f  noteDur0_ms=%.0f  noteDur14_ms=%.0f\n",
+            m_tempo,
+            32000.0 / 144.0 * m_tempo / 256.0,
+            k_noteDurTbl[0]  / (32000.0 / 144.0 * m_tempo / 256.0) * 1000.0,
+            k_noteDurTbl[14] / (32000.0 / 144.0 * m_tempo / 256.0) * 1000.0);
         break;
 
     // ── $F4 SetTempoEnv (p1=duration, p2=target) ────────────────────────────
