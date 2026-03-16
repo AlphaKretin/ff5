@@ -33,6 +33,7 @@ export PYTHONPATH := tools/romtools:$(PYTHONPATH)
 rip:
 	git submodule update --init --recursive
 	$(PYTHON) tools/extract_assets.py
+	$(PYTHON) tools/encode_song_samples.py
 
 # shuffle the RNG table
 rng:
@@ -49,6 +50,7 @@ clean:
 	find ./src -name "*.bgf" -type f -delete
 	find ./src/text -name "*.dat" -type f -delete
 	$(RM) ./src/field/world_tilemap.dat
+	$(RM) ./src/sound/song_samples.dat
 	$(RM) $(SPC_PRG)
 
 # remove all ripped assets

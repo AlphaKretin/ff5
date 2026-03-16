@@ -81,170 +81,6 @@ const uint8_t Sequencer::k_cmdParams[46] = {
     0, // $FF EndScript
 };
 
-// ---------------------------------------------------------------------------
-// SongSamples[72][16] — mirrors song-data.asm SongSamples table.
-//
-// Each row lists the 0-based instrument indices used by that song, in the
-// order they appear in SongSamples (which equals the SPC RAM slot order
-// starting at slot 32).  0xFF = unused slot.
-//
-// Instrument indices (from sample_brr.inc enum, 0-based):
-//   0=BASS_DRUM  1=SNARE      2=HARD_SNARE 3=CYMBAL     4=TOM
-//   5=CLOSED_HIHAT 6=OPEN_HIHAT 7=TIMPANI  8=VIBRAPHONE 9=MARIMBA
-//  10=STRINGS   11=CHOIR     12=HARP      13=TRUMPET   14=OBOE
-//  15=FLUTE     16=ORGAN     17=PIANO     18=ELEC_BASS 19=BASS_GUITAR
-//  20=GRAND_PIANO 21=MUSIC_BOX 22=WOO     23=METAL_SYS 24=SYNTH_CHORD
-//  25=DIST_GUITAR 26=KRABI   27=HORN      28=MANDOLIN  29=UNKNOWN_1
-//  30=CONGA     31=CASABA    32=KLAVES    33=UNKNOWN_2 34=HAND_CLAP
-// ---------------------------------------------------------------------------
-#define FF 0xFF
-const uint8_t Sequencer::k_songSamples[72][16] = {
- // 00 Ahead on Our Way
- {14,13,10,19, 5, 6, 0, 1,12, 3,FF,FF,FF,FF,FF,FF},
- // 01 The Fierce Battle
- { 7,13,19,10, 3, 1,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 02 A Presentiment
- {14,15,10,20,27,21,11,24, 3,FF,FF,FF,FF,FF,FF,FF},
- // 03 Go Go Boko!
- {14, 9,19,13, 5, 6, 0, 1, 4,FF,FF,FF,FF,FF,FF,FF},
- // 04 Pirates Ahoy!
- {14,15,13,28,19, 7,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 05 Tenderness in the Air
- {12,14,27,10,28,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 06 Fate in Haze
- {15,12,10,19, 4,31,30, 3,FF,FF,FF,FF,FF,FF,FF,FF},
- // 07 Critter Tripper Fritter!
- {14,15, 9, 7,19,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 08 The Prelude
- {12,10,14,27,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 09 The Last Battle
- {13,10,19, 3,15, 5, 6, 0, 2,FF,FF,FF,FF,FF,FF,FF},
- // 0A Requiem
- {15,10,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 0B Nostalgia
- {17,11,10,21,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 0C Cursed Earths
- {14,10,20, 4, 7,23,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 0D Lenna's Theme
- {15,10,21,19, 8,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 0E Victory's Fanfare
- {13,19, 1, 0,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 0F Deception
- {12,10,15,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 10 The Day will Come
- {14,12,10,19,11,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 11 ...silence
- {FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 12 Exdeath's Castle
- {10,19,13,16, 3, 7,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 13 My Home, Sweet Home
- {15,17,10,28,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 14 Waltz Suomi
- {10,15,14, 1,27, 7,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 15 Sealed Away
- {14,32,10,19, 7,26,12,27,FF,FF,FF,FF,FF,FF,FF,FF},
- // 16 The Four Warriors of Dawn
- {13,10,19, 7, 1, 3,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 17 Danger!
- {10,19, 3, 0, 2,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 18 The Fire-Powered Ship
- {19,10, 1,13, 3,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 19 As I Feel, You Feel
- {10,14,12,15,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 1A Mambo de Chocobo!
- {13,29,19,32,22,31,33,30,FF,FF,FF,FF,FF,FF,FF,FF},
- // 1B Music Box
- {21,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 1C Intension of the Earth
- {14,12,10,19,18,32, 3,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 1D The Dragon Spreads its Wings
- {13,12,19,10, 5, 0, 1,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 1E Beyond the Deep Blue Sea
- {15,12,10,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 1F Prelude of Empty Skies
- { 0,19,10,13,15,32,34, 3,FF,FF,FF,FF,FF,FF,FF,FF},
- // 20 Searching the Light
- {13,10,19, 1, 3, 7,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 21 Harvest
- {14,34,15,18,28, 4,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 22 Gilgamesh
- {16,13,19,25, 3, 5, 6, 0, 2, 4,FF,FF,FF,FF,FF,FF},
- // 23 Four Valiant Hearts
- {15,10, 7,19, 1,12, 3,27,13,FF,FF,FF,FF,FF,FF,FF},
- // 24 The Book of Sealings
- {12, 8,23,11,30,10,28, 3,FF,FF,FF,FF,FF,FF,FF,FF},
- // 25 What?
- { 4,30,31,19, 8,22,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 26 Hurry! Hurry!
- {10,26, 5, 6,30, 0, 1, 8,19, 3,FF,FF,FF,FF,FF,FF},
- // 27 Unknown Lands
- {15,10,12,19, 6, 5, 0, 2, 1,FF,FF,FF,FF,FF,FF,FF},
- // 28 The Airship
- {15,13,10,19, 3, 5, 6, 7, 0, 1,FF,FF,FF,FF,FF,FF},
- // 29 Fanfare #1
- {13, 7, 3,10,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 2A Fanfare #2
- {13,10,15, 3, 1, 7,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 2B The Battle
- {10,13,19, 3, 5, 6, 0, 1, 8,FF,FF,FF,FF,FF,FF,FF},
- // 2C Walking the Snowy Mountains
- {13,16,28,19,25, 3, 5, 6, 0, 1,24,FF,FF,FF,FF,FF},
- // 2D The Evil Lord, Exdeath
- {10,11,19, 3, 0, 2,25,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 2E The Castle of Dawn
- {13,10,19,27, 1, 3,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 2F I'm a Dancer
- {19,13,28,32,34,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 30 Reminiscence
- {FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 31 Run!
- {13,10,15, 9, 7, 3,27, 1,FF,FF,FF,FF,FF,FF,FF,FF},
- // 32 The Ancient Library
- { 4, 6, 1,33,32,10,19,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 33 Royal Palace
- {14,13,10,19,12, 1, 7, 8,FF,FF,FF,FF,FF,FF,FF,FF},
- // 34 Good Night!
- {FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 35 Piano lesson 1
- { 8,32, 8,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 36 Piano lesson 2
- { 8,32, 8,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 37 Piano lesson 3
- { 8,32, 8,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 38 Piano lesson 4
- { 8,32, 8,33,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 39 Piano lesson 5
- { 8,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 3A Piano lesson 6
- { 8,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 3B Piano lesson 7
- { 8,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 3C Piano lesson 8
- { 8,16,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 3D Musica Machina
- { 7,19, 3,10,13,15,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 3E (a meteor is falling)
- {FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 3F The Land Unknown
- {28,12,11,10,19,15, 0,31, 8,32,FF,FF,FF,FF,FF,FF},
- // 40 The Decisive Battle
- {10,13, 4,19, 3, 1, 6, 5, 0,25,FF,FF,FF,FF,FF,FF},
- // 41 The Silent Beyond
- {15,14,12,19,10,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 42 Dear Friends
- {28,15,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 43 Final Fantasy
- {27,10,12,21,15, 8,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 44 A New Origin
- {10,13,27, 3, 1, 7,15,12,FF,FF,FF,FF,FF,FF,FF,FF},
- // 45 (crickets chirping)
- {FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 46 a shore
- {FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
- // 47 the tide rolls in
- {FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF,FF},
-};
-#undef FF
 
 // ---------------------------------------------------------------------------
 // Constructor
@@ -264,12 +100,14 @@ void Sequencer::playSong(const uint8_t* songData, int songLen, int songIdx) {
         return;
     }
 
-    // Build sample slot map: slot 32+k → instrument index for this song.
+    // Build sample slot map: SPC slot → instrument index for this song.
+    // BGM samples occupy slots 32–47 in the order listed in the SongSamples
+    // table (generated from the ROM by tools/encode_song_samples.py).
     std::fill(m_sampleSlotMap, m_sampleSlotMap + 64, 0xFF);
-    if (songIdx >= 0 && songIdx < 72) {
-        const uint8_t* samps = k_songSamples[songIdx];
-        for (int k = 0; k < 16 && samps[k] != 0xFF; k++)
-            m_sampleSlotMap[32 + k] = samps[k];
+    for (int k = 0; k < 16; k++) {
+        uint8_t inst = m_bank.songInstrument(songIdx, k);
+        if (inst == 0xFF) break;
+        m_sampleSlotMap[32 + k] = inst;
     }
 
     // Keep a copy of the song data so pointers remain valid

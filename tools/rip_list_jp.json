@@ -338,6 +338,10 @@
       "asset_range": "0xC3EB00-0xC3FDFF"
     },
     {
+      "file_path": "src/sound/song_samples_raw.dat",
+      "asset_range": "0xC43DAA-0xC446A9"
+    },
+    {
       "file_path": "src/sound/sfx_brr.dat",
       "asset_range": "0xC41E3F-0xC41F4E"
     },

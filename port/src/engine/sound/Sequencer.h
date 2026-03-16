@@ -94,9 +94,6 @@ private:
     static const int k_noteDurTbl[15];
     // ChCmdParams[46]: parameter counts for commands $D2..$FF
     static const uint8_t k_cmdParams[46];
-    // SongSamples[72][16]: instrument index for each SPC slot per song (0xFF=unused).
-    // Mirrors song-data.asm SongSamples table; slot 32+k = k-th sample listed for song.
-    static const uint8_t k_songSamples[72][16];
 
     SampleBank& m_bank;
 
