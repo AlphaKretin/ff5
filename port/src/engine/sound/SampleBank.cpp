@@ -12,6 +12,52 @@
 // ---------------------------------------------------------------------------
 struct SampleLoc { int file; int offset; };
 
+// ---------------------------------------------------------------------------
+// SampleLoopStart from src/sound/song-data.asm.
+// Each value is a byte offset from the start of the instrument's BRR data
+// to the loop point (i.e. the relative part of SAMPDIR loop_addr).
+// The 65816 init code writes: SAMPDIR.loop_addr = spc_start_addr + k_loopStart[i]
+// Values equal to or greater than the BRR data size mean the sample does not
+// loop (loop_flag will be 0 in the BRR end block for those instruments).
+// ---------------------------------------------------------------------------
+static const int k_loopStart[NUM_INSTRUMENTS] = {
+    0x0A8C, // 0  BASS_DRUM
+    0x0BD9, // 1  SNARE
+    0x1194, // 2  HARD_SNARE
+    0x05FA, // 3  CYMBAL
+    0x15F9, // 4  TOM
+    0x0465, // 5  CLOSED_HIHAT
+    0x1194, // 6  OPEN_HIHAT
+    0x1194, // 7  TIMPANI
+    0x04F5, // 8  VIBRAPHONE
+    0x029A, // 9  MARIMBA
+    0x08F7, // 10 STRINGS
+    0x02C7, // 11 CHOIR
+    0x034E, // 12 HARP
+    0x04DA, // 13 TRUMPET
+    0x0252, // 14 OBOE
+    0x0489, // 15 FLUTE
+    0x0936, // 16 ORGAN
+    0x0642, // 17 PIANO
+    0x0144, // 18 ELECTRIC_BASS
+    0x044A, // 19 BASS_GUITAR
+    0x05BB, // 20 GRAND_PIANO
+    0x0666, // 21 MUSIC_BOX_INSTR
+    0x1194, // 22 WOO
+    0x09BD, // 23 METAL_SYSTEM
+    0x0384, // 24 SYNTH_CHORD
+    0x05BB, // 25 DIST_GUITAR
+    0x092D, // 26 KRABI
+    0x15F9, // 27 HORN
+    0x0318, // 28 MANDOLIN
+    0x077D, // 29 UNKNOWN_1
+    0x08DC, // 30 CONGA
+    0x088D, // 31 CASABA
+    0x09E1, // 32 KLAVES
+    0x0E7C, // 33 UNKNOWN_2
+    0x0B6D, // 34 HAND_CLAP
+};
+
 static const SampleLoc k_sampleLoc[NUM_INSTRUMENTS] = {
     {0,      0}, {0,   2702}, {0,   5737}, {0,  10239}, {0,  13904},  // 0-4
     {0,  19531}, {0,  20658}, {0,  25160}, {0,  29662}, {0,  32337},  // 5-9
@@ -111,24 +157,23 @@ bool SampleBank::load(const AssetManager& assets) {
             continue;
         }
 
-        // 2-byte LE loop-start offset (byte offset from first BRR block)
-        int loopByteOfs = (int)file[offset] | ((int)file[offset + 1] << 8);
+        // 2-byte LE prefix = BRR data size in bytes (used for bounds checking).
+        // Loop byte offset comes from k_loopStart[] (from SampleLoopStart in song-data.asm):
+        //   SAMPDIR.loop_addr = spc_start_addr + k_loopStart[i]
+        // i.e. k_loopStart[i] is a relative byte offset within the BRR data.
+        int brrSize     = (int)file[offset] | ((int)file[offset + 1] << 8);
+        int loopByteOfs = k_loopStart[i];
 
         const uint8_t* brrData = file.data() + offset + 2;
-        int brrAvail = (int)file.size() - offset - 2;
 
         // Scan to find the end-flagged block so we don't over-decode
         int brrLen = 0;
-        for (int b = 0; b + 8 < brrAvail; b += 9) {
+        for (int b = 0; b + 8 < brrSize; b += 9) {
             brrLen = b + 9;
-            if (file[offset + 2 + b] & 0x01) break;  // end-flag bit
+            if (brrData[b] & 0x01) break;  // end-flag bit
         }
 
         m_samples[i] = BRRDecoder::decode(brrData, brrLen, loopByteOfs);
-        const auto& s = m_samples[i];
-        int loopLen = (int)s.pcm.size() - s.loopStart;
-        std::fprintf(stderr, "[SampleBank] instr %2d: pcm=%5zu  loopStart=%5d  loopLen=%5d  loops=%d\n",
-            i, s.pcm.size(), s.loopStart, loopLen, (int)s.loops);
     }
 
     return true;
