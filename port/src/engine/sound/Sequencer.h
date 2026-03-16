@@ -39,10 +39,14 @@ public:
 private:
     static constexpr int NUM_CHANNELS = 8;
 
+    // SPC-700 envelope phase
+    enum class EnvPhase : uint8_t { OFF, ATTACK, DECAY, SUSTAIN, RELEASE };
+
     // Per-channel repeat stack (mirrors SPC wRepeatPtr / wRepeatCount)
     struct RepeatEntry {
-        const uint8_t* ptr   = nullptr;  // script ptr at start of loop body
-        int            count = 0;        // 0 = infinite; >0 = remaining plays
+        const uint8_t* ptr       = nullptr;  // script ptr at start of loop body
+        int            count     = 0;        // 0 = infinite; >0 = remaining plays
+        int            passCount = 0;        // volta repeat pass counter
     };
 
     struct ChannelState {
@@ -70,6 +74,33 @@ private:
         uint32_t phaseAccum = 0;  // 20.12 fixed-point sample position
         uint16_t dspFreq    = 0;  // pitch (phase advance per output sample × 4096)
 
+        // ADSR envelope (mirrors SPC-700 DSP ADSR1/ADSR2 registers)
+        uint8_t  adsrAttack      = 15;   // AR  0..15  (15 = instant)
+        uint8_t  adsrDecay       = 7;    // DR  0..7   (index = DR*2+16 into rate table)
+        uint8_t  adsrSustainLvl  = 7;    // SL  0..7   threshold = (SL+1)*256
+        uint8_t  adsrSustainRate = 0;    // SR  0..31  (0 = hold; direct index into rate table)
+        int      envLevel        = 0;    // 0..2047 (SPC-700 $000..$7FF)
+        int      envStepCounter  = 0;    // output samples until next envelope step
+        EnvPhase envPhase        = EnvPhase::OFF;
+
+        // Vibrato (mirrors SPC wVibAmpl/wVibDelay/wVibCycleDur)
+        uint8_t vibAmpl          = 0;    // 0=off; ≥$C0 = balanced (±); <$C0 = one-sided (+)
+        uint8_t vibDelay         = 0;    // ticks before vibrato starts
+        uint8_t vibDelayCounter  = 0;    // countdown (decremented per tick)
+        uint8_t vibCycleDur      = 1;    // main-loop iterations per triangle step
+        uint8_t vibCycleCounter  = 1;    // main-loop countdown until next step
+        int     vibPhase         = 0;    // 0..3 (quarter-cycle of triangle wave)
+        int16_t vibFreqOffset    = 0;    // current DSP pitch offset applied in mixer
+
+        // Tremolo (mirrors SPC wTremAmpl/wTremDelay/wTremCycleDur)
+        uint8_t tremAmpl         = 0;    // 0=off; ≥$C0 = balanced; <$C0 = one-sided
+        uint8_t tremDelay        = 0;
+        uint8_t tremDelayCounter = 0;
+        uint8_t tremCycleDur     = 1;
+        uint8_t tremCycleCounter = 1;
+        int     tremPhase        = 0;
+        float   tremVolMult      = 1.0f; // 0.0..1.0 multiplier applied to voice volume
+
         // Repeat stack (up to 4 levels, mirroring SPC repeat depth)
         RepeatEntry repeatStack[4];
         int         repeatSP = -1;  // top-of-stack index (-1 = empty)
@@ -83,6 +114,16 @@ private:
     uint8_t readByte(ChannelState& ch);
     void    jumpTo(ChannelState& ch, uint16_t spcAddr);
 
+    // ── Envelope / effects ───────────────────────────────────────────────────
+    // Called every 144 output samples (mirrors SPC main-loop UpdateChVolFreq).
+    void    tickEffects();
+    // Advance ADSR envelope by one output sample.
+    void    stepEnvelope(ChannelState& ch);
+    // Key-on: reset envelope to attack phase (called when a new note starts).
+    void    keyOn(ChannelState& ch);
+    // Key-off: switch envelope to release phase (called on rest/new-note-off).
+    void    keyOff(ChannelState& ch);
+
     // ── Pitch calculation (mirrors ff5-spc.asm CalcFreq) ────────────────────
     uint16_t calcFreq(uint8_t pitch, uint8_t freqMultLo,
                       uint8_t freqMultHi, int8_t detune) const;
@@ -94,6 +135,9 @@ private:
     static const int k_noteDurTbl[15];
     // ChCmdParams[46]: parameter counts for commands $D2..$FF
     static const uint8_t k_cmdParams[46];
+    // GainRate[32]: output samples between SPC-700 envelope steps.
+    // Decay uses index DR*2+16; sustain/release use SR directly; 0 = infinite (no step).
+    static const int k_gainRate[32];
 
     SampleBank& m_bank;
 

@@ -14,8 +14,19 @@
 #include <cstring>
 
 // ---------------------------------------------------------------------------
-// Static tables — from ff5-spc.asm
+// Static tables — from ff5-spc.asm and SPC-700 hardware spec
 // ---------------------------------------------------------------------------
+
+// GainRate[0..31]: output samples between SPC-700 exponential-decrease steps.
+// Decay uses index DR*2+16; sustain/release use SR directly.
+// 0 = infinite (no decay).  Values scaled to 32 kHz output.
+const int Sequencer::k_gainRate[32] = {
+       0,                                           // 0: infinite
+    2048, 1536, 1280, 1024, 768, 640, 512,          // 1-7
+     384,  320,  256,  192, 160, 128,  96,  80,     // 8-15
+      64,   48,   40,   32,  24,  20,  16,  12,     // 16-23
+      10,    8,    6,    5,   4,   3,   2,   1,     // 24-31
+};
 
 // PitchConst[0..11]: base DSP pitch values for C through B.
 // At octave 4 with freqMultLo<0x80, freq = pitchConst + (pitchConst * mult / 256).
@@ -181,10 +192,11 @@ void Sequencer::generateAudio(float* out, int nFrames) {
     }
 
     for (int f = 0; f < nFrames; f++) {
-        // ── Tick sequencer at 144-sample boundaries ───────────────────────
+        // ── Tick sequencer and effects at 144-sample boundaries ──────────
         m_sampleCount++;
         if (m_sampleCount >= 144) {
             m_sampleCount -= 144;
+            tickEffects();  // vibrato / tremolo oscillator step (fixed ~222 Hz)
             m_tickAccum += m_tempo;
             while (m_tickAccum >= 256) {
                 m_tickAccum -= 256;
@@ -197,13 +209,25 @@ void Sequencer::generateAudio(float* out, int nFrames) {
 
         for (int i = 0; i < NUM_CHANNELS; i++) {
             ChannelState& ch = m_ch[i];
-            if (!ch.active || !ch.playing) continue;
+            if (!ch.active) continue;
+
+            // Advance ADSR envelope regardless of playing state (release continues
+            // after the note has logically ended until the voice goes silent).
+            if (ch.envPhase != EnvPhase::OFF) stepEnvelope(ch);
+
+            if (!ch.playing && ch.envPhase == EnvPhase::OFF) continue;
+            if (!ch.playing) {
+                // Voice is in release tail: still mixing until envelope reaches 0.
+                // Fall through to the mix below.
+            }
 
             const DecodedSample& smp = m_bank.sample(ch.sampleId);
             if (smp.pcm.empty()) continue;
 
-            // Advance phase
-            ch.phaseAccum += ch.dspFreq;
+            // Advance phase (add vibrato frequency offset)
+            uint32_t freq = (uint32_t)(int32_t)ch.dspFreq + (int32_t)ch.vibFreqOffset;
+            if (freq > 0x3FFF) freq = 0x3FFF;  // clamp to safe range
+            ch.phaseAccum += freq;
             int sampleIdx = (int)(ch.phaseAccum >> 12);
 
             // Handle looping
@@ -216,7 +240,8 @@ void Sequencer::generateAudio(float* out, int nFrames) {
                 }
             } else {
                 if (sampleIdx >= (int)smp.pcm.size()) {
-                    ch.playing = false;
+                    ch.playing    = false;
+                    ch.envPhase   = EnvPhase::OFF;
                     continue;
                 }
             }
@@ -230,8 +255,9 @@ void Sequencer::generateAudio(float* out, int nFrames) {
             float frac = (float)(ch.phaseAccum & 0xFFF) * (1.0f / 4096.0f);
             float s = s0 + frac * (s1 - s0);
 
-            // Apply volume (0..255) and master song volume
-            float vol = (ch.volume / 255.0f) * (m_songVol / 255.0f);
+            // Apply ADSR envelope, channel volume, tremolo, and master song volume
+            float envelope = ch.envLevel * (1.0f / 2047.0f);
+            float vol = envelope * (ch.volume / 255.0f) * ch.tremVolMult * (m_songVol / 255.0f);
             s *= vol;
 
             // Apply pan: 0x01=full-left, 0x40=center, 0x7F=full-right (range 1..127 = span 126)
@@ -259,6 +285,10 @@ void Sequencer::tickAll() {
         if (!ch.active) continue;
 
         anyActive = true;
+
+        // Decrement vib/trem delay counters (tempo-dependent, per tick).
+        if (ch.vibDelayCounter > 0) ch.vibDelayCounter--;
+        if (ch.tremDelayCounter > 0) ch.tremDelayCounter--;
 
         ch.tickCounter--;
         if (ch.tickCounter <= 0)
@@ -300,6 +330,7 @@ void Sequencer::execScript(ChannelState& ch) {
 
         if (b >= 0xC3) {
             // Rest ($C3..$D1)
+            if (ch.playing) keyOff(ch);
             ch.playing = false;
             ch.isTie   = false;
             return;
@@ -318,8 +349,9 @@ void Sequencer::execScript(ChannelState& ch) {
                               ch.freqMultLo, ch.freqMultHi, ch.detune);
 
         if (!ch.isTie) {
-            // New note: key-on → reset phase to beginning of sample
+            // New note: key-on → reset phase and trigger ADSR attack
             ch.phaseAccum = 0;
+            keyOn(ch);
         }
         ch.playing = true;
 
@@ -377,10 +409,10 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
         ch.volume = p1;  // 0..255
         break;
 
-    // ── $D3 SetVolEnv: set volume with envelope (skip 2nd param) ───────────
+    // ── $D3 SetVolEnv: p1=duration, p2=target volume ───────────────────────
+    // Without envelope interpolation, just snap to the target volume.
     case 0xD3:
-        readByte(ch);    // consume p2 (final volume)
-        ch.volume = p1;  // p1 = duration; use as instant set
+        ch.volume = readByte(ch);   // p2 = target volume
         break;
 
     // ── $D4 SetPan: set stereo pan ──────────────────────────────────────────
@@ -388,10 +420,10 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
         ch.pan = p1;
         break;
 
-    // ── $D5 SetPanEnv: pan envelope (consume p2) ───────────────────────────
+    // ── $D5 SetPanEnv: p1=duration, p2=target pan ──────────────────────────
+    // Without envelope interpolation, just snap to the target pan.
     case 0xD5:
-        readByte(ch);           // p2 = target pan
-        ch.pan = p1;
+        ch.pan = readByte(ch);  // p2 = target pan
         break;
 
     // ── $D6 SetPitchEnv: pitch envelope (p1=dur, p2=offset) ────────────────
@@ -399,24 +431,44 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
         readByte(ch);           // p2 = pitch offset (ignored for now)
         break;
 
-    // ── $D7 EnableVib: p1=delay, p2=rate, p3=depth (consume extras) ────────
-    case 0xD7:
-        readByte(ch);           // p2
-        readByte(ch);           // p3
+    // ── $D7 EnableVib: p1=delay, p2=cycleDur-1, p3=depth ──────────────────
+    // Mirrors ff5-spc.asm EnableVib: delay→wVibDelay, (p2+1)→wVibCycleDur,
+    // p3→wVibAmpl.  vibAmpl≥$C0 = balanced ±, <$C0 = one-sided (+).
+    case 0xD7: {
+        ch.vibDelay        = p1;
+        ch.vibDelayCounter = p1;
+        uint8_t rate       = readByte(ch);       // p2
+        ch.vibCycleDur     = rate + 1;
+        ch.vibCycleCounter = 1;
+        ch.vibAmpl         = readByte(ch);       // p3
+        ch.vibPhase        = 0;
+        ch.vibFreqOffset   = 0;
         break;
+    }
 
     // ── $D8 DisableVib ──────────────────────────────────────────────────────
     case 0xD8:
+        ch.vibAmpl       = 0;
+        ch.vibFreqOffset = 0;
         break;
 
-    // ── $D9 EnableTrem: p1=delay, p2=rate, p3=depth ─────────────────────────
-    case 0xD9:
-        readByte(ch);           // p2
-        readByte(ch);           // p3
+    // ── $D9 EnableTrem: p1=delay, p2=cycleDur-1, p3=depth ───────────────────
+    case 0xD9: {
+        ch.tremDelay        = p1;
+        ch.tremDelayCounter = p1;
+        uint8_t rate        = readByte(ch);      // p2
+        ch.tremCycleDur     = rate + 1;
+        ch.tremCycleCounter = 1;
+        ch.tremAmpl         = readByte(ch);      // p3
+        ch.tremPhase        = 0;
+        ch.tremVolMult      = 1.0f;
         break;
+    }
 
     // ── $DA DisableTrem ─────────────────────────────────────────────────────
     case 0xDA:
+        ch.tremAmpl    = 0;
+        ch.tremVolMult = 1.0f;
         break;
 
     // ── $DB EnablePanCycle: p1=rate, p2=depth ───────────────────────────────
@@ -486,12 +538,48 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
         ch.sampleId   = id;
         ch.freqMultLo = m_bank.meta(id).freqMultLo;
         ch.freqMultHi = m_bank.meta(id).freqMultHi;
+        // Load default ADSR from instrument metadata.
+        // adsr1 = $80 | (AR & $0F) | ((DR & $07) << 4)
+        // adsr2 = (SR & $1F) | ((SL & $07) << 5)
+        uint8_t adsr1 = m_bank.meta(id).adsr1;
+        uint8_t adsr2 = m_bank.meta(id).adsr2;
+        ch.adsrAttack      = adsr1 & 0x0F;
+        ch.adsrDecay       = (adsr1 >> 4) & 0x07;
+        ch.adsrSustainLvl  = (adsr2 >> 5) & 0x07;
+        ch.adsrSustainRate = adsr2 & 0x1F;
         break;
     }
 
-    // ── $EB..$EF ADSR controls (stubbed; ADSR not yet emulated) ─────────────
-    case 0xEB: case 0xEC: case 0xED: case 0xEE: case 0xEF:
+    // ── $EB SetADSRAttack: p1 = AR (0..15) ──────────────────────────────────
+    case 0xEB:
+        ch.adsrAttack = p1 & 0x0F;
         break;
+
+    // ── $EC SetADSRDecay: p1 = DR (0..7) ────────────────────────────────────
+    case 0xEC:
+        ch.adsrDecay = p1 & 0x07;
+        break;
+
+    // ── $ED SetADSRSustain: p1 = SL (0..7) ──────────────────────────────────
+    case 0xED:
+        ch.adsrSustainLvl = p1 & 0x07;
+        break;
+
+    // ── $EE SetADSRRelease: p1 = SR (0..31) ─────────────────────────────────
+    case 0xEE:
+        ch.adsrSustainRate = p1 & 0x1F;
+        break;
+
+    // ── $EF SetADSRDefault: restore instrument defaults ─────────────────────
+    case 0xEF: {
+        uint8_t adsr1 = m_bank.meta(ch.sampleId).adsr1;
+        uint8_t adsr2 = m_bank.meta(ch.sampleId).adsr2;
+        ch.adsrAttack      = adsr1 & 0x0F;
+        ch.adsrDecay       = (adsr1 >> 4) & 0x07;
+        ch.adsrSustainLvl  = (adsr2 >> 5) & 0x07;
+        ch.adsrSustainRate = adsr2 & 0x1F;
+        break;
+    }
 
     // ── $F0 StartRepeat: p1 = repeat count (0=infinite, else play count+1) ──
     case 0xF0: {
@@ -499,8 +587,9 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
         if (sp > 3) sp = 3;  // clamp to max depth
         ch.repeatSP = sp;
         RepeatEntry& e = ch.repeatStack[sp];
-        e.ptr   = ch.scriptPtr;    // loop body starts here (after StartRepeat + param)
-        e.count = (p1 == 0) ? 0 : (p1 + 1);  // 0=infinite; else total-plays count
+        e.ptr       = ch.scriptPtr;               // loop body starts here
+        e.count     = (p1 == 0) ? 0 : (p1 + 1);  // 0=infinite; else total-plays count
+        e.passCount = 0;                           // reset volta counter for this level
         break;
     }
 
@@ -560,11 +649,22 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
         break;
 
     // ── $F9 VoltaRepeat (p1=ending_num, p2=dest_lo, p3=dest_hi) ────────────
-    // Minimal implementation: skip for now (consume remaining params)
-    case 0xF9:
-        readByte(ch);           // p2 dest_lo (already consumed p1=ending_num)
-        readByte(ch);           // p3 dest_hi
+    // Mirrors ff5-spc.asm VoltaRepeat: increments the pass counter for the
+    // current repeat level; when pass == ending_num, jumps to dest.
+    // Typical use: StartRepeat(2) → body → VoltaRepeat(2, 2nd_ending) →
+    //   1st ending → EndRepeat.  On pass 2 the jump skips the 1st ending.
+    case 0xF9: {
+        uint8_t destLo = readByte(ch);  // p2
+        uint8_t destHi = readByte(ch);  // p3
+        if (ch.repeatSP >= 0) {
+            RepeatEntry& e = ch.repeatStack[ch.repeatSP];
+            e.passCount++;
+            if (e.passCount == (int)p1) {
+                jumpTo(ch, (uint16_t)(destLo | (destHi << 8)));
+            }
+        }
         break;
+    }
 
     // ── $FA UncondJump (p1=dest_lo, p2=dest_hi) ─────────────────────────────
     case 0xFA: {
@@ -582,6 +682,190 @@ void Sequencer::execCmd(ChannelState& ch, uint8_t cmd, uint8_t p1) {
 
     default:
         break;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// calcFreq — mirrors ff5-spc.asm CalcFreq
+//
+// Converts a semitone pitch index + instrument frequency multiplier + detune
+// into a 16-bit DSP pitch register value.
+// DSP pitch register: 0x1000 = play exactly one BRR sample per output sample.
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// keyOn / keyOff — ADSR envelope triggers
+// ---------------------------------------------------------------------------
+
+void Sequencer::keyOn(ChannelState& ch) {
+    if (ch.adsrAttack == 15) {
+        // Instant attack: jump straight to decay phase at full level.
+        ch.envLevel = 2047;
+        // Compute decay interval: DR maps to rate table index DR*2+16.
+        int rateIdx = ch.adsrDecay * 2 + 16;
+        ch.envStepCounter = k_gainRate[rateIdx];
+        ch.envPhase = EnvPhase::DECAY;
+    } else {
+        // Linear attack: rise from 0.  Attack rate index = AR*2+1.
+        ch.envLevel = 0;
+        ch.envStepCounter = k_gainRate[ch.adsrAttack * 2 + 1];
+        ch.envPhase = EnvPhase::ATTACK;
+    }
+}
+
+void Sequencer::keyOff(ChannelState& ch) {
+    if (ch.adsrSustainRate == 0) {
+        // No release configured — silence immediately.
+        ch.envPhase = EnvPhase::OFF;
+        ch.envLevel = 0;
+    } else {
+        ch.envPhase       = EnvPhase::RELEASE;
+        ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
+    }
+}
+
+// ---------------------------------------------------------------------------
+// stepEnvelope — advance ADSR by one output sample
+// Mirrors the SPC-700 envelope counter: exponential decrease of max(1, level/8).
+// ---------------------------------------------------------------------------
+
+void Sequencer::stepEnvelope(ChannelState& ch) {
+    switch (ch.envPhase) {
+
+    case EnvPhase::ATTACK: {
+        // Linear increase: +32 per step.
+        ch.envStepCounter--;
+        if (ch.envStepCounter <= 0) {
+            int rateIdx = ch.adsrAttack * 2 + 1;
+            ch.envStepCounter = k_gainRate[rateIdx];
+            ch.envLevel += 32;
+            if (ch.envLevel >= 2047) {
+                ch.envLevel = 2047;
+                // Switch to decay.
+                int drIdx = ch.adsrDecay * 2 + 16;
+                ch.envStepCounter = k_gainRate[drIdx];
+                ch.envPhase = EnvPhase::DECAY;
+            }
+        }
+        break;
+    }
+
+    case EnvPhase::DECAY: {
+        // Exponential decrease until sustain threshold (SL+1)*256 is reached.
+        int threshold = (ch.adsrSustainLvl + 1) * 256;
+        ch.envStepCounter--;
+        if (ch.envStepCounter <= 0) {
+            int drIdx = ch.adsrDecay * 2 + 16;
+            ch.envStepCounter = k_gainRate[drIdx];
+            int step = std::max(1, ch.envLevel >> 3);
+            ch.envLevel -= step;
+            if (ch.envLevel <= threshold) {
+                ch.envLevel = threshold;
+                // Switch to sustain.
+                ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
+                ch.envPhase = EnvPhase::SUSTAIN;
+            }
+        }
+        break;
+    }
+
+    case EnvPhase::SUSTAIN: {
+        if (ch.adsrSustainRate == 0) break;  // hold forever
+        ch.envStepCounter--;
+        if (ch.envStepCounter <= 0) {
+            ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
+            int step = std::max(1, ch.envLevel >> 3);
+            ch.envLevel -= step;
+            if (ch.envLevel <= 0) {
+                ch.envLevel = 0;
+                ch.envPhase = EnvPhase::OFF;
+            }
+        }
+        break;
+    }
+
+    case EnvPhase::RELEASE: {
+        ch.envStepCounter--;
+        if (ch.envStepCounter <= 0) {
+            ch.envStepCounter = k_gainRate[ch.adsrSustainRate];
+            int step = std::max(1, ch.envLevel >> 3);
+            ch.envLevel -= step;
+            if (ch.envLevel <= 0) {
+                ch.envLevel = 0;
+                ch.envPhase = EnvPhase::OFF;
+            }
+        }
+        break;
+    }
+
+    case EnvPhase::OFF:
+        break;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// tickEffects — vibrato and tremolo oscillator step.
+// Called once per 144-output-sample block (~222 Hz), independent of song tempo.
+// Mirrors UpdateChVolFreq in ff5-spc.asm.
+// ---------------------------------------------------------------------------
+
+void Sequencer::tickEffects() {
+    for (int i = 0; i < NUM_CHANNELS; i++) {
+        ChannelState& ch = m_ch[i];
+        if (!ch.active) continue;
+
+        // ── Vibrato ──────────────────────────────────────────────────────────
+        if (ch.vibAmpl != 0) {
+            if (ch.vibDelayCounter == 0) {
+                ch.vibCycleCounter--;
+                if (ch.vibCycleCounter <= 0) {
+                    ch.vibCycleCounter = ch.vibCycleDur;
+                    ch.vibPhase = (ch.vibPhase + 1) & 3;
+                }
+                // Triangle wave: phases 0=zero, 1=+peak, 2=zero, 3=-peak (balanced)
+                // or 0=zero, 1=+peak (one-sided, repeats every 2 phases).
+                bool balanced = (ch.vibAmpl >= 0xC0);
+                // depth = (amplitude & 0x3F) * 2, range 0..126.
+                // freq_offset = dspFreq * 15 * depth / 65536
+                float depth = (float)((ch.vibAmpl & 0x3F) * 2) / 65536.0f * 15.0f;
+                float wave;
+                switch (ch.vibPhase & (balanced ? 3 : 1)) {
+                    case 0:  wave =  0.0f; break;
+                    case 1:  wave =  1.0f; break;
+                    case 2:  wave =  0.0f; break;
+                    default: wave = -1.0f; break;
+                }
+                ch.vibFreqOffset = (int16_t)((float)ch.dspFreq * depth * wave);
+            }
+        } else {
+            ch.vibFreqOffset = 0;
+        }
+
+        // ── Tremolo ──────────────────────────────────────────────────────────
+        if (ch.tremAmpl != 0) {
+            if (ch.tremDelayCounter == 0) {
+                ch.tremCycleCounter--;
+                if (ch.tremCycleCounter <= 0) {
+                    ch.tremCycleCounter = ch.tremCycleDur;
+                    ch.tremPhase = (ch.tremPhase + 1) & 3;
+                }
+                bool balanced = (ch.tremAmpl >= 0xC0);
+                // tremolo depth: same scale as vibrato but applied to volume.
+                float depth = (float)((ch.tremAmpl & 0x3F) * 2) / 65536.0f * 15.0f;
+                float wave;
+                switch (ch.tremPhase & (balanced ? 3 : 1)) {
+                    case 0:  wave =  0.0f; break;
+                    case 1:  wave =  1.0f; break;
+                    case 2:  wave =  0.0f; break;
+                    default: wave = -1.0f; break;
+                }
+                // Tremolo modulates volume: mult = 1 - |depth * wave|.
+                // For one-sided: depth always reduces volume.
+                ch.tremVolMult = std::max(0.0f, 1.0f - depth * std::abs(wave));
+            }
+        } else {
+            ch.tremVolMult = 1.0f;
+        }
     }
 }
 
